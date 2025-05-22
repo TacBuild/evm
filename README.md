@@ -64,7 +64,7 @@ through [Solidity](https://docs.soliditylang.org/en/v0.8.26/) smart contracts.
 Your chain provides a *seamless use of any IBC asset in the EVM*
 without liquidity fragmentation between wrapped and unwrapped tokens.
 Transaction surges are handled by the *self-regulating fee market mechanism* based on EIP-1559
-and EIP-712 allows for *structured data si gning* for arbitrary messages.
+and EIP-712 allows for *structured data signing* for arbitrary messages.
 
 *Everything* can be controlled by on-chain governance
 to create alignment between chain teams and their communities.
