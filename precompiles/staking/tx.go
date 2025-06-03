@@ -199,7 +199,7 @@ func (p *Precompile) Delegate(
 	// 3 possible cases:
 	// 1. Delegator is EOA and submits tx to stake its own funds (origin == contract_caller_addr) -> no auth needed
 	// 2. Delegator is SC and submits tx to stake its own funds -> no auth needed (should be handled at SC level)
-	// 3. Delegator is EOA and SC submits tx to stake the EOA funds -> auth needed
+	// 3. Delegator is EOA and SC makes call to stake the EOA's funds -> auth needed
 
 	// no need to have authorization when the delegator is the owner of the funds
 	if !isCallerOrigin && !isSCDelegator {
