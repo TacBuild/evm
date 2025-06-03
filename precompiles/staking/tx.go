@@ -287,7 +287,7 @@ func (p Precompile) Undelegate(
 		isSCDelegator = contract.CallerAddress == delegatorHexAddr && origin != contract.CallerAddress
 	)
 
-	// no need to have authorization when the contract caller is the sowner of funds
+	// no need to have authorization when the contract caller is the owner of funds
 	if !isCallerOrigin && !isSCDelegator {
 		// Check if the authorization grant exists for the caller and the origin
 		stakeAuthz, expiration, err = authorization.CheckAuthzAndAllowanceForGranter(ctx, p.AuthzKeeper, contract.CallerAddress, delegatorHexAddr, &msg.Amount, UndelegateMsg)
