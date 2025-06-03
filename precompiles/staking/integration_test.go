@@ -2439,6 +2439,49 @@ var _ = Describe("Calling staking precompile via Solidity", Ordered, func() {
 				Expect(res.DelegationResponse).NotTo(BeNil())
 				Expect(res.DelegationResponse.Delegation).To(Equal(prevDelegation), "no new delegation to be found")
 			})
+
+			It("should delegate SC funds", func() {
+				Expect(s.network.App.EVMKeeper.GetAccount(s.network.GetContext(), contractAddr)).ToNot(BeNil(), "expected contract to exist")
+				signer := s.keyring.GetKey(0)
+
+				// send some funds to SC to delegate
+				delegationAmount := big.NewInt(1e18)
+				err = testutils.FundAccountWithBaseDenom(s.factory, s.network, s.keyring.GetKey(0), contractAddr.Bytes(), math.NewIntFromBigInt(delegationAmount))
+				Expect(s.network.NextBlock()).To(BeNil())
+
+				balRes, err := s.grpcHandler.GetBalanceFromBank(contractAddr.Bytes(), s.bondDenom)
+				Expect(err).To(BeNil())
+				contractInitialBal := balRes.Balance
+				Expect(contractInitialBal.Amount).To(Equal(math.NewIntFromBigInt(delegationAmount)))
+
+				callArgs.Args = []interface{}{
+					contractAddr, valAddr.String(), delegationAmount,
+				}
+				txArgs.GasLimit = 500_000
+				logCheckArgs := passCheck.
+					WithExpEvents(staking.EventTypeDelegate)
+
+				_, _, err = s.factory.CallContractAndCheckLogs(
+					signer.Priv,
+					txArgs, callArgs,
+					logCheckArgs,
+				)
+				Expect(err).To(BeNil(), "error while calling the smart contract: %v", err)
+				Expect(s.network.NextBlock()).To(BeNil())
+
+				res, err := s.grpcHandler.GetDelegation(sdk.AccAddress(contractAddr.Bytes()).String(), valAddr.String())
+				Expect(err).To(BeNil())
+				Expect(res.DelegationResponse).NotTo(BeNil())
+				delegation := res.DelegationResponse.Delegation
+
+				expShares := math.LegacyNewDec(1)
+				Expect(delegation.GetShares()).To(Equal(expShares), "expected delegation shares to be 1")
+
+				balRes, err = s.grpcHandler.GetBalanceFromBank(contractAddr.Bytes(), s.bondDenom)
+				Expect(err).To(BeNil())
+				contractFinalBal := balRes.Balance
+				Expect(contractFinalBal.Amount).To(Equal(math.ZeroInt()))
+			})
 		})
 
 		Context("with approval set", func() {
