@@ -722,7 +722,6 @@ func (s *PrecompileTestSuite) TestDelegate() {
 			true,
 			fmt.Sprintf(cmn.ErrInvalidNumberOfArgs, 3, 0),
 		},
-		// TODO: check case if authorization does not exist
 		{
 			name: "fail - different origin than delegator",
 			malleate: func(_, _ testkeyring.Key, operatorAddress string) []interface{} {
@@ -735,7 +734,7 @@ func (s *PrecompileTestSuite) TestDelegate() {
 			},
 			gas:         200000,
 			expError:    true,
-			errContains: "is not the same as delegator address",
+			errContains: "does not exist or is expired",
 		},
 		{
 			"fail - invalid delegator address",
@@ -952,9 +951,8 @@ func (s *PrecompileTestSuite) TestUndelegate() {
 			true,
 			fmt.Sprintf(cmn.ErrInvalidNumberOfArgs, 3, 0),
 		},
-		// TODO: check case if authorization does not exist
 		{
-			name: "fail - different origin than delegator",
+			name: "fail - different origin than delegator (unauthorized)",
 			malleate: func(_, _ testkeyring.Key, operatorAddress string) []interface{} {
 				differentAddr := cosmosevmutiltx.GenerateAddress()
 				return []interface{}{
@@ -965,7 +963,7 @@ func (s *PrecompileTestSuite) TestUndelegate() {
 			},
 			gas:         200000,
 			expError:    true,
-			errContains: "is not the same as delegator",
+			errContains: "does not exist or is expired",
 		},
 		{
 			"fail - invalid delegator address",
@@ -1087,7 +1085,6 @@ func (s *PrecompileTestSuite) TestRedelegate() {
 			true,
 			fmt.Sprintf(cmn.ErrInvalidNumberOfArgs, 4, 0),
 		},
-		// TODO: check case if authorization does not exist
 		{
 			name: "fail - different origin than delegator",
 			malleate: func(_, _ testkeyring.Key, srcOperatorAddr, dstOperatorAddr string) []interface{} {
@@ -1101,7 +1098,7 @@ func (s *PrecompileTestSuite) TestRedelegate() {
 			},
 			gas:         200000,
 			expError:    true,
-			errContains: "is not the same as delegator",
+			errContains: "does not exist or is expired",
 		},
 		{
 			"fail - invalid delegator address",

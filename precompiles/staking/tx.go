@@ -189,25 +189,20 @@ func (p *Precompile) Delegate(
 		// expiration is the expiration time of the authorization grant
 		expiration *time.Time
 
-		// isCallerOrigin is true when the contract caller is the same as the origin
-		isCallerOrigin = contract.CallerAddress == origin
-		// isCallerDelegator is true when the contract caller is the same as the delegator
-		isCallerDelegator = contract.CallerAddress == delegatorHexAddr
+		// isCallerOrigin is true when the delegator is the same as the origin and is the caller address
+		isCallerOrigin = delegatorHexAddr == origin && contract.CallerAddress == origin
+		// isSCDelegator is true when the contract caller is the same as the delegator
+		// and is not origin (it is a SmartContract)
+		isSCDelegator = contract.CallerAddress == delegatorHexAddr && origin != contract.CallerAddress
 	)
 
-	// The provided delegator address should always be equal to the origin address.
-	// In case the contract caller address is the same as the delegator address provided,
-	// update the delegator address to be equal to the origin address.
-	// Otherwise, if the provided delegator address is different from the origin address,
-	// return an error because is a forbidden operation
-	if isCallerDelegator {
-		delegatorHexAddr = origin
-	} else if origin != delegatorHexAddr {
-		return nil, fmt.Errorf(ErrDifferentOriginFromDelegator, origin.String(), delegatorHexAddr.String())
-	}
+	// 3 possible cases:
+	// 1. Delegator is EOA and submits tx to stake its own funds (origin == contract_caller_addr) -> no auth needed
+	// 2. Delegator is SC and submits tx to stake its own funds -> no auth needed (should be handled at SC level)
+	// 3. Delegator is EOA and SC makes call to stake the EOA's funds -> auth needed
 
-	// no need to have authorization when the contract caller is the same as origin (owner of funds)
-	if !isCallerOrigin {
+	// no need to have authorization when the delegator is the owner of the funds
+	if !isCallerOrigin && !isSCDelegator {
 		// Check if the authorization grant exists for the caller and the origin
 		stakeAuthz, expiration, err = authorization.CheckAuthzAndAllowanceForGranter(ctx, p.AuthzKeeper, contract.CallerAddress, delegatorHexAddr, &msg.Amount, DelegateMsg)
 		if err != nil {
@@ -221,8 +216,8 @@ func (p *Precompile) Delegate(
 		return nil, err
 	}
 
-	// Only update the authorization if the contract caller is different from the origin
-	if !isCallerOrigin {
+	// Only update the authorization if the contract caller is different from owner of the funds
+	if !isCallerOrigin && !isSCDelegator {
 		if err := p.UpdateStakingAuthorization(ctx, contract.CallerAddress, delegatorHexAddr, stakeAuthz, expiration, DelegateMsg, msg); err != nil {
 			return nil, err
 		}
@@ -285,25 +280,15 @@ func (p Precompile) Undelegate(
 		// expiration is the expiration time of the authorization grant
 		expiration *time.Time
 
-		// isCallerOrigin is true when the contract caller is the same as the origin
-		isCallerOrigin = contract.CallerAddress == origin
-		// isCallerDelegator is true when the contract caller is the same as the delegator
-		isCallerDelegator = contract.CallerAddress == delegatorHexAddr
+		// isCallerOrigin is true when the delegator is the same as the origin and is the caller address
+		isCallerOrigin = delegatorHexAddr == origin && contract.CallerAddress == origin
+		// isSCDelegator is true when the contract caller is the same as the delegator
+		// and is not origin (it is a SmartContract)
+		isSCDelegator = contract.CallerAddress == delegatorHexAddr && origin != contract.CallerAddress
 	)
 
-	// The provided delegator address should always be equal to the origin address.
-	// In case the contract caller address is the same as the delegator address provided,
-	// update the delegator address to be equal to the origin address.
-	// Otherwise, if the provided delegator address is different from the origin address,
-	// return an error because is a forbidden operation
-	if isCallerDelegator {
-		delegatorHexAddr = origin
-	} else if origin != delegatorHexAddr {
-		return nil, fmt.Errorf(ErrDifferentOriginFromDelegator, origin.String(), delegatorHexAddr.String())
-	}
-
-	// no need to have authorization when the contract caller is the same as origin (owner of funds)
-	if !isCallerOrigin {
+	// no need to have authorization when the contract caller is the owner of funds
+	if !isCallerOrigin && !isSCDelegator {
 		// Check if the authorization grant exists for the caller and the origin
 		stakeAuthz, expiration, err = authorization.CheckAuthzAndAllowanceForGranter(ctx, p.AuthzKeeper, contract.CallerAddress, delegatorHexAddr, &msg.Amount, UndelegateMsg)
 		if err != nil {
@@ -318,8 +303,8 @@ func (p Precompile) Undelegate(
 		return nil, err
 	}
 
-	// Only update the authorization if the contract caller is different from the origin
-	if !isCallerOrigin {
+	// Only update the authorization if the contract caller is not owner of the funds
+	if !isCallerOrigin && !isSCDelegator {
 		if err := p.UpdateStakingAuthorization(ctx, contract.CallerAddress, delegatorHexAddr, stakeAuthz, expiration, UndelegateMsg, msg); err != nil {
 			return nil, err
 		}
@@ -371,25 +356,15 @@ func (p Precompile) Redelegate(
 		// expiration is the expiration time of the authorization grant
 		expiration *time.Time
 
-		// isCallerOrigin is true when the contract caller is the same as the origin
-		isCallerOrigin = contract.CallerAddress == origin
-		// isCallerDelegator is true when the contract caller is the same as the delegator
-		isCallerDelegator = contract.CallerAddress == delegatorHexAddr
+		// isCallerOrigin is true when the delegator is the same as the origin and is the caller address
+		isCallerOrigin = delegatorHexAddr == origin && contract.CallerAddress == origin
+		// isSCDelegator is true when the contract caller is the same as the delegator
+		// and is not origin (it is a SmartContract)
+		isSCDelegator = contract.CallerAddress == delegatorHexAddr && origin != contract.CallerAddress
 	)
 
-	// The provided delegator address should always be equal to the origin address.
-	// In case the contract caller address is the same as the delegator address provided,
-	// update the delegator address to be equal to the origin address.
-	// Otherwise, if the provided delegator address is different from the origin address,
-	// return an error because is a forbidden operation
-	if isCallerDelegator {
-		delegatorHexAddr = origin
-	} else if origin != delegatorHexAddr {
-		return nil, fmt.Errorf(ErrDifferentOriginFromDelegator, origin.String(), delegatorHexAddr.String())
-	}
-
-	// no need to have authorization when the contract caller is the same as origin (owner of funds)
-	if !isCallerOrigin {
+	// no need to have authorization when the contract caller is the owner of funds
+	if !isCallerOrigin && !isSCDelegator {
 		// Check if the authorization grant exists for the caller and the origin
 		stakeAuthz, expiration, err = authorization.CheckAuthzAndAllowanceForGranter(ctx, p.AuthzKeeper, contract.CallerAddress, delegatorHexAddr, &msg.Amount, RedelegateMsg)
 		if err != nil {
@@ -403,8 +378,8 @@ func (p Precompile) Redelegate(
 		return nil, err
 	}
 
-	// Only update the authorization if the contract caller is different from the origin
-	if !isCallerOrigin {
+	// Only update the authorization if the contract caller is different from the oowner of the funds
+	if !isCallerOrigin && !isSCDelegator {
 		if err := p.UpdateStakingAuthorization(ctx, contract.CallerAddress, delegatorHexAddr, stakeAuthz, expiration, RedelegateMsg, msg); err != nil {
 			return nil, err
 		}
@@ -455,25 +430,15 @@ func (p Precompile) CancelUnbondingDelegation(
 		// expiration is the expiration time of the authorization grant
 		expiration *time.Time
 
-		// isCallerOrigin is true when the contract caller is the same as the origin
-		isCallerOrigin = contract.CallerAddress == origin
-		// isCallerDelegator is true when the contract caller is the same as the delegator
-		isCallerDelegator = contract.CallerAddress == delegatorHexAddr
+		// isCallerOrigin is true when the delegator is the same as the origin and is the caller address
+		isCallerOrigin = delegatorHexAddr == origin && contract.CallerAddress == origin
+		// isSCDelegator is true when the contract caller is the same as the delegator
+		// and is not origin (it is a SmartContract)
+		isSCDelegator = contract.CallerAddress == delegatorHexAddr && origin != contract.CallerAddress
 	)
 
-	// The provided delegator address should always be equal to the origin address.
-	// In case the contract caller address is the same as the delegator address provided,
-	// update the delegator address to be equal to the origin address.
-	// Otherwise, if the provided delegator address is different from the origin address,
-	// return an error because is a forbidden operation
-	if isCallerDelegator {
-		delegatorHexAddr = origin
-	} else if origin != delegatorHexAddr {
-		return nil, fmt.Errorf(ErrDifferentOriginFromDelegator, origin.String(), delegatorHexAddr.String())
-	}
-
-	// no need to have authorization when the contract caller is the same as origin (owner of funds)
-	if !isCallerOrigin {
+	// no need to have authorization when the contract caller is the same as the owner of funds
+	if !isCallerOrigin && !isSCDelegator {
 		// Check if the authorization grant exists for the caller and the origin
 		stakeAuthz, expiration, err = authorization.CheckAuthzAndAllowanceForGranter(ctx, p.AuthzKeeper, contract.CallerAddress, delegatorHexAddr, &msg.Amount, CancelUnbondingDelegationMsg)
 		if err != nil {
@@ -486,8 +451,8 @@ func (p Precompile) CancelUnbondingDelegation(
 		return nil, err
 	}
 
-	// Only update the authorization if the contract caller is different from the origin
-	if !isCallerOrigin {
+	// Only update the authorization if the contract caller is different from the owner of funds
+	if !isCallerOrigin && !isSCDelegator {
 		if err := p.UpdateStakingAuthorization(ctx, contract.CallerAddress, delegatorHexAddr, stakeAuthz, expiration, CancelUnbondingDelegationMsg, msg); err != nil {
 			return nil, err
 		}
