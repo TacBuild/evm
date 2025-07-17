@@ -127,6 +127,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+
+	"github.com/cosmos/evm/x/liquidstake"
+	liquidstakekeeper "github.com/cosmos/evm/x/liquidstake/keeper"
+	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
 )
 
 func init() {
@@ -156,6 +161,9 @@ var (
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
+
+		// liquidstake module
+		liquidstaketypes.ModuleName: {authtypes.Minter, authtypes.Burner},
 
 		// Cosmos EVM modules
 		evmtypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
@@ -211,6 +219,9 @@ type EVMD struct {
 	FeeMarketKeeper feemarketkeeper.Keeper
 	EVMKeeper       *evmkeeper.Keeper
 	Erc20Keeper     erc20keeper.Keeper
+
+	// liquidstake keeper
+	LiquidStakeKeeper liquidstakekeeper.Keeper
 
 	// the module manager
 	ModuleManager      *module.Manager
@@ -292,6 +303,8 @@ func NewExampleApp(
 		authzkeeper.StoreKey,
 		// ibc keys
 		ibcexported.StoreKey, ibctransfertypes.StoreKey,
+		// liquidstake key
+		liquidstaketypes.StoreKey,
 		// Cosmos EVM store keys
 		evmtypes.StoreKey, feemarkettypes.StoreKey, erc20types.StoreKey,
 	)
@@ -484,6 +497,20 @@ func NewExampleApp(
 	)
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
+
+	// liquidstake keeper
+	app.LiquidStakeKeeper = liquidstakekeeper.NewKeeper(
+		appCodec,
+		keys[liquidstaketypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		*app.StakingKeeper,
+		app.MintKeeper,
+		app.DistrKeeper,
+		app.SlashingKeeper,
+		app.MsgServiceRouter(),
+		authAddr,
+	)
 
 	// Cosmos EVM keepers
 	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(
