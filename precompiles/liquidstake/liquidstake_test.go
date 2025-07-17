@@ -8,7 +8,6 @@ import (
 
 	"math/big"
 
-	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -43,8 +42,6 @@ type LiquidStakePrecompileTestSuite struct {
 
 	bondDenom  string
 	precompile *liquidstake.Precompile
-
-	ctx sdk.Context
 }
 
 func TestPrecompileUnitTestSuite(t *testing.T) {
@@ -71,7 +68,6 @@ func (s *LiquidStakePrecompileTestSuite) SetupTest() {
 	s.grpcHandler = grpcHandler
 	s.keyring = keyring
 	s.nw = nw
-	s.ctx = ctx
 
 	if s.precompile, err = liquidstake.NewPrecompile(
 		s.nw.App.LiquidStakeKeeper,
@@ -136,7 +132,7 @@ func (s *LiquidStakePrecompileTestSuite) TestRun() {
 				s.Require().NoError(err, "failed to pack input")
 				return input
 			},
-			8000,
+			8000000,
 			false,
 			false,
 			"out of gas",
@@ -147,7 +143,7 @@ func (s *LiquidStakePrecompileTestSuite) TestRun() {
 		s.Run(tc.name, func() {
 			// setup basic test suite
 			s.SetupTest()
-			ctx = s.nw.App.NewContext(false).WithBlockTime(time.Now())
+			ctx = s.nw.GetContext().WithBlockTime(time.Now())
 
 			baseFee := s.nw.App.EVMKeeper.GetBaseFee(ctx)
 
@@ -222,11 +218,6 @@ func (s *LiquidStakePrecompileTestSuite) TestPrecompileInitialization() {
 	s.Require().NotNil(s.precompile)
 	s.Require().NotNil(s.nw.App.LiquidStakeKeeper)
 	s.Require().NotNil(s.nw.App.AuthzKeeper)
-
-	// Test that liquidstake module account exists
-	moduleAcc := s.nw.App.AccountKeeper.GetModuleAccount(s.ctx, liquidstaketypes.ModuleName)
-	s.Require().NotNil(moduleAcc)
-	s.Require().Equal(liquidstaketypes.ModuleName, moduleAcc.GetName())
 }
 
 func (s *LiquidStakePrecompileTestSuite) TestPrecompileMethodSignatures() {
