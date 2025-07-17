@@ -70,6 +70,7 @@ endif
 
 BUILD_TARGETS := build install
 
+.PHONY: build
 build: BUILD_ARGS=-o $(BUILDDIR)/
 build-linux:
 	GOOS=linux GOARCH=amd64 $(MAKE) build

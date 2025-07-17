@@ -1,0 +1,640 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "LiquidStakingI",
+  "sourceName": "contracts/LiquidStakingI.sol",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "grantee",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "granter",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string[]",
+          "name": "methods",
+          "type": "string[]"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256[]",
+          "name": "values",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "AllowanceChange",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "grantee",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "granter",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string[]",
+          "name": "methods",
+          "type": "string[]"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Approval",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "grantee",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "granter",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string[]",
+          "name": "methods",
+          "type": "string[]"
+        }
+      ],
+      "name": "Revocation",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "grantee",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "granter",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "method",
+          "type": "string"
+        }
+      ],
+      "name": "allowance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "remaining",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "grantee",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string[]",
+          "name": "methods",
+          "type": "string[]"
+        }
+      ],
+      "name": "approve",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "approved",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "grantee",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string[]",
+          "name": "methods",
+          "type": "string[]"
+        }
+      ],
+      "name": "decreaseAllowance",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "approved",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "grantee",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string[]",
+          "name": "methods",
+          "type": "string[]"
+        }
+      ],
+      "name": "increaseAllowance",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "approved",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "delegatorAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "liquidStake",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "delegatorAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "callDataAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "liquidUnstake",
+      "outputs": [
+        {
+          "internalType": "int64",
+          "name": "completionTime",
+          "type": "int64"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "liquidValidators",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "operatorAddress",
+              "type": "string"
+            },
+            {
+              "internalType": "int256",
+              "name": "weight",
+              "type": "int256"
+            },
+            {
+              "internalType": "enum ValidatorStatus",
+              "name": "status",
+              "type": "uint8"
+            },
+            {
+              "internalType": "int256",
+              "name": "delShares",
+              "type": "int256"
+            },
+            {
+              "internalType": "int256",
+              "name": "liquidTokens",
+              "type": "int256"
+            }
+          ],
+          "internalType": "struct LiquidValidatorState[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "params",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "LiquidBondDenom",
+              "type": "string"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "ValidatorAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "int32",
+                  "name": "TargetWeight",
+                  "type": "int32"
+                }
+              ],
+              "internalType": "struct WhitelistedValidator[]",
+              "name": "WhitelistedValidators",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "int256",
+              "name": "UnstakeFeeRate",
+              "type": "int256"
+            },
+            {
+              "internalType": "bool",
+              "name": "LsmDisabled",
+              "type": "bool"
+            },
+            {
+              "internalType": "int256",
+              "name": "MinLiquidStakeAmount",
+              "type": "int256"
+            },
+            {
+              "internalType": "string",
+              "name": "CwLockedPoolAddress",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "FeeAcountAddress",
+              "type": "string"
+            },
+            {
+              "internalType": "int256",
+              "name": "AutocompoundFeeRate",
+              "type": "int256"
+            },
+            {
+              "internalType": "address",
+              "name": "WhitelistAdminAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "ModulePaused",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct LiquidStakeParams",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "grantee",
+          "type": "address"
+        },
+        {
+          "internalType": "string[]",
+          "name": "methods",
+          "type": "string[]"
+        }
+      ],
+      "name": "revoke",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "revoked",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "authoriy",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "isPaused",
+          "type": "bool"
+        }
+      ],
+      "name": "setModulePaused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "delegatorAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "validatorAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "stakedAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "liquidAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "stakeToLP",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "states",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "int256",
+              "name": "mintRate",
+              "type": "int256"
+            },
+            {
+              "internalType": "int256",
+              "name": "stkTACTotalSupply",
+              "type": "int256"
+            },
+            {
+              "internalType": "int256",
+              "name": "netAmount",
+              "type": "int256"
+            },
+            {
+              "internalType": "int256",
+              "name": "totalDelShares",
+              "type": "int256"
+            },
+            {
+              "internalType": "int256",
+              "name": "totalLiquidTokens",
+              "type": "int256"
+            },
+            {
+              "internalType": "int256",
+              "name": "totalRemainingRewards",
+              "type": "int256"
+            },
+            {
+              "internalType": "int256",
+              "name": "totalUnbondingBalance",
+              "type": "int256"
+            },
+            {
+              "internalType": "int256",
+              "name": "proxyAccBalance",
+              "type": "int256"
+            }
+          ],
+          "internalType": "struct NetAmountState",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "authority",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "LiquidBondDenom",
+              "type": "string"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "ValidatorAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "int32",
+                  "name": "TargetWeight",
+                  "type": "int32"
+                }
+              ],
+              "internalType": "struct WhitelistedValidator[]",
+              "name": "WhitelistedValidators",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "int256",
+              "name": "UnstakeFeeRate",
+              "type": "int256"
+            },
+            {
+              "internalType": "bool",
+              "name": "LsmDisabled",
+              "type": "bool"
+            },
+            {
+              "internalType": "int256",
+              "name": "MinLiquidStakeAmount",
+              "type": "int256"
+            },
+            {
+              "internalType": "string",
+              "name": "CwLockedPoolAddress",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "FeeAcountAddress",
+              "type": "string"
+            },
+            {
+              "internalType": "int256",
+              "name": "AutocompoundFeeRate",
+              "type": "int256"
+            },
+            {
+              "internalType": "address",
+              "name": "WhitelistAdminAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "ModulePaused",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct LiquidStakeParams",
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "updateParams",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "authoriy",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "ValidatorAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "int32",
+              "name": "TargetWeight",
+              "type": "int32"
+            }
+          ],
+          "internalType": "struct WhitelistedValidator[]",
+          "name": "whitelistedValidators",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "updateWhiteListedValidators",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
