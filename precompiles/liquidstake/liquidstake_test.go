@@ -1,13 +1,14 @@
 package liquidstake_test
 
 import (
+	"fmt"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/evm/precompiles/authorization"
 	cmn "github.com/cosmos/evm/precompiles/common"
 	liquidstake "github.com/cosmos/evm/precompiles/liquidstake"
 	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
-	sdkmath "cosmossdk.io/math"
 
 	"math/big"
 
@@ -75,7 +76,7 @@ func (s *LiquidStakePrecompileTestSuite) SetupTest() {
 
 	params := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
 	params.ModulePaused = false
-	params.LiquidBondDenom = "aatom"
+	params.LiquidBondDenom = "agatom"
 
 	s.nw.App.LiquidStakeKeeper.SetLiquidValidator(ctx,liquidstaketypes.LiquidValidator {
 		OperatorAddress: validatorAddrs[0].OperatorAddress,
@@ -156,7 +157,7 @@ func (s *LiquidStakePrecompileTestSuite) TestRun() {
 			},
 			8000000,
 			false,
-			false,
+			true,
 			"out of gas",
 		},
 	}
@@ -165,7 +166,7 @@ func (s *LiquidStakePrecompileTestSuite) TestRun() {
 		s.Run(tc.name, func() {
 			// setup basic test suite
 			s.SetupTest()
-			ctx = s.nw.GetContext().WithBlockTime(time.Now())
+			ctx = s.nw.GetContext().WithBlockHeight(10000)
 
 			baseFee := s.nw.App.EVMKeeper.GetBaseFee(ctx)
 
@@ -217,6 +218,9 @@ func (s *LiquidStakePrecompileTestSuite) TestRun() {
 
 			// Run precompiled contract
 			bz, err := s.precompile.Run(evm, contract, tc.readOnly)
+
+			bal := s.nw.App.BankKeeper.BaseSendKeeper.BaseViewKeeper.GetAllBalances(ctx, delegator.AccAddr)
+			fmt.Println(bal)
 
 			// Check results
 			if tc.expPass {

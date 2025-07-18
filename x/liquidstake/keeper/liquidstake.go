@@ -131,7 +131,7 @@ func (k Keeper) LiquidStake(
 	liquidBondDenom := k.LiquidBondDenom(ctx)
 	stkXPRTMintAmount = stakingCoin.Amount
 
-	if nas.StkxprtTotalSupply.IsPositive() {
+	if !nas.StkxprtTotalSupply.IsPositive() {
 		if nas.NetAmount.IsZero() {
 			// this case must not be reachable, consider stopping module for investigation
 			// c_value -> inf

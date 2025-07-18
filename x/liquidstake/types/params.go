@@ -12,7 +12,7 @@ import (
 
 // Parameter store keys
 var (
-	DefaultLiquidBondDenom = "ugtac"
+	DefaultLiquidBondDenom = "agatom"
 
 	// DefaultUnstakeFeeRate is the default Unstake Fee Rate.
 	DefaultUnstakeFeeRate = math.LegacyZeroDec()
