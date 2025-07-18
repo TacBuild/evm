@@ -1,10 +1,13 @@
 package liquidstake_test
 
 import (
-	liquidstake "github.com/cosmos/evm/precompiles/liquidstake"
 	"time"
+
 	"github.com/cosmos/evm/precompiles/authorization"
 	cmn "github.com/cosmos/evm/precompiles/common"
+	liquidstake "github.com/cosmos/evm/precompiles/liquidstake"
+	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
+	sdkmath "cosmossdk.io/math"
 
 	"math/big"
 
@@ -14,22 +17,18 @@ import (
 
 	testkeyring "github.com/cosmos/evm/testutil/integration/os/keyring"
 
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/cosmos/evm/x/vm/statedb"
-	evmtypes "github.com/cosmos/evm/x/vm/types"
-	ethtypes "github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/common"
-	chainutil "github.com/cosmos/evm/evmd/testutil"
-)
-
-import (
 	"testing"
 
-	"github.com/stretchr/testify/suite"
-
+	chainutil "github.com/cosmos/evm/evmd/testutil"
 	"github.com/cosmos/evm/testutil/integration/os/factory"
 	"github.com/cosmos/evm/testutil/integration/os/grpc"
 	"github.com/cosmos/evm/testutil/integration/os/network"
+	"github.com/cosmos/evm/x/vm/statedb"
+	evmtypes "github.com/cosmos/evm/x/vm/types"
+	"github.com/ethereum/go-ethereum/common"
+	ethtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/stretchr/testify/suite"
 )
 
 type LiquidStakePrecompileTestSuite struct {
@@ -69,6 +68,30 @@ func (s *LiquidStakePrecompileTestSuite) SetupTest() {
 	s.keyring = keyring
 	s.nw = nw
 
+	validatorAddrs, err := s.nw.App.StakingKeeper.GetValidators(ctx, 1)
+	if err != nil {
+		panic(err)
+	}
+
+	params := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+	params.ModulePaused = false
+	params.LiquidBondDenom = "aatom"
+
+	s.nw.App.LiquidStakeKeeper.SetLiquidValidator(ctx,liquidstaketypes.LiquidValidator {
+		OperatorAddress: validatorAddrs[0].OperatorAddress,
+	})
+
+	params.WhitelistedValidators = append(params.WhitelistedValidators,	liquidstaketypes.WhitelistedValidator {
+		ValidatorAddress: validatorAddrs[0].OperatorAddress,
+		TargetWeight: sdkmath.NewInt(10000),
+	})
+
+
+	err = s.nw.App.LiquidStakeKeeper.SetParams(ctx, params)
+	if err != nil {
+		panic(err)
+	}
+
 	if s.precompile, err = liquidstake.NewPrecompile(
 		s.nw.App.LiquidStakeKeeper,
 		s.nw.App.AuthzKeeper,
@@ -76,7 +99,6 @@ func (s *LiquidStakePrecompileTestSuite) SetupTest() {
 		panic(err)
 	}
 }
-
 func (s *LiquidStakePrecompileTestSuite) CreateAuthorization(ctx sdk.Context, granter, grantee sdk.AccAddress, authzType stakingtypes.AuthorizationType, coin *sdk.Coin) error {
 	// Get all available validators and filter out jailed validators
 	validators := make([]sdk.ValAddress, 0)
@@ -127,7 +149,7 @@ func (s *LiquidStakePrecompileTestSuite) TestRun() {
 				input, err := s.precompile.Pack(
 					liquidstake.LiquidStakeMethod,
 					delegator.Addr,
-					big.NewInt(1000),
+					big.NewInt(1000000),
 				)
 				s.Require().NoError(err, "failed to pack input")
 				return input
