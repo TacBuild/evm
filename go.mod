@@ -274,7 +274,7 @@ replace (
 	github.com/cockroachdb/pebble => github.com/cockroachdb/pebble v0.0.0-20230928194634-aa077af62593
 	// use Cosmos-SDK fork to enable Ledger functionality
 	// github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.50.13-0.20250319183239-53dea340efc7
-	github.com/cosmos/cosmos-sdk => github.com/pixelplex/cosmos-sdk v0.0.0-20250617165712-c53a1019ecfd
+	github.com/cosmos/cosmos-sdk => github.com/pixelplex/cosmos-sdk v0.50.12-lsm-beta.0
 	// use Cosmos geth fork
 	github.com/ethereum/go-ethereum => github.com/TacBuild/go-ethereum v0.0.0-20250428082551-b4f5a8f8420a
 	// Security Advisory https://github.com/advisories/GHSA-h395-qcrw-5vmq

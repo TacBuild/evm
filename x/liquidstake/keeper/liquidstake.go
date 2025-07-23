@@ -33,7 +33,7 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas *types.NetAmountState, e
 
 	totalUnbondingBalance := math.ZeroInt()
 	ubds, err := k.stakingKeeper.GetAllUnbondingDelegations(ctx, types.LiquidStakeProxyAcc)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	for _, ubd := range ubds {
@@ -131,7 +131,7 @@ func (k Keeper) LiquidStake(
 	liquidBondDenom := k.LiquidBondDenom(ctx)
 	stkXPRTMintAmount = stakingCoin.Amount
 
-	if !nas.StkxprtTotalSupply.IsPositive() {
+	if nas.StkxprtTotalSupply.IsPositive() {
 		if nas.NetAmount.IsZero() {
 			// this case must not be reachable, consider stopping module for investigation
 			// c_value -> inf
@@ -1021,7 +1021,12 @@ func (k Keeper) CheckDelegationStates(ctx sdk.Context, proxyAcc sdk.AccAddress) 
 		cachedCtx, proxyAcc,
 		func(_ int64, del stakingtypes.DelegationI) (stop bool) {
 			valAddr := del.GetValidatorAddr()
-			val, err := k.stakingKeeper.Validator(cachedCtx, sdk.ValAddress(valAddr))
+			valAddrObj, parseErr := sdk.ValAddressFromBech32(valAddr)
+			if parseErr != nil {
+				return false
+			}
+
+			val, err := k.stakingKeeper.Validator(cachedCtx, valAddrObj)
 			if err != nil {
 				return false
 			}

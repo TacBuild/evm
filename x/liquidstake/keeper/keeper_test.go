@@ -1,5 +1,5 @@
 package keeper_test
-
+//
 //import (
 //	"fmt"
 //	"testing"
@@ -7,6 +7,8 @@ package keeper_test
 //
 //	"cosmossdk.io/log"
 //	"cosmossdk.io/math"
+//	testhelpers "github.com/Asphere-xyz/tacchain/app/helpers"
+//	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 //	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 //	sdk "github.com/cosmos/cosmos-sdk/types"
 //	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -18,7 +20,7 @@ package keeper_test
 //	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 //	"github.com/stretchr/testify/suite"
 //
-//	chain "github.com/Asphere-xyz/tacchain/app"
+//	chain "github.com/cosmos/evm/evmd"
 //	"github.com/cosmos/evm/x/liquidstake/keeper"
 //	"github.com/cosmos/evm/x/liquidstake/types"
 //	dbm "github.com/cosmos/cosmos-db"
@@ -78,39 +80,39 @@ package keeper_test
 //	crisis.EndBlocker(s.ctx, *s.app.CrisisKeeper)
 //}
 //
-//// TODO: Upgrade Cosmos SDK
-//// func (s *KeeperTestSuite) CreateValidators(powers []int64) ([]sdk.AccAddress, []sdk.ValAddress, []cryptotypes.PubKey) {
-//// 	s.app.BeginBlocker(s.ctx)
-//// 	num := len(powers)
-//// 	addrs := chain.AddTestAddrsIncremental(s.app, s.ctx, num, math.NewInt(10000000000000))
-//// 	valAddrs := chain.ConvertAddrsToValAddrs(addrs)
-//// 	pks := chain.CreateTestPubKeys(num)
-//// 	skParams, _ := s.app.StakingKeeper.GetParams(s.ctx)
-//// 	skParams.ValidatorLiquidStakingCap = sdk.OneDec()
-//// 	_ = s.app.StakingKeeper.SetParams(s.ctx, skParams)
-//// 	for i, power := range powers {
-//// 		val, err := stakingtypes.NewValidator(valAddrs[i].String(), pks[i], stakingtypes.Description{})
-//// 		s.Require().NoError(err)
-//// 		s.app.StakingKeeper.SetValidator(s.ctx, val)
-//// 		err = s.app.StakingKeeper.SetValidatorByConsAddr(s.ctx, val)
-//// 		s.Require().NoError(err)
-//// 		s.app.StakingKeeper.SetNewValidatorByPowerIndex(s.ctx, val)
-//// 		_ = s.app.StakingKeeper.Hooks().AfterValidatorCreated(s.ctx, sdk.ValAddress(val.GetOperator()))
-//// 		newShares, err := s.app.StakingKeeper.Delegate(s.ctx, addrs[i], math.NewInt(power), stakingtypes.Unbonded, val, true)
-//// 		s.Require().NoError(err)
-//// 		s.Require().Equal(newShares.TruncateInt(), math.NewInt(power))
-//// 		msgValidatorBond := &stakingtypes.MsgValidatorBond{
-//// 			DelegatorAddress: addrs[i].String(),
-//// 			ValidatorAddress: val.OperatorAddress,
-//// 		}
-//// 		handler := s.app.MsgServiceRouter().Handler(msgValidatorBond)
-//// 		_, err = handler(s.ctx, msgValidatorBond)
-//// 		s.Require().NoError(err)
-//// 	}
-////
-//// 	s.app.EndBlocker(s.ctx)
-//// 	return addrs, valAddrs, pks
-//// }
+//func (s *KeeperTestSuite) CreateValidators(powers []int64) ([]sdk.AccAddress, []sdk.ValAddress, []cryptotypes.PubKey) {
+//	s.app.BeginBlocker(s.ctx)
+//	num := len(powers)
+//	addrs := testhelpers.AddTestAddrsIncremental(s.app, s.ctx, num, math.NewInt(10000000000000))
+//	valAddrs := testhelpers.ConvertAddrsToValAddrs(addrs)
+//	pks := testhelpers.CreateTestPubKeys(num)
+//	skParams, err := s.app.StakingKeeper.GetParams(s.ctx)
+//	s.Require().NoError(err)
+//	skParams.ValidatorLiquidStakingCap = sdk.OneDec()
+//	_ = s.app.StakingKeeper.SetParams(s.ctx, skParams)
+//	for i, power := range powers {
+//		val, err := stakingtypes.NewValidator(valAddrs[i].String(), pks[i], stakingtypes.Description{})
+//		s.Require().NoError(err)
+//		s.app.StakingKeeper.SetValidator(s.ctx, val)
+//		err = s.app.StakingKeeper.SetValidatorByConsAddr(s.ctx, val)
+//		s.Require().NoError(err)
+//		s.app.StakingKeeper.SetNewValidatorByPowerIndex(s.ctx, val)
+//		_ = s.app.StakingKeeper.Hooks().AfterValidatorCreated(s.ctx, valAddrs[i])
+//		newShares, err := s.app.StakingKeeper.Delegate(s.ctx, addrs[i], math.NewInt(power), stakingtypes.Unbonded, val, true)
+//		s.Require().NoError(err)
+//		s.Require().Equal(newShares.TruncateInt(), math.NewInt(power))
+//		msgValidatorBond := &stakingtypes.MsgValidatorBond{
+//			DelegatorAddress: addrs[i].String(),
+//			ValidatorAddress: val.OperatorAddress,
+//		}
+//		handler := s.app.MsgServiceRouter().Handler(msgValidatorBond)
+//		_, err = handler(s.ctx, msgValidatorBond)
+//		s.Require().NoError(err)
+//	}
+//
+//	s.app.EndBlocker(s.ctx)
+//	return addrs, valAddrs, pks
+//}
 //
 //func (s *KeeperTestSuite) liquidStaking(liquidStaker sdk.AccAddress, stakingAmt math.Int) error {
 //	ctx, writeCache := s.ctx.CacheContext()

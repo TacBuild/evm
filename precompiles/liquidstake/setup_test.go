@@ -4,9 +4,9 @@ package liquidstake_test
 //	"testing"
 //
 //	"cosmossdk.io/log"
-//	chain "github.com/Asphere-xyz/tacchain/app"
-//	liquidstake "github.com/Asphere-xyz/tacchain/x/liquidstake/precompile"
-//	liquidstaketypes "github.com/Asphere-xyz/tacchain/x/liquidstake/types"
+//	chain "github.com/cosmos/evm/app"
+//	liquidstake "github.com/cosmos/evm/x/liquidstake/precompile"
+//	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
 //	dbm "github.com/cosmos/cosmos-db"
 //	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 //	sdk "github.com/cosmos/cosmos-sdk/types"

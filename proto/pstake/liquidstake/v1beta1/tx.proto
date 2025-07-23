@@ -13,7 +13,7 @@ option go_package = "github.com/cosmos/evm/x/liquidstake/types";
 
 // Msg defines the liquid staking Msg service.
 service Msg {
-  option (cosmos.msg.v1.service) = true;  
+  option (cosmos.msg.v1.service) = true;
   // LiquidStake defines a method for performing a delegation of coins
   // from a delegator to whitelisted validators.
   rpc LiquidStake(MsgLiquidStake) returns (MsgLiquidStakeResponse);

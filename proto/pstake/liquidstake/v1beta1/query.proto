@@ -6,7 +6,6 @@ import "pstake/liquidstake/v1beta1/liquidstake.proto";
 import "gogoproto/gogo.proto";
 import "cosmos/msg/v1/msg.proto";
 
-
 option go_package = "github.com/cosmos/evm/x/liquidstake/types";
 
 // Query defines the gRPC query service for the liquidstake module.

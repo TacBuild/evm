@@ -18,7 +18,6 @@ import (
 	"github.com/cosmos/evm/x/liquidstake/client/cli"
 	"github.com/cosmos/evm/x/liquidstake/keeper"
 	"github.com/cosmos/evm/x/liquidstake/types"
-	"github.com/cosmos/evm/precompiles/liquidstake"
 )
 
 var (
@@ -85,7 +84,6 @@ type AppModule struct {
 	AppModuleBasic
 
 	keeper keeper.Keeper
-	liquidstake.Precompile
 }
 
 // NewAppModule creates a new AppModule object
