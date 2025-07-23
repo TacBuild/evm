@@ -22,6 +22,10 @@ func (k Keeper) LiquidBondDenom(ctx sdk.Context) string {
 	return k.GetParams(ctx).LiquidBondDenom
 }
 
+func (k Keeper) BondDenom(ctx sdk.Context) (string, error) {
+	 return k.stakingKeeper.BondDenom(ctx)
+}
+
 // GetNetAmountState calculates the sum of bondedDenom balance, total delegation tokens(slash applied LiquidTokens), total remaining reward of types.LiquidStakeProxyAcc
 // During liquid unstaking, stkxprt immediately burns and the unbonding queue belongs to the requester, so the liquid staker's unbonding values are excluded on netAmount
 // It is used only for calculation and query and is not stored in kv.
