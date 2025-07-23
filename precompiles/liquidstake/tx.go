@@ -8,18 +8,18 @@ import (
 	"github.com/cosmos/evm/precompiles/authorization"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	keeper "github.com/cosmos/evm/x/liquidstake/keeper"
 	types "github.com/cosmos/evm/x/liquidstake/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 const (
-	LiquidStakeMethod = "liquidStake"
-	StakeToLPMethod = "stakeToLP"
-	LiquidUnstakeMethod = "liquidUnstake"
-	UpdateParamsMethod = "updateParams"
+	LiquidStakeMethod                 = "liquidStake"
+	StakeToLPMethod                   = "stakeToLP"
+	LiquidUnstakeMethod               = "liquidUnstake"
+	UpdateParamsMethod                = "updateParams"
 	UpdateWhitelistedValidatorsMethod = "updateWhitelistedValidators"
-	SetModulePausedMethod = "setModulePaused"
+	SetModulePausedMethod             = "setModulePaused"
 )
 
 // Ensure imports are used (compiler workaround)
@@ -28,7 +28,7 @@ var (
 	_ *stakingtypes.StakeAuthorization
 )
 
-//Maybe its better to just use those from staking precompile
+// Maybe its better to just use those from staking precompile
 const (
 	// DelegateAuthz defines the authorization type for the staking Delegate
 	DelegateAuthz = stakingtypes.AuthorizationType_AUTHORIZATION_TYPE_DELEGATE
@@ -40,7 +40,6 @@ const (
 	CancelUnbondingDelegationAuthz = stakingtypes.AuthorizationType_AUTHORIZATION_TYPE_CANCEL_UNBONDING_DELEGATION
 )
 
-
 func (p Precompile) LiquidStake(
 	ctx sdk.Context,
 	origin common.Address,
@@ -49,7 +48,11 @@ func (p Precompile) LiquidStake(
 	method *abi.Method,
 	args []interface{},
 ) ([]byte, error) {
-	bondDenom := "aatom"
+	bondDenom, err := p.liquidStakeKeeper.BondDenom(ctx)
+
+	if err != nil {
+		return nil, err
+	}
 
 	msg, err := NewMsgLiquidStake(args, bondDenom)
 	if err != nil {
@@ -91,9 +94,13 @@ func (p Precompile) StakeToLP(
 	method *abi.Method,
 	args []interface{},
 ) ([]byte, error) {
-	bondDenom := p.liquidStakeKeeper.LiquidBondDenom(ctx)
+	liquidBondDenom := p.liquidStakeKeeper.LiquidBondDenom(ctx)
+	bondDenom, err := p.liquidStakeKeeper.BondDenom(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-	msg, err := NewMsgStakeToLP(args, bondDenom)
+	msg, err := NewMsgStakeToLP(args, liquidBondDenom, bondDenom)
 	if err != nil {
 		return nil, err
 	}
@@ -241,4 +248,3 @@ func (p Precompile) SetModulePaused(
 
 	return method.Outputs.Pack(true)
 }
-

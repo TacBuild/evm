@@ -13,14 +13,12 @@ import (
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
 
-	"github.com/cosmos/evm/x/liquidstake/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
+	"github.com/cosmos/evm/x/liquidstake/keeper"
 )
 
 var _ vm.PrecompiledContract = &Precompile{}
-
-
 
 // Embed abi json file to the executable binary. Needed when importing as dependency.
 //
@@ -113,7 +111,6 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readOnly bool) (bz [
 				bz, err = p.UpdateWhitelistedValidators(ctx, evm.Origin, contract, stateDB, method, args)
 			case SetModulePausedMethod:
 				bz, err = p.SetModulePaused(ctx, evm.Origin, contract, stateDB, method, args)
-
 
 			// Authorization transactions
 			case authorization.ApproveMethod:

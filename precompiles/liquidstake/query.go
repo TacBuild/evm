@@ -69,4 +69,3 @@ package liquidstake
 //
 //	return out.Pack(method.Outputs)
 //}
-

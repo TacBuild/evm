@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "LiquidStakingI",
-  "sourceName": "contracts/LiquidStakingI.sol",
+  "sourceName": "solidity/precompiles/liquidstake/LiquidStakingI.sol",
   "abi": [
     {
       "anonymous": false,
@@ -621,7 +621,7 @@
           "type": "tuple[]"
         }
       ],
-      "name": "updateWhiteListedValidators",
+      "name": "updateWhitelistedValidators",
       "outputs": [
         {
           "internalType": "bool",
