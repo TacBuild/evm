@@ -167,11 +167,12 @@ func (p Precompile) LiquidUnstake(
 	msgSrv := keeper.NewMsgServerImpl(p.liquidStakeKeeper)
 
 	// Execute the transaction using the message server
-	if _, err = msgSrv.LiquidUnstake(ctx, msg); err != nil {
+	responce, err := msgSrv.LiquidUnstake(ctx, msg)
+	if err != nil {
 		return nil, err
 	}
 
-	return method.Outputs.Pack(true)
+	return method.Outputs.Pack(responce.CompletionTime.Unix())
 }
 
 func (p Precompile) UpdateParams(

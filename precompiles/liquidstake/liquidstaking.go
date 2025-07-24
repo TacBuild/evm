@@ -121,6 +121,15 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readOnly bool) (bz [
 				bz, err = p.IncreaseAllowance(ctx, evm.Origin, stateDB, method, args)
 			case authorization.DecreaseAllowanceMethod:
 				bz, err = p.DecreaseAllowance(ctx, evm.Origin, stateDB, method, args)
+
+			// Query methods
+			case ParamsMethod:
+				bz, err = p.Params(ctx, contract, method, args)
+			case LiquidValidatorsMethod:
+				bz, err = p.LiquidValidators(ctx, contract, method, args)
+			case StatesMethod:
+				bz, err = p.States(ctx, contract, method, args)
+
 			// Authorization queries
 			case authorization.AllowanceMethod:
 				bz, err = p.Allowance(ctx, method, contract, args)

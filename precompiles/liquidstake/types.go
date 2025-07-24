@@ -9,10 +9,97 @@ import (
 
 	"github.com/cosmos/evm/x/liquidstake/types"
 
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+type LiquidValidatorOutput struct {
+	ValidatorAddress string   `json:"operatorAddress"`
+	Weight           *big.Int `json:"weight"`
+	Status           uint32   `json:"status"`
+	DelShares        *big.Int `json:"delShares"`
+	LiquidTokens     *big.Int `json:"liquidTokens"`
+}
+
+func NewLiquidValidatorOutput(lvs *types.LiquidValidatorState) LiquidValidatorOutput {
+	return LiquidValidatorOutput{
+		ValidatorAddress: lvs.OperatorAddress,
+		Weight:           lvs.Weight.BigInt(),
+		Status:           uint32(lvs.Status),
+		DelShares:        lvs.DelShares.BigInt(),
+		LiquidTokens:     lvs.LiquidTokens.BigInt(),
+	}
+}
+
+func PackLiquidValidatorOutputs(lvs []types.LiquidValidatorState, args abi.Arguments) ([]byte, error) {
+	outputs := make([]LiquidValidatorOutput, len(lvs))
+	for i, state := range lvs {
+		outputs[i] = NewLiquidValidatorOutput(&state)
+	}
+	return args.Pack(outputs)
+}
+
+type NetAmountOutput struct {
+	MintRate              *big.Int `json:"mintRate"`
+	StkTACTotalSupply     *big.Int `json:"stkTACTotalSupply"`
+	NetAmount             *big.Int `json:"netAmount"`
+	TotalDelShares        *big.Int `json:"totalDelShares"`
+	TotalLiquidTokens     *big.Int `json:"totalLiquidTokens"`
+	TotalRemainingRewards *big.Int `json:"totalRemainingRewards"`
+	TotalUnbondingBalance *big.Int `json:"totalUnbondingBalance"`
+	ProxyAccBalance       *big.Int `json:"proxyAccBalance"`
+}
+
+func NewNetAmountOutput(nas *types.NetAmountState) NetAmountOutput {
+	return NetAmountOutput{
+		MintRate:              nas.MintRate.BigInt(),
+		StkTACTotalSupply:     nas.StkxprtTotalSupply.BigInt(),
+		NetAmount:             nas.NetAmount.BigInt(),
+		TotalDelShares:        nas.TotalDelShares.BigInt(),
+		TotalLiquidTokens:     nas.TotalLiquidTokens.BigInt(),
+		TotalRemainingRewards: nas.TotalRemainingRewards.BigInt(),
+		TotalUnbondingBalance: nas.TotalUnbondingBalance.BigInt(),
+		ProxyAccBalance:       nas.ProxyAccBalance.BigInt(),
+	}
+}
+
+type LiquidStakeParamsOutput struct {
+	LiquidBondDenom       string                 `json:"LiquidBondDenom"`
+	WhiteListedValidators []WhitelistedValidator `json:"WhiteListedValidators"`
+	UnstakeFeeRate        *big.Int               `json:"UnstakeFeeRate"`
+	LsmDisabled           bool                   `json:"LsmDisabled"`
+	MinLiquidStakeAmount  *big.Int               `json:"MinLiquidStakeAmount"`
+	CwLockedPoolAddress   string                 `json:"CwLockedPoolAddress"`
+	FeeAccountAddress     string                 `json:"FeeAccountAddress"`
+	AutocompoundFeeRate   *big.Int               `json:"AutocompoundFeeRate"`
+	WhitelistAdminAddress string                 `json:"WhitelistAdminAddress"`
+	ModulePaused          bool                   `json:"ModulePaused"`
+}
+
+func NewLiquidStakeParamsOutput(params *types.Params) LiquidStakeParamsOutput {
+	whitelistedValidators := make([]WhitelistedValidator, len(params.WhitelistedValidators))
+	for i, wv := range params.WhitelistedValidators {
+		whitelistedValidators[i] = WhitelistedValidator{
+			ValidatorAddress: wv.ValidatorAddress,
+			TargetWeight:     wv.TargetWeight.BigInt(),
+		}
+	}
+
+	return LiquidStakeParamsOutput{
+		LiquidBondDenom:       params.LiquidBondDenom,
+		WhiteListedValidators: whitelistedValidators,
+		UnstakeFeeRate:        params.UnstakeFeeRate.BigInt(),
+		LsmDisabled:           params.LsmDisabled,
+		MinLiquidStakeAmount:  params.MinLiquidStakeAmount.BigInt(),
+		CwLockedPoolAddress:   params.CwLockedPoolAddress,
+		FeeAccountAddress:     params.FeeAccountAddress,
+		AutocompoundFeeRate:   params.AutocompoundFeeRate.BigInt(),
+		WhitelistAdminAddress: params.WhitelistAdminAddress,
+		ModulePaused:          params.ModulePaused,
+	}
+}
 
 // !!WARNING!!, from PixelPlex dev Team:
 // Adding new precompiled contract introduces few implicit conflicts with dependency to cosmos/evm module
