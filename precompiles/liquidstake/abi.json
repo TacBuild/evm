@@ -239,7 +239,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "callDataAmount",
+          "name": "Amount",
           "type": "uint256"
         }
       ],
@@ -302,64 +302,64 @@
           "components": [
             {
               "internalType": "string",
-              "name": "LiquidBondDenom",
+              "name": "liquidBondDenom",
               "type": "string"
             },
             {
               "components": [
                 {
                   "internalType": "address",
-                  "name": "ValidatorAddress",
+                  "name": "validatorAddress",
                   "type": "address"
                 },
                 {
-                  "internalType": "int32",
-                  "name": "TargetWeight",
-                  "type": "int32"
+                  "internalType": "int256",
+                  "name": "targetWeight",
+                  "type": "int256"
                 }
               ],
               "internalType": "struct WhitelistedValidator[]",
-              "name": "WhitelistedValidators",
+              "name": "whitelistedValidators",
               "type": "tuple[]"
             },
             {
               "internalType": "int256",
-              "name": "UnstakeFeeRate",
+              "name": "unstakeFeeRate",
               "type": "int256"
             },
             {
               "internalType": "bool",
-              "name": "LsmDisabled",
+              "name": "lsmDisabled",
               "type": "bool"
             },
             {
               "internalType": "int256",
-              "name": "MinLiquidStakeAmount",
-              "type": "int256"
-            },
-            {
-              "internalType": "string",
-              "name": "CwLockedPoolAddress",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "FeeAcountAddress",
-              "type": "string"
-            },
-            {
-              "internalType": "int256",
-              "name": "AutocompoundFeeRate",
+              "name": "minLiquidStakeAmount",
               "type": "int256"
             },
             {
               "internalType": "address",
-              "name": "WhitelistAdminAddress",
+              "name": "cwLockedPoolAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "feeAccountAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "int256",
+              "name": "autocompoundFeeRate",
+              "type": "int256"
+            },
+            {
+              "internalType": "address",
+              "name": "whitelistAdminAddress",
               "type": "address"
             },
             {
               "internalType": "bool",
-              "name": "ModulePaused",
+              "name": "modulePaused",
               "type": "bool"
             }
           ],
@@ -519,64 +519,64 @@
           "components": [
             {
               "internalType": "string",
-              "name": "LiquidBondDenom",
+              "name": "liquidBondDenom",
               "type": "string"
             },
             {
               "components": [
                 {
                   "internalType": "address",
-                  "name": "ValidatorAddress",
+                  "name": "validatorAddress",
                   "type": "address"
                 },
                 {
-                  "internalType": "int32",
-                  "name": "TargetWeight",
-                  "type": "int32"
+                  "internalType": "int256",
+                  "name": "targetWeight",
+                  "type": "int256"
                 }
               ],
               "internalType": "struct WhitelistedValidator[]",
-              "name": "WhitelistedValidators",
+              "name": "whitelistedValidators",
               "type": "tuple[]"
             },
             {
               "internalType": "int256",
-              "name": "UnstakeFeeRate",
+              "name": "unstakeFeeRate",
               "type": "int256"
             },
             {
               "internalType": "bool",
-              "name": "LsmDisabled",
+              "name": "lsmDisabled",
               "type": "bool"
             },
             {
               "internalType": "int256",
-              "name": "MinLiquidStakeAmount",
-              "type": "int256"
-            },
-            {
-              "internalType": "string",
-              "name": "CwLockedPoolAddress",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "FeeAcountAddress",
-              "type": "string"
-            },
-            {
-              "internalType": "int256",
-              "name": "AutocompoundFeeRate",
+              "name": "minLiquidStakeAmount",
               "type": "int256"
             },
             {
               "internalType": "address",
-              "name": "WhitelistAdminAddress",
+              "name": "cwLockedPoolAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "feeAccountAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "int256",
+              "name": "autocompoundFeeRate",
+              "type": "int256"
+            },
+            {
+              "internalType": "address",
+              "name": "whitelistAdminAddress",
               "type": "address"
             },
             {
               "internalType": "bool",
-              "name": "ModulePaused",
+              "name": "modulePaused",
               "type": "bool"
             }
           ],
@@ -607,13 +607,13 @@
           "components": [
             {
               "internalType": "address",
-              "name": "ValidatorAddress",
+              "name": "validatorAddress",
               "type": "address"
             },
             {
-              "internalType": "int32",
-              "name": "TargetWeight",
-              "type": "int32"
+              "internalType": "int256",
+              "name": "targetWeight",
+              "type": "int256"
             }
           ],
           "internalType": "struct WhitelistedValidator[]",

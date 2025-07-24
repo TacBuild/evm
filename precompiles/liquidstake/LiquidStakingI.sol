@@ -19,21 +19,21 @@ string constant MSG_UPDATE_WHITELISTED_VALIDATORS = "/pstake.liquidstake.v1beta1
 string constant MSG_SET_MODULE_PAUSED = "/pstake.liquidstake.v1beta1.MsgSetModulePaused";
 
 struct WhitelistedValidator {
-	address ValidatorAddress;
-    int32     TargetWeight;
+    address     validatorAddress;
+    int256      targetWeight;
 }
 
 struct LiquidStakeParams {
-	string                  LiquidBondDenom;
-    WhitelistedValidator[]  WhitelistedValidators;
-    int256                  UnstakeFeeRate;
-    bool                    LsmDisabled;
-    int256                  MinLiquidStakeAmount;
-    string                  CwLockedPoolAddress;
-    string                  FeeAcountAddress;
-    int256                  AutocompoundFeeRate;
-    address                 WhitelistAdminAddress;
-    bool                    ModulePaused;
+    string                  liquidBondDenom;
+    WhitelistedValidator[]  whitelistedValidators;
+    int256                  unstakeFeeRate;
+    bool                    lsmDisabled;
+    int256                  minLiquidStakeAmount;
+    address                  cwLockedPoolAddress;
+    address                  feeAccountAddress;
+    int256                  autocompoundFeeRate;
+    address                 whitelistAdminAddress;
+    bool                    modulePaused;
 }
 
 enum ValidatorStatus {

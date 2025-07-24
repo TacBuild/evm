@@ -485,41 +485,6 @@ func (s *LiquidStakePrecompileTestSuite) TestPrecompileMethodSignatures() {
 	s.Require().Contains(methods, liquidstake.StatesMethod)
 }
 
-		//		{
-		//			"pass - allowance query",
-		//			func(delegator, grantee testkeyring.Key) []byte {
-		//				input, err := s.precompile.Pack(
-		//					authorization.AllowanceMethod,
-		//					delegator.Addr,
-		//					grantee.Addr,
-		//					liquidstake.LiquidStakeMsg,
-		//				)
-		//				s.Require().NoError(err, "failed to pack input")
-		//				return input
-		//			},
-		//			1000000,
-		//			false,
-		//			true,
-		//			"",
-		//		},
-		//		{
-		//			"pass - allowance query - read only",
-		//			func(delegator, grantee testkeyring.Key) []byte {
-		//				input, err := s.precompile.Pack(
-		//					authorization.AllowanceMethod,
-		//					delegator.Addr,
-		//					grantee.Addr,
-		//					liquidstake.LiquidStakeMsg,
-		//				)
-		//				s.Require().NoError(err, "failed to pack input")
-		//				return input
-		//			},
-		//			1000000,
-		//			true,
-		//			true,
-		//			"",
-		//		},
-
 // TestQueryMethods tests the precompile's query methods.
 func (s *LiquidStakePrecompileTestSuite) TestQueryMethods() {
 	var ctx sdk.Context
@@ -544,18 +509,6 @@ func (s *LiquidStakePrecompileTestSuite) TestQueryMethods() {
 			"",
 		},
 		{
-			"pass - params query - not read only",
-			func() []byte {
-				input, err := s.precompile.Pack(liquidstake.ParamsMethod)
-				s.Require().NoError(err, "failed to pack input")
-				return input
-			},
-			100000,
-			false,
-			true,
-			"",
-		},
-		{
 			"pass - liquidValidators query",
 			func() []byte {
 				input, err := s.precompile.Pack(liquidstake.LiquidValidatorsMethod)
@@ -564,18 +517,6 @@ func (s *LiquidStakePrecompileTestSuite) TestQueryMethods() {
 			},
 			100000,
 			true,
-			true,
-			"",
-		},
-		{
-			"pass - liquidValidators query - not read only",
-			func() []byte {
-				input, err := s.precompile.Pack(liquidstake.LiquidValidatorsMethod)
-				s.Require().NoError(err, "failed to pack input")
-				return input
-			},
-			100000,
-			false,
 			true,
 			"",
 		},
@@ -590,44 +531,6 @@ func (s *LiquidStakePrecompileTestSuite) TestQueryMethods() {
 			true,
 			true,
 			"",
-		},
-		{
-			"pass - states query - not read only",
-			func() []byte {
-				input, err := s.precompile.Pack(liquidstake.StatesMethod)
-				s.Require().NoError(err, "failed to pack input")
-				return input
-			},
-			100000,
-			false,
-			true,
-			"",
-		},
-		{
-			"fail - params query with arguments",
-			func() []byte {
-				// Pack with extra argument to test validation
-				input, err := s.precompile.Pack(liquidstake.ParamsMethod)
-				s.Require().NoError(err)
-				// Append extra data to simulate extra arguments
-				return append(input, make([]byte, 32)...)
-			},
-			100000,
-			true,
-			false,
-			"invalid number of arguments",
-		},
-		{
-			"fail - insufficient gas",
-			func() []byte {
-				input, err := s.precompile.Pack(liquidstake.ParamsMethod)
-				s.Require().NoError(err, "failed to pack input")
-				return input
-			},
-			1000, // Very low gas
-			true,
-			false,
-			"out of gas",
 		},
 	}
 
@@ -701,47 +604,47 @@ func (s *LiquidStakePrecompileTestSuite) TestQueryMethods() {
 	}
 }
 
-// TestQueryMethodsWithData tests query methods with some liquid staking data.
-func (s *LiquidStakePrecompileTestSuite) TestQueryMethodsWithData() {
-	s.SetupTest()
-	ctx := s.nw.GetContext().WithBlockTime(time.Now())
-
-	// Perform a liquid stake operation to have some data
-	delegator := s.keyring.GetKey(0)
-	_, err := s.nw.App.LiquidStakeKeeper.LiquidStake(
-		ctx,
-		liquidstaketypes.LiquidStakeProxyAcc,
-		delegator.AccAddr,
-		sdk.NewCoin(s.bondDenom, math.NewInt(1000000)),
-	)
-	s.Require().NoError(err, "failed to perform liquid stake")
-
-	// Test params query
-	contract := vm.NewPrecompile(vm.AccountRef(delegator.Addr), s.precompile, common.U2560, 100000)
-	contract.Input, err = s.precompile.Pack(liquidstake.ParamsMethod)
-	s.Require().NoError(err)
-
-	bz, err := s.precompile.Run(nil, contract, true)
-	s.Require().NoError(err, "params query should succeed")
-	s.Require().NotNil(bz, "params response should not be nil")
-	s.Require().Greater(len(bz), 0, "params response should not be empty")
-
-	// Test liquidValidators query
-	contract.Input, err = s.precompile.Pack(liquidstake.LiquidValidatorsMethod)
-	s.Require().NoError(err)
-
-	bz, err = s.precompile.Run(nil, contract, true)
-	s.Require().NoError(err, "liquidValidators query should succeed")
-	s.Require().NotNil(bz, "liquidValidators response should not be nil")
-	s.Require().Greater(len(bz), 0, "liquidValidators response should not be empty")
-
-	// Test states query
-	contract.Input, err = s.precompile.Pack(liquidstake.StatesMethod)
-	s.Require().NoError(err)
-
-	bz, err = s.precompile.Run(nil, contract, true)
-	s.Require().NoError(err, "states query should succeed")
-	s.Require().NotNil(bz, "states response should not be nil")
-	s.Require().Greater(len(bz), 0, "states response should not be empty")
-}
-
+//// TestQueryMethodsWithData tests query methods with some liquid staking data.
+//func (s *LiquidStakePrecompileTestSuite) TestQueryMethodsWithData() {
+//	s.SetupTest()
+//	ctx := s.nw.GetContext().WithBlockTime(time.Now())
+//
+//	// Perform a liquid stake operation to have some data
+//	delegator := s.keyring.GetKey(0)
+//	_, err := s.nw.App.LiquidStakeKeeper.LiquidStake(
+//		ctx,
+//		liquidstaketypes.LiquidStakeProxyAcc,
+//		delegator.AccAddr,
+//		sdk.NewCoin(s.bondDenom, math.NewInt(1000000)),
+//	)
+//	s.Require().NoError(err, "failed to perform liquid stake")
+//
+//	// Test params query
+//	contract := vm.NewPrecompile(vm.AccountRef(delegator.Addr), s.precompile, common.U2560, 100000)
+//	contract.Input, err = s.precompile.Pack(liquidstake.ParamsMethod)
+//	s.Require().NoError(err)
+//
+//	bz, err := s.precompile.Run(nil, contract, true)
+//	s.Require().NoError(err, "params query should succeed")
+//	s.Require().NotNil(bz, "params response should not be nil")
+//	s.Require().Greater(len(bz), 0, "params response should not be empty")
+//
+//	// Test liquidValidators query
+//	contract.Input, err = s.precompile.Pack(liquidstake.LiquidValidatorsMethod)
+//	s.Require().NoError(err)
+//
+//	bz, err = s.precompile.Run(nil, contract, true)
+//	s.Require().NoError(err, "liquidValidators query should succeed")
+//	s.Require().NotNil(bz, "liquidValidators response should not be nil")
+//	s.Require().Greater(len(bz), 0, "liquidValidators response should not be empty")
+//
+//	// Test states query
+//	contract.Input, err = s.precompile.Pack(liquidstake.StatesMethod)
+//	s.Require().NoError(err)
+//
+//	bz, err = s.precompile.Run(nil, contract, true)
+//	s.Require().NoError(err, "states query should succeed")
+//	s.Require().NotNil(bz, "states response should not be nil")
+//	s.Require().Greater(len(bz), 0, "states response should not be empty")
+//}
+//

@@ -81,7 +81,7 @@ func (p Precompile) States(
 		return nil, err
 	}
 
-	statesOutput := NewNetAmountOutput(&res.NetAmountState)
+	statesOutput := NewNetAmount(&res.NetAmountState)
 
 	return method.Outputs.Pack(statesOutput)
 }
