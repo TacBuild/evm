@@ -105,12 +105,6 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readOnly bool) (bz [
 				bz, err = p.StakeToLP(ctx, evm.Origin, contract, stateDB, method, args)
 			case LiquidUnstakeMethod:
 				bz, err = p.LiquidUnstake(ctx, evm.Origin, contract, stateDB, method, args)
-			case UpdateParamsMethod:
-				bz, err = p.UpdateParams(ctx, evm.Origin, contract, stateDB, method, args)
-			case UpdateWhitelistedValidatorsMethod:
-				bz, err = p.UpdateWhitelistedValidators(ctx, evm.Origin, contract, stateDB, method, args)
-			case SetModulePausedMethod:
-				bz, err = p.SetModulePaused(ctx, evm.Origin, contract, stateDB, method, args)
 
 			// Authorization transactions
 			case authorization.ApproveMethod:

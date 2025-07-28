@@ -29,8 +29,8 @@ struct LiquidStakeParams {
     int256                  unstakeFeeRate;
     bool                    lsmDisabled;
     int256                  minLiquidStakeAmount;
-    address                  cwLockedPoolAddress;
-    address                  feeAccountAddress;
+    address                 cwLockedPoolAddress;
+    address                 feeAccountAddress;
     int256                  autocompoundFeeRate;
     address                 whitelistAdminAddress;
     bool                    modulePaused;
@@ -43,7 +43,7 @@ enum ValidatorStatus {
 }
 
 struct LiquidValidatorState {
-    string                  operatorAddress;
+    address                 operatorAddress;
     int256                  weight;
     ValidatorStatus         status;
     int256                  delShares;
@@ -83,21 +83,6 @@ interface LiquidStakingI is authorization.AuthorizationI {
         address         delegatorAddress,
         uint256         Amount
     ) external returns (int64 completionTime);
-
-    function updateParams(
-        address         authority,
-        LiquidStakeParams calldata params
-    ) external returns (bool success);
-
-    function updateWhitelistedValidators(
-        address                         authoriy,
-        WhitelistedValidator[] calldata whitelistedValidators
-    ) external returns (bool success);
-
-    function setModulePaused(
-        address authoriy,
-        bool    isPaused
-    ) external returns (bool success);
     // functions definitions end
 
     // view functions/query definitions start

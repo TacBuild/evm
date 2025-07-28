@@ -39,11 +39,11 @@ type LiquidStakeParams = struct {
 }
 
 type LiquidValidatorState struct {
-	ValidatorAddress string   `json:"operatorAddress"`
-	Weight           *big.Int `json:"weight"`
-	Status           uint32   `json:"status"`
-	DelShares        *big.Int `json:"delShares"`
-	LiquidTokens     *big.Int `json:"liquidTokens"`
+	OperatorAddress  common.Address   `json:"operatorAddress"`
+	Weight           *big.Int         `json:"weight"`
+	Status           uint8            `json:"status"`
+	DelShares        *big.Int         `json:"delShares"`
+	LiquidTokens     *big.Int         `json:"liquidTokens"`
 }
 
 type NetAmount struct {
@@ -59,10 +59,16 @@ type NetAmount struct {
 
 
 func NewLiquidValidatorOutput(lvs *types.LiquidValidatorState) LiquidValidatorState {
+	valAddr, err := sdk.ValAddressFromBech32(lvs.OperatorAddress)
+	var validatorAddr common.Address
+	if err == nil {
+		validatorAddr = common.BytesToAddress(valAddr.Bytes())
+	}
+
 	return LiquidValidatorState{
-		ValidatorAddress: lvs.OperatorAddress,
+		OperatorAddress: validatorAddr,
 		Weight:           lvs.Weight.BigInt(),
-		Status:           uint32(lvs.Status),
+		Status:           uint8(lvs.Status),
 		DelShares:        lvs.DelShares.BigInt(),
 		LiquidTokens:     lvs.LiquidTokens.BigInt(),
 	}
