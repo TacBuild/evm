@@ -179,21 +179,6 @@ func (s *LiquidStakePrecompileTestSuite) TestIsTransaction() {
 			true,
 		},
 		{
-			liquidstake.UpdateParamsMethod,
-			s.precompile.Methods[liquidstake.UpdateParamsMethod],
-			true,
-		},
-		{
-			liquidstake.UpdateWhitelistedValidatorsMethod,
-			s.precompile.Methods[liquidstake.UpdateWhitelistedValidatorsMethod],
-			true,
-		},
-		{
-			liquidstake.SetModulePausedMethod,
-			s.precompile.Methods[liquidstake.SetModulePausedMethod],
-			true,
-		},
-		{
 			authorization.AllowanceMethod,
 			s.precompile.Methods[authorization.AllowanceMethod],
 			false,
@@ -648,3 +633,429 @@ func (s *LiquidStakePrecompileTestSuite) TestQueryMethods() {
 //	s.Require().Greater(len(bz), 0, "states response should not be empty")
 //}
 //
+
+// TestApprove tests the precompile's Approve authorization method.
+func (s *LiquidStakePrecompileTestSuite) TestApprove() {
+	var ctx sdk.Context
+	testcases := []struct {
+		name        string
+		malleate    func(delegator, grantee testkeyring.Key) []byte
+		gas         uint64
+		readOnly    bool
+		expPass     bool
+		errContains string
+	}{
+		{
+			"pass - approve LiquidStake transaction",
+			func(delegator, grantee testkeyring.Key) []byte {
+				input, err := s.precompile.Pack(
+					authorization.ApproveMethod,
+					grantee.Addr,
+					big.NewInt(1000000),
+					[]string{liquidstake.LiquidStakeMsg},
+				)
+				s.Require().NoError(err, "failed to pack input")
+				return input
+			},
+			1000000,
+			false,
+			true,
+			"",
+		},
+		{
+			"pass - approve StakeToLP transaction",
+			func(delegator, grantee testkeyring.Key) []byte {
+				input, err := s.precompile.Pack(
+					authorization.ApproveMethod,
+					grantee.Addr,
+					big.NewInt(2000000),
+					[]string{liquidstake.StakeToLPMsg},
+				)
+				s.Require().NoError(err, "failed to pack input")
+				return input
+			},
+			1000000,
+			false,
+			true,
+			"",
+		},
+		{
+			"pass - approve LiquidUnstake transaction",
+			func(delegator, grantee testkeyring.Key) []byte {
+				input, err := s.precompile.Pack(
+					authorization.ApproveMethod,
+					grantee.Addr,
+					big.NewInt(1500000),
+					[]string{liquidstake.LiquidUnstakeMsg},
+				)
+				s.Require().NoError(err, "failed to pack input")
+				return input
+			},
+			1000000,
+			false,
+			true,
+			"",
+		},
+	}
+
+	for _, tc := range testcases {
+		s.Run(tc.name, func() {
+			// setup basic test suite
+			s.SetupTest()
+			ctx = s.nw.GetContext().WithBlockTime(time.Now())
+
+			baseFee := s.nw.App.EVMKeeper.GetBaseFee(ctx)
+
+			delegator := s.keyring.GetKey(0)
+			grantee := s.keyring.GetKey(1)
+
+			contract := vm.NewPrecompile(vm.AccountRef(delegator.Addr), s.precompile, common.U2560, tc.gas)
+			contractAddr := contract.Address()
+
+			// malleate testcase
+			contract.Input = tc.malleate(delegator, grantee)
+
+			// Build and sign Ethereum transaction
+			txArgs := evmtypes.EvmTxArgs{
+				ChainID:   evmtypes.GetEthChainConfig().ChainID,
+				Nonce:     0,
+				To:        &contractAddr,
+				Amount:    nil,
+				GasLimit:  tc.gas,
+				GasPrice:  chainutil.ExampleMinGasPrices.BigInt(),
+				GasFeeCap: baseFee,
+				GasTipCap: big.NewInt(1),
+				Accesses:  &ethtypes.AccessList{},
+			}
+
+			msg, err := s.factory.GenerateGethCoreMsg(delegator.Priv, txArgs)
+			s.Require().NoError(err)
+
+			// Instantiate config
+			proposerAddress := ctx.BlockHeader().ProposerAddress
+			cfg, err := s.nw.App.EVMKeeper.EVMConfig(ctx, proposerAddress)
+			s.Require().NoError(err, "failed to instantiate EVM config")
+
+			// Instantiate EVM
+			headerHash := ctx.HeaderHash()
+			stDB := statedb.New(
+				ctx,
+				s.nw.App.EVMKeeper,
+				statedb.NewEmptyTxConfig(common.BytesToHash(headerHash)),
+			)
+			evm := s.nw.App.EVMKeeper.NewEVM(
+				ctx, *msg, cfg, nil, stDB,
+			)
+
+			precompiles, found, err := s.nw.App.EVMKeeper.GetPrecompileInstance(ctx, contractAddr)
+			s.Require().NoError(err, "failed to instantiate precompile")
+			s.Require().True(found, "not found precompile")
+			evm.WithPrecompiles(precompiles.Map, precompiles.Addresses)
+
+			// Run precompiled contract
+			bz, err := s.precompile.Run(evm, contract, tc.readOnly)
+
+			// Check results
+			if tc.expPass {
+				s.Require().NoError(err, "expected no error when running the precompile")
+				s.Require().NotNil(bz, "expected returned bytes not to be nil")
+			} else {
+				s.Require().Error(err, "expected error to be returned when running the precompile")
+				s.Require().Nil(bz, "expected returned bytes to be nil")
+				s.Require().ErrorContains(err, tc.errContains)
+			}
+		})
+	}
+}
+
+//// TestIncreaseAllowance tests the precompile's IncreaseAllowance authorization method.
+//func (s *LiquidStakePrecompileTestSuite) TestIncreaseAllowance() {
+//	var ctx sdk.Context
+//	testcases := []struct {
+//		name        string
+//		malleate    func(delegator, grantee testkeyring.Key) []byte
+//		gas         uint64
+//		readOnly    bool
+//		expPass     bool
+//		errContains string
+//	}{
+//		{
+//			"pass - increase allowance for LiquidStake transaction",
+//			func(delegator, grantee testkeyring.Key) []byte {
+//				// First create an authorization to increase
+//				err := s.CreateAuthorization(ctx, delegator.AccAddr, grantee.AccAddr, liquidstake.DelegateAuthz, &sdk.Coin{Denom: s.bondDenom, Amount: math.NewInt(1000000)})
+//				s.Require().NoError(err)
+//
+//				input, err := s.precompile.Pack(
+//					authorization.IncreaseAllowanceMethod,
+//					grantee.Addr,
+//					big.NewInt(500000),
+//					[]string{liquidstake.LiquidStakeMsg},
+//				)
+//				s.Require().NoError(err, "failed to pack input")
+//				return input
+//			},
+//			1000000,
+//			false,
+//			true,
+//			"",
+//		},
+//		{
+//			"pass - increase allowance for StakeToLP transaction",
+//			func(delegator, grantee testkeyring.Key) []byte {
+//				// First create an authorization to increase
+//				err := s.CreateAuthorization(ctx, delegator.AccAddr, grantee.AccAddr, liquidstake.DelegateAuthz, &sdk.Coin{Denom: s.bondDenom, Amount: math.NewInt(2000000)})
+//				s.Require().NoError(err)
+//
+//				input, err := s.precompile.Pack(
+//					authorization.IncreaseAllowanceMethod,
+//					grantee.Addr,
+//					big.NewInt(1000000),
+//					[]string{liquidstake.StakeToLPMsg},
+//				)
+//				s.Require().NoError(err, "failed to pack input")
+//				return input
+//			},
+//			1000000,
+//			false,
+//			true,
+//			"",
+//		},
+//		{
+//			"pass - increase allowance for LiquidUnstake transaction",
+//			func(delegator, grantee testkeyring.Key) []byte {
+//				// First create an authorization to increase
+//				err := s.CreateAuthorization(ctx, delegator.AccAddr, grantee.AccAddr, liquidstake.UndelegateAuthz, &sdk.Coin{Denom: s.bondDenom, Amount: math.NewInt(1500000)})
+//				s.Require().NoError(err)
+//
+//				input, err := s.precompile.Pack(
+//					authorization.IncreaseAllowanceMethod,
+//					grantee.Addr,
+//					big.NewInt(750000),
+//					[]string{liquidstake.LiquidUnstakeMsg},
+//				)
+//				s.Require().NoError(err, "failed to pack input")
+//				return input
+//			},
+//			1000000,
+//			false,
+//			true,
+//			"",
+//		},
+//	}
+//
+//	for _, tc := range testcases {
+//		s.Run(tc.name, func() {
+//			// setup basic test suite
+//			s.SetupTest()
+//			ctx = s.nw.GetContext().WithBlockTime(time.Now())
+//
+//			baseFee := s.nw.App.EVMKeeper.GetBaseFee(ctx)
+//
+//			delegator := s.keyring.GetKey(0)
+//			grantee := s.keyring.GetKey(1)
+//
+//			contract := vm.NewPrecompile(vm.AccountRef(delegator.Addr), s.precompile, common.U2560, tc.gas)
+//			contractAddr := contract.Address()
+//
+//			// malleate testcase
+//			contract.Input = tc.malleate(delegator, grantee)
+//
+//			// Build and sign Ethereum transaction
+//			txArgs := evmtypes.EvmTxArgs{
+//				ChainID:   evmtypes.GetEthChainConfig().ChainID,
+//				Nonce:     0,
+//				To:        &contractAddr,
+//				Amount:    nil,
+//				GasLimit:  tc.gas,
+//				GasPrice:  chainutil.ExampleMinGasPrices.BigInt(),
+//				GasFeeCap: baseFee,
+//				GasTipCap: big.NewInt(1),
+//				Accesses:  &ethtypes.AccessList{},
+//			}
+//
+//			msg, err := s.factory.GenerateGethCoreMsg(delegator.Priv, txArgs)
+//			s.Require().NoError(err)
+//
+//			// Instantiate config
+//			proposerAddress := ctx.BlockHeader().ProposerAddress
+//			cfg, err := s.nw.App.EVMKeeper.EVMConfig(ctx, proposerAddress)
+//			s.Require().NoError(err, "failed to instantiate EVM config")
+//
+//			// Instantiate EVM
+//			headerHash := ctx.HeaderHash()
+//			stDB := statedb.New(
+//				ctx,
+//				s.nw.App.EVMKeeper,
+//				statedb.NewEmptyTxConfig(common.BytesToHash(headerHash)),
+//			)
+//			evm := s.nw.App.EVMKeeper.NewEVM(
+//				ctx, *msg, cfg, nil, stDB,
+//			)
+//
+//			precompiles, found, err := s.nw.App.EVMKeeper.GetPrecompileInstance(ctx, contractAddr)
+//			s.Require().NoError(err, "failed to instantiate precompile")
+//			s.Require().True(found, "not found precompile")
+//			evm.WithPrecompiles(precompiles.Map, precompiles.Addresses)
+//
+//			// Run precompiled contract
+//			bz, err := s.precompile.Run(evm, contract, tc.readOnly)
+//
+//			// Check results
+//			if tc.expPass {
+//				s.Require().NoError(err, "expected no error when running the precompile")
+//				s.Require().NotNil(bz, "expected returned bytes not to be nil")
+//			} else {
+//				s.Require().Error(err, "expected error to be returned when running the precompile")
+//				s.Require().Nil(bz, "expected returned bytes to be nil")
+//				s.Require().ErrorContains(err, tc.errContains)
+//			}
+//		})
+//	}
+//}
+//
+//// TestDecreaseAllowance tests the precompile's DecreaseAllowance authorization method.
+//func (s *LiquidStakePrecompileTestSuite) TestDecreaseAllowance() {
+//	var ctx sdk.Context
+//	testcases := []struct {
+//		name        string
+//		malleate    func(delegator, grantee testkeyring.Key) []byte
+//		gas         uint64
+//		readOnly    bool
+//		expPass     bool
+//		errContains string
+//	}{
+//		{
+//			"pass - decrease allowance for LiquidStake transaction",
+//			func(delegator, grantee testkeyring.Key) []byte {
+//				// First create an authorization to decrease
+//				err := s.CreateAuthorization(ctx, delegator.AccAddr, grantee.AccAddr, liquidstake.DelegateAuthz, &sdk.Coin{Denom: s.bondDenom, Amount: math.NewInt(2000000)})
+//				s.Require().NoError(err)
+//
+//				input, err := s.precompile.Pack(
+//					authorization.DecreaseAllowanceMethod,
+//					grantee.Addr,
+//					big.NewInt(500000),
+//					[]string{liquidstake.LiquidStakeMsg},
+//				)
+//				s.Require().NoError(err, "failed to pack input")
+//				return input
+//			},
+//			1000000,
+//			false,
+//			true,
+//			"",
+//		},
+//		{
+//			"pass - decrease allowance for StakeToLP transaction",
+//			func(delegator, grantee testkeyring.Key) []byte {
+//				// First create an authorization to decrease
+//				err := s.CreateAuthorization(ctx, delegator.AccAddr, grantee.AccAddr, liquidstake.DelegateAuthz, &sdk.Coin{Denom: s.bondDenom, Amount: math.NewInt(3000000)})
+//				s.Require().NoError(err)
+//
+//				input, err := s.precompile.Pack(
+//					authorization.DecreaseAllowanceMethod,
+//					grantee.Addr,
+//					big.NewInt(1000000),
+//					[]string{liquidstake.StakeToLPMsg},
+//				)
+//				s.Require().NoError(err, "failed to pack input")
+//				return input
+//			},
+//			1000000,
+//			false,
+//			true,
+//			"",
+//		},
+//		{
+//			"pass - decrease allowance for LiquidUnstake transaction",
+//			func(delegator, grantee testkeyring.Key) []byte {
+//				// First create an authorization to decrease
+//				err := s.CreateAuthorization(ctx, delegator.AccAddr, grantee.AccAddr, liquidstake.UndelegateAuthz, &sdk.Coin{Denom: s.bondDenom, Amount: math.NewInt(2500000)})
+//				s.Require().NoError(err)
+//
+//				input, err := s.precompile.Pack(
+//					authorization.DecreaseAllowanceMethod,
+//					grantee.Addr,
+//					big.NewInt(750000),
+//					[]string{liquidstake.LiquidUnstakeMsg},
+//				)
+//				s.Require().NoError(err, "failed to pack input")
+//				return input
+//			},
+//			1000000,
+//			false,
+//			true,
+//			"",
+//		},
+//	}
+//
+//	for _, tc := range testcases {
+//		s.Run(tc.name, func() {
+//			// setup basic test suite
+//			s.SetupTest()
+//			ctx = s.nw.GetContext().WithBlockTime(time.Now())
+//
+//			baseFee := s.nw.App.EVMKeeper.GetBaseFee(ctx)
+//
+//			delegator := s.keyring.GetKey(0)
+//			grantee := s.keyring.GetKey(1)
+//
+//			contract := vm.NewPrecompile(vm.AccountRef(delegator.Addr), s.precompile, common.U2560, tc.gas)
+//			contractAddr := contract.Address()
+//
+//			// malleate testcase
+//			contract.Input = tc.malleate(delegator, grantee)
+//
+//			// Build and sign Ethereum transaction
+//			txArgs := evmtypes.EvmTxArgs{
+//				ChainID:   evmtypes.GetEthChainConfig().ChainID,
+//				Nonce:     0,
+//				To:        &contractAddr,
+//				Amount:    nil,
+//				GasLimit:  tc.gas,
+//				GasPrice:  chainutil.ExampleMinGasPrices.BigInt(),
+//				GasFeeCap: baseFee,
+//				GasTipCap: big.NewInt(1),
+//				Accesses:  &ethtypes.AccessList{},
+//			}
+//
+//			msg, err := s.factory.GenerateGethCoreMsg(delegator.Priv, txArgs)
+//			s.Require().NoError(err)
+//
+//			// Instantiate config
+//			proposerAddress := ctx.BlockHeader().ProposerAddress
+//			cfg, err := s.nw.App.EVMKeeper.EVMConfig(ctx, proposerAddress)
+//			s.Require().NoError(err, "failed to instantiate EVM config")
+//
+//			// Instantiate EVM
+//			headerHash := ctx.HeaderHash()
+//			stDB := statedb.New(
+//				ctx,
+//				s.nw.App.EVMKeeper,
+//				statedb.NewEmptyTxConfig(common.BytesToHash(headerHash)),
+//			)
+//			evm := s.nw.App.EVMKeeper.NewEVM(
+//				ctx, *msg, cfg, nil, stDB,
+//			)
+//
+//			precompiles, found, err := s.nw.App.EVMKeeper.GetPrecompileInstance(ctx, contractAddr)
+//			s.Require().NoError(err, "failed to instantiate precompile")
+//			s.Require().True(found, "not found precompile")
+//			evm.WithPrecompiles(precompiles.Map, precompiles.Addresses)
+//
+//			// Run precompiled contract
+//			bz, err := s.precompile.Run(evm, contract, tc.readOnly)
+//
+//			// Check results
+//			if tc.expPass {
+//				s.Require().NoError(err, "expected no error when running the precompile")
+//				s.Require().NotNil(bz, "expected returned bytes not to be nil")
+//			} else {
+//				s.Require().Error(err, "expected error to be returned when running the precompile")
+//				s.Require().Nil(bz, "expected returned bytes to be nil")
+//				s.Require().ErrorContains(err, tc.errContains)
+//			}
+//		})
+//	}
+//}

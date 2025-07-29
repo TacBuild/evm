@@ -29,4 +29,8 @@ var (
 	ErrInvalidResponse                              = errors.Register(ModuleName, 1022, "invalid response")
 	ErrUnstakeFailed                                = errors.Register(ModuleName, 1023, "Unstaking failed")
 	ErrRedelegateFailed                             = errors.Register(ModuleName, 1024, "Redelegate failed")
+	//allow only exact match case conversion rate authorization is hard to implement
+	ErrStakeToLPFailedAmountNotSame                 = errors.Register(ModuleName, 1026, "Stake to LP authz failed: requested amount of staked tokens should be equal to authorized")
+	ErrStakeToLPFailedInvalidValidator              = errors.Register(ModuleName, 1025, "Stake to LP authz failed: validator not correpsond")
+	ErrStakeToLPFailedInvalidLiquidAmount           = errors.Register(ModuleName, 1026, "Stake to LP authz failed: requested liquid amount is less then allowed minimal")
 )

@@ -17,9 +17,6 @@ const (
 	LiquidStakeMethod                 = "liquidStake"
 	StakeToLPMethod                   = "stakeToLP"
 	LiquidUnstakeMethod               = "liquidUnstake"
-	UpdateParamsMethod                = "updateParams"
-	UpdateWhitelistedValidatorsMethod = "updateWhitelistedValidators"
-	SetModulePausedMethod             = "setModulePaused"
 )
 
 // Ensure imports are used (compiler workaround)

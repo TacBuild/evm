@@ -5,6 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 )
 
 // RegisterLegacyAminoCodec registers the necessary x/liquidstake interfaces and concrete types
@@ -16,6 +17,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgUpdateParams{}, "liquidstake/MsgUpdateParams", nil)
 	cdc.RegisterConcrete(&MsgUpdateWhitelistedValidators{}, "liquidstake/MsgUpdateWhitelistedValidators", nil)
 	cdc.RegisterConcrete(&MsgSetModulePaused{}, "liquidstake/MsgSetModulePaused", nil)
+	cdc.RegisterConcrete(&LiquidStakeAuthorization{}, "liquidstake/LiquidStakeAuthorization", nil)
 }
 
 // RegisterInterfaces registers the x/liquidstake interfaces types with the interface registry.
@@ -28,6 +30,10 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgUpdateParams{},
 		&MsgUpdateWhitelistedValidators{},
 		&MsgSetModulePaused{},
+		)
+	registry.RegisterImplementations(
+		(*authz.Authorization)(nil),
+		&LiquidStakeAuthorization{},
 	)
 }
 
