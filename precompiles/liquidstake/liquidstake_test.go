@@ -65,7 +65,7 @@ func TestLiquidStakePrecompileTestSuite(t *testing.T) {
 }
 
 func (s *LiquidStakePrecompileTestSuite) SetupTest() {
-	keyring := testkeyring.New(2)
+	keyring := testkeyring.New(10)
 	nw := network.NewUnitTestNetwork(
 		network.WithPreFundedAccounts(keyring.GetAllAccAddrs()...),
 	)

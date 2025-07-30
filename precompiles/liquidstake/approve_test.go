@@ -3,6 +3,7 @@ package liquidstake_test
 import (
 	"fmt"
 	"math/big"
+	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
 
 	"cosmossdk.io/math"
 
@@ -19,6 +20,162 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/core/vm"
 )
+
+func (s *LiquidStakePrecompileTestSuite) TestRevoke() {
+	var (
+		ctx  sdk.Context
+		stDB *statedb.StateDB
+	)
+	method := s.precompile.Methods[authorization.RevokeMethod]
+
+	testCases := []struct {
+		name        string
+		malleate    func(granter, grantee testkeyring.Key) []interface{}
+		postCheck   func(granter, grantee testkeyring.Key, data []byte)
+		gas         uint64
+		expError    bool
+		errContains string
+	}{
+		{
+			"fail - empty input args",
+			func(_, _ testkeyring.Key) []interface{} {
+				return []interface{}{}
+			},
+			func(_, _ testkeyring.Key, _ []byte) {},
+			200000,
+			true,
+			fmt.Sprintf(cmn.ErrInvalidNumberOfArgs, 2, 0),
+		},
+		{
+			"fail - invalid message type",
+			func(_, grantee testkeyring.Key) []interface{} {
+				return []interface{}{
+					grantee.Addr,
+					[]string{"invalid"},
+				}
+			},
+			func(_, _ testkeyring.Key, _ []byte) {},
+			200000,
+			true,
+			fmt.Sprintf(cmn.ErrInvalidMsgType, "liquidstake", "invalid"),
+		},
+		{
+			"success - revoke liquid stake authorization",
+			func(granter, grantee testkeyring.Key) []interface{} {
+				approveMethod := s.precompile.Methods[authorization.ApproveMethod]
+				_, err := s.precompile.Approve(ctx, granter.Addr, stDB, &approveMethod, []interface{}{
+					grantee.Addr, big.NewInt(1), []string{liquidstake.LiquidStakeMsg},
+				})
+				s.Require().NoError(err)
+
+				// Check that the authorization exists
+				authz, expirationTime := CheckAuthorizationWithContext(ctx, s.nw.App.AuthzKeeper, liquidstaketypes.AuthorizationType_AUTHORIZATION_TYPE_STAKE, grantee.Addr, granter.Addr)
+				s.Require().NotNil(authz)
+				s.Require().NotNil(expirationTime)
+
+				return []interface{}{
+					grantee.Addr,
+					[]string{liquidstake.LiquidStakeMsg},
+				}
+			},
+			func(granter, grantee testkeyring.Key, data []byte) {
+				s.Require().Equal(data, cmn.TrueValue)
+
+				// Check that the authorization is revoked
+				authz, expirationTime := CheckAuthorizationWithContext(ctx, s.nw.App.AuthzKeeper, liquidstaketypes.AuthorizationType_AUTHORIZATION_TYPE_STAKE, grantee.Addr, granter.Addr)
+				s.Require().Nil(authz)
+				s.Require().Nil(expirationTime)
+			},
+			200000,
+			false,
+			"",
+		},
+		{
+			"fail - should not revoke the approval when trying to revoke for a different message type",
+			func(granter, grantee testkeyring.Key) []interface{} {
+				approveMethod := s.precompile.Methods[authorization.ApproveMethod]
+				_, err := s.precompile.Approve(ctx, granter.Addr, stDB, &approveMethod, []interface{}{
+					grantee.Addr, big.NewInt(1), []string{liquidstake.LiquidStakeMsg},
+				})
+				s.Require().NoError(err)
+
+				return []interface{}{
+					grantee.Addr,
+					[]string{liquidstake.LiquidUnstakeMsg},
+				}
+			},
+			func(granter, grantee testkeyring.Key, data []byte) {
+				authz, expirationTime := CheckAuthorizationWithContext(ctx, s.nw.App.AuthzKeeper, liquidstaketypes.AuthorizationType_AUTHORIZATION_TYPE_STAKE, grantee.Addr, granter.Addr)
+				s.Require().NotNil(authz)
+				s.Require().NotNil(expirationTime)
+			},
+			200000,
+			true,
+			"authorization not found",
+		},
+		{
+			"fail - should return error if the approval does not exist",
+			func(granter, grantee testkeyring.Key) []interface{} {
+				return []interface{}{
+					grantee.Addr,
+					[]string{liquidstake.LiquidStakeMsg},
+				}
+			},
+			func(granter, grantee testkeyring.Key, data []byte) {},
+			200000,
+			true,
+			"authorization not found",
+		},
+		{
+			"fail - should not revoke the approval if sent by someone else than the granter",
+			func(granter, grantee testkeyring.Key) []interface{} {
+				approveMethod := s.precompile.Methods[authorization.ApproveMethod]
+				_, err := s.precompile.Approve(ctx, granter.Addr, stDB, &approveMethod, []interface{}{
+					grantee.Addr, big.NewInt(1), []string{liquidstake.LiquidStakeMsg},
+				})
+				s.Require().NoError(err)
+
+				differentSender := s.keyring.GetKey(2)
+
+				return []interface{}{
+					differentSender.Addr,
+					[]string{liquidstake.LiquidStakeMsg},
+				}
+			},
+			func(granter, grantee testkeyring.Key, data []byte) {
+				authz, expirationTime := CheckAuthorizationWithContext(ctx, s.nw.App.AuthzKeeper, liquidstaketypes.AuthorizationType_AUTHORIZATION_TYPE_STAKE, grantee.Addr, granter.Addr)
+				s.Require().NotNil(authz)
+				s.Require().NotNil(expirationTime)
+			},
+			200000,
+			true,
+			"authorization not found",
+		},
+	}
+
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			s.SetupTest()
+			ctx = s.nw.GetContext()
+			stDB = s.nw.GetStateDB()
+
+			granter := s.keyring.GetKey(0)
+			grantee := s.keyring.GetKey(1)
+
+			args := tc.malleate(granter, grantee)
+			bz, err := s.precompile.Revoke(ctx, granter.Addr, stDB, &method, args)
+
+			if tc.expError {
+				s.Require().ErrorContains(err, tc.errContains)
+				s.Require().Empty(bz)
+			} else {
+				s.Require().NoError(err)
+				s.Require().NotEmpty(bz)
+				tc.postCheck(granter, grantee, bz)
+			}
+		})
+	}
+}
 
 func (s *LiquidStakePrecompileTestSuite) TestApprove() {
 	var (
