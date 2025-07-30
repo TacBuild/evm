@@ -16,6 +16,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	"github.com/cosmos/evm/x/liquidstake/keeper"
+	evmtypes "github.com/cosmos/evm/x/vm/types"
 )
 
 var _ vm.PrecompiledContract = &Precompile{}
@@ -59,7 +60,7 @@ func NewPrecompile(
 		liquidStakeKeeper: liquidStakeKeeper,
 	}
 	// SetAddress defines the address of the staking precompiled contract.
-	p.SetAddress(common.HexToAddress(LiquidStakingPrecompileAddress))
+	p.SetAddress(common.HexToAddress(evmtypes.LiquidStakePrecompileAddress))
 
 	return p, nil
 }

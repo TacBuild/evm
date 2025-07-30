@@ -1,6 +1,8 @@
 package liquidstake
 
 import (
+	"fmt"
+
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -8,7 +10,6 @@ import (
 	"github.com/cosmos/evm/precompiles/authorization"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	keeper "github.com/cosmos/evm/x/liquidstake/keeper"
 	types "github.com/cosmos/evm/x/liquidstake/types"
 )
@@ -22,19 +23,17 @@ const (
 // Ensure imports are used (compiler workaround)
 var (
 	_ *types.MsgLiquidStake
-	_ *stakingtypes.StakeAuthorization
+	_ *types.LiquidStakeAuthorization
 )
 
-// Maybe its better to just use those from staking precompile
+// Authorization types for liquid staking operations
 const (
-	// DelegateAuthz defines the authorization type for the staking Delegate
-	DelegateAuthz = stakingtypes.AuthorizationType_AUTHORIZATION_TYPE_DELEGATE
-	// UndelegateAuthz defines the authorization type for the staking Undelegate
-	UndelegateAuthz = stakingtypes.AuthorizationType_AUTHORIZATION_TYPE_UNDELEGATE
-	// RedelegateAuthz defines the authorization type for the staking Redelegate
-	RedelegateAuthz = stakingtypes.AuthorizationType_AUTHORIZATION_TYPE_REDELEGATE
-	// CancelUnbondingDelegationAuthz defines the authorization type for the staking
-	CancelUnbondingDelegationAuthz = stakingtypes.AuthorizationType_AUTHORIZATION_TYPE_CANCEL_UNBONDING_DELEGATION
+	// LiquidStakeAuthz defines the authorization type for the liquidstake Stake
+	LiquidStakeAuthz = types.AuthorizationType_AUTHORIZATION_TYPE_STAKE
+	// LiquidUnstakeAuthz defines the authorization type for the liquidstake Unstake
+	LiquidUnstakeAuthz = types.AuthorizationType_AUTHORIZATION_TYPE_UNSTAKE
+	// StakeToLPAuthz defines the authorization type for the liquidstake StakeToLP
+	StakeToLPAuthz = types.AuthorizationType_AUTHORIZATION_TYPE_STAKE_TO_LP
 )
 
 func (p Precompile) LiquidStake(
@@ -64,11 +63,17 @@ func (p Precompile) LiquidStake(
 	}
 
 	if !isCallerOrigin {
-		stakeAuthz, expiration, err := authorization.CheckAuthzAndAllowanceForGranter(ctx, p.AuthzKeeper, contract.CallerAddress, common.BytesToAddress(delegatorAddr), &msg.Amount, LiquidStakeMsg)
+		authz, expiration, err := authorization.CheckAuthzAndAllowanceForLiquidStake(ctx, p.AuthzKeeper, contract.CallerAddress, common.BytesToAddress(delegatorAddr), &msg.Amount, LiquidStakeMsg)
 		if err != nil {
 			return nil, err
 		}
-		if err := p.UpdateLiquidStakeAuthorization(ctx, contract.CallerAddress, common.BytesToAddress(delegatorAddr), stakeAuthz, expiration, LiquidStakeMsg, msg); err != nil {
+
+		liquidAuthz, ok := authz.(*types.LiquidStakeAuthorization)
+		if !ok {
+			return nil, fmt.Errorf("unexpected authorization type: %T", authz)
+		}
+
+		if err := p.UpdateLiquidStakeAuthorization(ctx, contract.CallerAddress, common.BytesToAddress(delegatorAddr), liquidAuthz, expiration, LiquidStakeMsg, msg); err != nil {
 			return nil, err
 		}
 	}
@@ -104,20 +109,31 @@ func (p Precompile) StakeToLP(
 
 	isCallerOrigin := contract.CallerAddress == origin
 
-	delegatorAddr, err := sdk.AccAddressFromBech32(msg.DelegatorAddress)
-	if err != nil {
-		return nil, err
+//	delegatorAddr, err := sdk.AccAddressFromBech32(msg.DelegatorAddress)
+//	if err != nil {
+//		return nil, err
+//	}
+
+	//TODO: fix this
+	if !isCallerOrigin {
+		return nil, fmt.Errorf("TODO")
 	}
 
-	if !isCallerOrigin {
-		stakeAuthz, expiration, err := authorization.CheckAuthzAndAllowanceForGranter(ctx, p.AuthzKeeper, contract.CallerAddress, common.BytesToAddress(delegatorAddr), &msg.StakedAmount, StakeToLPMsg)
-		if err != nil {
-			return nil, err
-		}
-		if err := p.UpdateLiquidStakeAuthorization(ctx, contract.CallerAddress, common.BytesToAddress(delegatorAddr), stakeAuthz, expiration, StakeToLPMsg, msg); err != nil {
-			return nil, err
-		}
-	}
+//	if !isCallerOrigin {
+//		authz, expiration, err := authorization.CheckAuthzAndAllowanceForLiquidStake(ctx, p.AuthzKeeper, contract.CallerAddress, common.BytesToAddress(delegatorAddr), &msg.StakedAmount, StakeToLPMsg)
+//		if err != nil {
+//			return nil, err
+//		}
+//
+//		liquidAuthz, ok := authz.(*types.LiquidStakeAuthorization)
+//		if !ok {
+//			return nil, fmt.Errorf("unexpected authorization type: %T", authz)
+//		}
+//
+//		if err := p.UpdateLiquidStakeAuthorization(ctx, contract.CallerAddress, common.BytesToAddress(delegatorAddr), liquidAuthz, expiration, StakeToLPMsg, msg); err != nil {
+//			return nil, err
+//		}
+//	}
 
 	msgSrv := keeper.NewMsgServerImpl(p.liquidStakeKeeper)
 
@@ -152,11 +168,17 @@ func (p Precompile) LiquidUnstake(
 	}
 
 	if !isCallerOrigin {
-		stakeAuthz, expiration, err := authorization.CheckAuthzAndAllowanceForGranter(ctx, p.AuthzKeeper, contract.CallerAddress, common.BytesToAddress(delegatorAddr), &msg.Amount, LiquidUnstakeMsg)
+		authz, expiration, err := authorization.CheckAuthzAndAllowanceForLiquidStake(ctx, p.AuthzKeeper, contract.CallerAddress, common.BytesToAddress(delegatorAddr), &msg.Amount, LiquidUnstakeMsg)
 		if err != nil {
 			return nil, err
 		}
-		if err := p.UpdateLiquidStakeAuthorization(ctx, contract.CallerAddress, common.BytesToAddress(delegatorAddr), stakeAuthz, expiration, LiquidUnstakeMsg, msg); err != nil {
+
+		liquidAuthz, ok := authz.(*types.LiquidStakeAuthorization)
+		if !ok {
+			return nil, fmt.Errorf("unexpected authorization type: %T", authz)
+		}
+
+		if err := p.UpdateLiquidStakeAuthorization(ctx, contract.CallerAddress, common.BytesToAddress(delegatorAddr), liquidAuthz, expiration, LiquidUnstakeMsg, msg); err != nil {
 			return nil, err
 		}
 	}

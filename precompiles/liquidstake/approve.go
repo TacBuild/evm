@@ -15,18 +15,30 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	liquidtypes "github.com/cosmos/evm/x/liquidstake/types"
 )
 
 var (
 	// LiquidStakeMsg defines the authorization type for MsgLiquidStake
 	LiquidStakeMsg = sdk.MsgTypeURL(&liquidtypes.MsgLiquidStake{})
-	// StakeToLPMsg defines the authorization type for MsgStakeToLP
-	StakeToLPMsg = sdk.MsgTypeURL(&liquidtypes.MsgStakeToLP{})
 	// LiquidUnstakeMsg defines the authorization type for MsgLiquidUnstake
 	LiquidUnstakeMsg = sdk.MsgTypeURL(&liquidtypes.MsgLiquidUnstake{})
+
+	// We do not allow StakeToLp delegation through smart-contract, 
+	// because current authorization interface doesnt provide opportunity to pass more arguments required for this delegation
+	// It is still possible to delegate through native cosmos transaction, or call StakeToLP from smart-contract directly
 )
+
+func coinToLiquidCoin(coin *sdk.Coin, liquidDenom string) *sdk.Coin {
+	if coin == nil {
+		return nil
+	}
+
+	return &sdk.Coin{
+		Denom:  liquidDenom,
+		Amount: coin.Amount,
+	}
+}
 
 // Approve sets an amount as the allowance of a grantee over the caller's tokens.
 // Returns a boolean value indicating whether the operation succeeded.
@@ -37,7 +49,11 @@ func (p Precompile) Approve(
 	method *abi.Method,
 	args []interface{},
 ) ([]byte, error) {
-	bondDenom := p.liquidStakeKeeper.LiquidBondDenom(ctx)
+	bondDenom, err := p.liquidStakeKeeper.BondDenom(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	grantee, coin, typeURLs, err := authorization.CheckApprovalArgs(args, bondDenom)
 	if err != nil {
 		return nil, err
@@ -45,10 +61,17 @@ func (p Precompile) Approve(
 
 	for _, typeURL := range typeURLs {
 		switch typeURL {
-		case LiquidStakeMsg, StakeToLPMsg, LiquidUnstakeMsg:
+		case LiquidStakeMsg:
 			if err = p.grantOrDeleteLiquidStakeAuthz(ctx, grantee, origin, coin, typeURL); err != nil {
 				return nil, err
 			}
+		case LiquidUnstakeMsg:
+			LiquidCoin := coinToLiquidCoin(coin, p.liquidStakeKeeper.LiquidBondDenom(ctx))
+
+			if err = p.grantOrDeleteLiquidStakeAuthz(ctx, grantee, origin, LiquidCoin, typeURL); err != nil {
+				return nil, err
+			}
+
 		default:
 			return nil, fmt.Errorf(cmn.ErrInvalidMsgType, "liquidstake", typeURL)
 		}
@@ -72,7 +95,7 @@ func (p Precompile) Revoke(
 
 	for _, typeURL := range typeURLs {
 		switch typeURL {
-		case LiquidStakeMsg, StakeToLPMsg, LiquidUnstakeMsg:
+		case LiquidStakeMsg, LiquidUnstakeMsg:
 			if err = p.AuthzKeeper.DeleteGrant(ctx, grantee.Bytes(), origin.Bytes(), typeURL); err != nil {
 				return nil, err
 			}
@@ -91,40 +114,45 @@ func (p Precompile) grantOrDeleteLiquidStakeAuthz(
 	coin *sdk.Coin,
 	msgURL string,
 ) error {
-	// If coin is nil, delete the grant
-	if coin == nil {
+	//if coin is negative or zero delete grant (nil is valid and means unlimited)
+	if coin != nil && !coin.Amount.IsPositive() {
 		return p.AuthzKeeper.DeleteGrant(ctx, grantee.Bytes(), granter.Bytes(), msgURL)
 	}
 
-	// Create a StakeAuthorization with the specified amount
-	stakeAuthz, err := stakingtypes.NewStakeAuthorization(
-		[]sdk.ValAddress{}, // empty allowList means any validator
-		nil,                // empty denyList means no restrictions
-		stakingtypes.AuthorizationType_AUTHORIZATION_TYPE_DELEGATE,
-		coin,
-	)
+	var authzType liquidtypes.AuthorizationType
+	switch msgURL {
+	case LiquidStakeMsg:
+		authzType = liquidtypes.AuthorizationType_AUTHORIZATION_TYPE_STAKE
+	case LiquidUnstakeMsg:
+		authzType = liquidtypes.AuthorizationType_AUTHORIZATION_TYPE_UNSTAKE
+	default:
+		return fmt.Errorf("invalid message type URL: %s", msgURL)
+	}
+
+	// Create a LiquidStakeAuthorization with the specified amount
+	liquidAuthz, err := liquidtypes.NewStakeAuthorization(authzType, coin, nil, nil)
 	if err != nil {
 		return err
 	}
 
-	if err := stakeAuthz.ValidateBasic(); err != nil {
+	if err := liquidAuthz.ValidateBasic(); err != nil {
 		return err
 	}
 
 	expiration := ctx.BlockTime().Add(p.ApprovalExpiration).UTC()
-	return p.AuthzKeeper.SaveGrant(ctx, grantee.Bytes(), granter.Bytes(), stakeAuthz, &expiration)
+	return p.AuthzKeeper.SaveGrant(ctx, grantee.Bytes(), granter.Bytes(), liquidAuthz, &expiration)
 }
 
 // UpdateLiquidStakeAuthorization updates the liquid stake authorization based on the authz AcceptResponse
 func (p Precompile) UpdateLiquidStakeAuthorization(
 	ctx sdk.Context,
 	grantee, granter common.Address,
-	stakeAuthz *stakingtypes.StakeAuthorization,
+	liquidAuthz *liquidtypes.LiquidStakeAuthorization,
 	expiration *time.Time,
 	messageType string,
 	msg sdk.Msg,
 ) error {
-	updatedResponse, err := stakeAuthz.Accept(ctx, msg)
+	updatedResponse, err := liquidAuthz.Accept(ctx, msg)
 	if err != nil {
 		return err
 	}
@@ -146,7 +174,11 @@ func (p Precompile) IncreaseAllowance(
 	method *abi.Method,
 	args []interface{},
 ) ([]byte, error) {
-	bondDenom := p.liquidStakeKeeper.LiquidBondDenom(ctx)
+	bondDenom, err := p.liquidStakeKeeper.BondDenom(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	grantee, coin, typeUrls, err := authorization.CheckApprovalArgs(args, bondDenom)
 	if err != nil {
 		return nil, err
@@ -154,10 +186,18 @@ func (p Precompile) IncreaseAllowance(
 
 	for _, typeURL := range typeUrls {
 		switch typeURL {
-		case LiquidStakeMsg, StakeToLPMsg, LiquidUnstakeMsg:
+		case LiquidStakeMsg:
 			if err = p.increaseAllowance(ctx, grantee, origin, coin, typeURL); err != nil {
 				return nil, err
 			}
+		case LiquidUnstakeMsg:
+			LiquidCoin := coinToLiquidCoin(coin, p.liquidStakeKeeper.LiquidBondDenom(ctx))
+
+			if err = p.increaseAllowance(ctx, grantee, origin, LiquidCoin, typeURL); err != nil {
+				return nil, err
+			}
+
+
 		default:
 			return nil, fmt.Errorf(cmn.ErrInvalidMsgType, "liquidstake", typeURL)
 		}
@@ -174,7 +214,11 @@ func (p Precompile) DecreaseAllowance(
 	method *abi.Method,
 	args []interface{},
 ) ([]byte, error) {
-	bondDenom := p.liquidStakeKeeper.LiquidBondDenom(ctx)
+	bondDenom, err := p.liquidStakeKeeper.BondDenom(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	grantee, coin, typeUrls, err := authorization.CheckApprovalArgs(args, bondDenom)
 	if err != nil {
 		return nil, err
@@ -182,20 +226,38 @@ func (p Precompile) DecreaseAllowance(
 
 	for _, typeURL := range typeUrls {
 		switch typeURL {
-		case LiquidStakeMsg, StakeToLPMsg, LiquidUnstakeMsg:
+		case LiquidStakeMsg, LiquidUnstakeMsg:
 			authzGrant, expiration, err := authorization.CheckAuthzExists(ctx, p.AuthzKeeper, grantee, origin, typeURL)
 			if err != nil {
 				return nil, err
 			}
 
-			stakeAuthz, ok := authzGrant.(*stakingtypes.StakeAuthorization)
+			liquidAuthz, ok := authzGrant.(*liquidtypes.LiquidStakeAuthorization)
 			if !ok {
-				return nil, errorsmod.Wrapf(authz.ErrUnknownAuthorizationType, "expected: *types.StakeAuthorization, received: %T", authzGrant)
+				return nil, errorsmod.Wrapf(authz.ErrUnknownAuthorizationType, "expected: *types.LiquidStakeAuthorization, received: %T", authzGrant)
 			}
 
-			if err = p.decreaseAllowance(ctx, grantee, origin, coin, stakeAuthz, expiration); err != nil {
+			if err = p.decreaseAllowance(ctx, grantee, origin, coin, liquidAuthz, expiration); err != nil {
 				return nil, err
 			}
+
+		case LiquidUnstakeMsg:
+			LiquidCoin := coinToLiquidCoin(coin, p.liquidStakeKeeper.LiquidBondDenom(ctx))
+
+			authzGrant, expiration, err := authorization.CheckAuthzExists(ctx, p.AuthzKeeper, grantee, origin, typeURL)
+			if err != nil {
+				return nil, err
+			}
+
+			liquidAuthz, ok := authzGrant.(*liquidtypes.LiquidStakeAuthorization)
+			if !ok {
+				return nil, errorsmod.Wrapf(authz.ErrUnknownAuthorizationType, "expected: *types.LiquidStakeAuthorization, received: %T", authzGrant)
+			}
+
+			if err = p.decreaseAllowance(ctx, grantee, origin, LiquidCoin, liquidAuthz, expiration); err != nil {
+				return nil, err
+			}
+
 		default:
 			return nil, fmt.Errorf(cmn.ErrInvalidMsgType, "liquidstake", typeURL)
 		}
@@ -217,22 +279,22 @@ func (p Precompile) increaseAllowance(
 		return err
 	}
 
-	// Cast the authorization to a staking authorization
-	stakeAuthz, ok := existingAuthz.(*stakingtypes.StakeAuthorization)
+	// Cast the authorization to a liquidstake authorization
+	liquidAuthz, ok := existingAuthz.(*liquidtypes.LiquidStakeAuthorization)
 	if !ok {
-		return errorsmod.Wrapf(authz.ErrUnknownAuthorizationType, "expected: *types.StakeAuthorization, received: %T", existingAuthz)
+		return errorsmod.Wrapf(authz.ErrUnknownAuthorizationType, "expected: *types.LiquidStakeAuthorization, received: %T", existingAuthz)
 	}
 
 	// If the authorization has no limit, no operation is performed
-	if stakeAuthz.MaxTokens == nil {
-		p.Logger(ctx).Debug("increaseAllowance called with no limit (stakeAuthz.MaxTokens == nil): no-op")
+	if liquidAuthz.MaxTokens == nil {
+		p.Logger(ctx).Debug("increaseAllowance called with no limit (liquidAuthz.MaxTokens == nil): no-op")
 		return nil
 	}
 
 	// Add the amount to the limit
-	stakeAuthz.MaxTokens.Amount = stakeAuthz.MaxTokens.Amount.Add(coin.Amount)
+	liquidAuthz.MaxTokens.Amount = liquidAuthz.MaxTokens.Amount.Add(coin.Amount)
 
-	return p.AuthzKeeper.SaveGrant(ctx, grantee.Bytes(), granter.Bytes(), stakeAuthz, expiration)
+	return p.AuthzKeeper.SaveGrant(ctx, grantee.Bytes(), granter.Bytes(), liquidAuthz, expiration)
 }
 
 // decreaseAllowance decreases the allowance of spender over the caller's tokens by the amount.
@@ -240,26 +302,26 @@ func (p Precompile) decreaseAllowance(
 	ctx sdk.Context,
 	grantee, granter common.Address,
 	coin *sdk.Coin,
-	stakeAuthz *stakingtypes.StakeAuthorization,
+	liquidAuthz *liquidtypes.LiquidStakeAuthorization,
 	expiration *time.Time,
 ) error {
 	// If the authorization has no limit, no operation is performed
-	if stakeAuthz.MaxTokens == nil {
-		p.Logger(ctx).Debug("decreaseAllowance called with no limit (stakeAuthz.MaxTokens == nil): no-op")
+	if liquidAuthz.MaxTokens == nil {
+		p.Logger(ctx).Debug("decreaseAllowance called with no limit (liquidAuthz.MaxTokens == nil): no-op")
 		return nil
 	}
 
 	// If the authorization limit is less than the subtraction amount, return error
-	if stakeAuthz.MaxTokens.Amount.LT(coin.Amount) {
-		return fmt.Errorf("amount by which the allowance should be decreased is greater than the authorization limit: %s > %s", coin.Amount, stakeAuthz.MaxTokens.Amount)
+	if liquidAuthz.MaxTokens.Amount.LT(coin.Amount) {
+		return fmt.Errorf("amount by which the allowance should be decreased is greater than the authorization limit: %s > %s", coin.Amount, liquidAuthz.MaxTokens.Amount)
 	}
 
 	// If amount is less than or equal to the Authorization amount, subtract the amount from the limit
-	if coin.Amount.LTE(stakeAuthz.MaxTokens.Amount) {
-		stakeAuthz.MaxTokens.Amount = stakeAuthz.MaxTokens.Amount.Sub(coin.Amount)
+	if coin.Amount.LTE(liquidAuthz.MaxTokens.Amount) {
+		liquidAuthz.MaxTokens.Amount = liquidAuthz.MaxTokens.Amount.Sub(coin.Amount)
 	}
 
-	return p.AuthzKeeper.SaveGrant(ctx, grantee.Bytes(), granter.Bytes(), stakeAuthz, expiration)
+	return p.AuthzKeeper.SaveGrant(ctx, grantee.Bytes(), granter.Bytes(), liquidAuthz, expiration)
 }
 
 // Allowance returns the allowance of spender over the caller's tokens.
@@ -280,16 +342,16 @@ func (p Precompile) Allowance(
 		return nil, err
 	}
 
-	// Cast the authorization to a staking authorization
-	stakeAuthz, ok := existingAuthz.(*stakingtypes.StakeAuthorization)
+	// Cast the authorization to a liquidstake authorization
+	liquidAuthz, ok := existingAuthz.(*liquidtypes.LiquidStakeAuthorization)
 	if !ok {
-		return nil, errorsmod.Wrapf(authz.ErrUnknownAuthorizationType, "expected: *types.StakeAuthorization, received: %T", existingAuthz)
+		return nil, errorsmod.Wrapf(authz.ErrUnknownAuthorizationType, "expected: *types.LiquidStakeAuthorization, received: %T", existingAuthz)
 	}
 
 	// If the authorization has no limit, return max uint256
-	if stakeAuthz.MaxTokens == nil {
+	if liquidAuthz.MaxTokens == nil {
 		return method.Outputs.Pack(abi.MaxUint256, expiration.Unix())
 	}
 
-	return method.Outputs.Pack(stakeAuthz.MaxTokens.Amount.BigInt(), expiration.Unix())
+	return method.Outputs.Pack(liquidAuthz.MaxTokens.Amount.BigInt(), expiration.Unix())
 }

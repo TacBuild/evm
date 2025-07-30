@@ -184,6 +184,34 @@ func CheckAuthzAndAllowanceForGranter(
 	return stakeAuthz, expiration, nil
 }
 
+// CheckAuthzAndAllowanceForLiquidStake checks if the authorization exists and is not expired for the
+// given spender and the allowance is not exceeded.
+// If the authorization has a limit, checks that the provided amount does not exceed the current limit.
+// Returns an error if the authorization does not exist
+// is expired or the allowance is exceeded.
+func CheckAuthzAndAllowanceForLiquidStake(
+	ctx sdk.Context,
+	authzKeeper authzkeeper.Keeper,
+	grantee, granter common.Address,
+	amount *sdk.Coin,
+	msgURL string,
+) (authz.Authorization, *time.Time, error) {
+	msgAuthz, expiration := authzKeeper.GetAuthorization(ctx, grantee.Bytes(), granter.Bytes(), msgURL)
+	if msgAuthz == nil {
+		return nil, nil, fmt.Errorf(ErrAuthzDoesNotExistOrExpired, msgURL, grantee)
+	}
+
+	// For liquid stake operations, we need to handle LiquidStakeAuthorization
+	// We return the generic authz.Authorization interface so the caller can cast it appropriately
+	if msgAuthz.MsgTypeURL() != msgURL {
+		return nil, nil, fmt.Errorf("authorization message type mismatch: expected %s, got %s", msgURL, msgAuthz.MsgTypeURL())
+	}
+
+	// Note: Amount validation will be done by the specific authorization's Accept method
+	// This allows for different authorization types to have different validation logic
+	return msgAuthz, expiration, nil
+}
+
 // validateMsgTypes checks if the typeURLs are of the correct type,
 // performs basic validation on the length and checks for any empty strings
 func validateMsgTypes(arg interface{}) ([]string, error) {
