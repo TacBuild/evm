@@ -18,6 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	liquidtypes "github.com/cosmos/evm/x/liquidstake/types"
 )
 
 const (
@@ -195,10 +196,15 @@ func CheckAuthzAndAllowanceForLiquidStake(
 	grantee, granter common.Address,
 	amount *sdk.Coin,
 	msgURL string,
-) (authz.Authorization, *time.Time, error) {
+) (*liquidtypes.LiquidStakeAuthorization, *time.Time, error) {
 	msgAuthz, expiration := authzKeeper.GetAuthorization(ctx, grantee.Bytes(), granter.Bytes(), msgURL)
 	if msgAuthz == nil {
 		return nil, nil, fmt.Errorf(ErrAuthzDoesNotExistOrExpired, msgURL, grantee)
+	}
+
+	liquidAuthz, ok := msgAuthz.(*liquidtypes.LiquidStakeAuthorization)
+	if !ok {
+		return nil, nil, authz.ErrUnknownAuthorizationType
 	}
 
 	// For liquid stake operations, we need to handle LiquidStakeAuthorization
@@ -209,7 +215,7 @@ func CheckAuthzAndAllowanceForLiquidStake(
 
 	// Note: Amount validation will be done by the specific authorization's Accept method
 	// This allows for different authorization types to have different validation logic
-	return msgAuthz, expiration, nil
+	return liquidAuthz, expiration, nil
 }
 
 // validateMsgTypes checks if the typeURLs are of the correct type,

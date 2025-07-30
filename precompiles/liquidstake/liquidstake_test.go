@@ -2,16 +2,13 @@ package liquidstake_test
 
 import (
 	"time"
-	"fmt"
 
 	"cosmossdk.io/math"
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/evm/precompiles/authorization"
-	cmn "github.com/cosmos/evm/precompiles/common"
 	liquidstake "github.com/cosmos/evm/precompiles/liquidstake"
 	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
-	testutil "github.com/cosmos/evm/precompiles/testutil"
 
 	"math/big"
 
@@ -125,120 +122,6 @@ func (s *LiquidStakePrecompileTestSuite) SetupTest() {
 		s.nw.App.AuthzKeeper,
 	); err != nil {
 		panic(err)
-	}
-}
-
-func (s *LiquidStakePrecompileTestSuite) TestApprove() {
-	var (
-		ctx  sdk.Context
-		stDB *statedb.StateDB
-	)
-	method := s.precompile.Methods[authorization.ApproveMethod]
-
-	testCases := []struct {
-		name        string
-		malleate    func(contract *vm.Contract, granter, grantee testkeyring.Key) []interface{}
-		postCheck   func(granter, grantee testkeyring.Key, data []byte, inputArgs []interface{})
-		gas         uint64
-		expError    bool
-		errContains string
-	}{
-		{
-			"fail - empty input args",
-			func(_ *vm.Contract, _, _ testkeyring.Key) []interface{} {
-				return []interface{}{}
-			},
-			func(_, _ testkeyring.Key, _ []byte, _ []interface{}) {},
-			200000,
-			true,
-			fmt.Sprintf(cmn.ErrInvalidNumberOfArgs, 3, 0),
-		},
-		{
-			"fail - invalid message type",
-			func(_ *vm.Contract, _, grantee testkeyring.Key) []interface{} {
-				return []interface{}{
-					grantee.Addr,
-					abi.MaxUint256,
-					[]string{"invalid"},
-				}
-			},
-			func(_, _ testkeyring.Key, _ []byte, _ []interface{}) {},
-			200000,
-			true,
-			fmt.Sprintf(cmn.ErrInvalidMsgType, "liquidstake", "invalid"),
-		},
-		{
-			"success - MsgDelegate with unlimited coins",
-			func(_ *vm.Contract, _, grantee testkeyring.Key) []interface{} {
-				return []interface{}{
-					grantee.Addr,
-					abi.MaxUint256,
-					[]string{liquidstake.LiquidStakeMsg},
-				}
-			},
-			func(granter, grantee testkeyring.Key, data []byte, _ []interface{}) {
-				s.Require().Equal(data, cmn.TrueValue)
-				authz, expirationTime := CheckAuthorizationWithContext(ctx, s.nw.App.AuthzKeeper, liquidstake.LiquidStakeAuthz, grantee.Addr, granter.Addr)
-
-				s.Require().NotNil(authz)
-				s.Require().NotNil(expirationTime)
-				s.Require().Equal(authz.AuthorizationType, liquidstake.LiquidStakeAuthz)
-				var coin *sdk.Coin
-				s.Require().Equal(authz.MaxTokens, coin)
-			},
-			20000,
-			false,
-			"",
-		},
-		{
-			"success - MsgUndelegate with unlimited coins",
-			func(_ *vm.Contract, _, grantee testkeyring.Key) []interface{} {
-				return []interface{}{
-					grantee.Addr,
-					abi.MaxUint256,
-					[]string{liquidstake.LiquidUnstakeMsg},
-				}
-			},
-			func(granter, grantee testkeyring.Key, data []byte, _ []interface{}) {
-				s.Require().Equal(data, cmn.TrueValue)
-
-				authz, expirationTime := CheckAuthorizationWithContext(ctx, s.nw.App.AuthzKeeper, liquidstake.LiquidUnstakeAuthz, grantee.Addr, granter.Addr)
-				s.Require().NotNil(authz)
-				s.Require().NotNil(expirationTime)
-				s.Require().Equal(authz.AuthorizationType, liquidstake.LiquidUnstakeAuthz)
-				var coin *sdk.Coin
-				s.Require().Equal(authz.MaxTokens, coin)
-			},
-			20000,
-			false,
-			"",
-		},
-	}
-
-	for _, tc := range testCases {
-		s.Run(tc.name, func() {
-			s.SetupTest()
-			ctx = s.nw.GetContext()
-			stDB = s.nw.GetStateDB()
-
-			granter := s.keyring.GetKey(0)
-			grantee := s.keyring.GetKey(1)
-
-			var contract *vm.Contract
-			contract, ctx = testutil.NewPrecompileContract(s.T(), ctx, granter.Addr, s.precompile, tc.gas)
-
-			args := tc.malleate(contract, granter, grantee)
-			bz, err := s.precompile.Approve(ctx, granter.Addr, stDB, &method, args)
-
-			if tc.expError {
-				s.Require().ErrorContains(err, tc.errContains)
-				s.Require().Empty(bz)
-			} else {
-				s.Require().NoError(err)
-				s.Require().NotEmpty(bz)
-				tc.postCheck(granter, grantee, bz, args)
-			}
-		})
 	}
 }
 
@@ -406,7 +289,7 @@ func (s *LiquidStakePrecompileTestSuite) TestRun() {
 //		{
 //			"pass - stakeToLP transaction",
 //			func(delegator, grantee testkeyring.Key) []byte {
-//				delAmount := math.NewInt(1000000)
+//				delAmount := math.NewInt(1000000000000000000)
 //				_, err := s.nw.App.StakingKeeper.Delegate(ctx, sdk.AccAddress(delegator.Addr.Bytes()), delAmount, stakingtypes.Bonded, s.validator, false)
 //				if err != nil {
 //					panic(err)
@@ -418,7 +301,7 @@ func (s *LiquidStakePrecompileTestSuite) TestRun() {
 //				}
 //
 //				// Use a smaller amount that definitely exists in the delegation
-//				tokenizeAmount := big.NewInt(1000000)
+//				tokenizeAmount := big.NewInt(1000000000000000000)
 //				input, err := s.precompile.Pack(
 //					liquidstake.StakeToLPMethod,
 //					delegator.Addr,

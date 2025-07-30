@@ -153,19 +153,19 @@ func NewLiquidStakeParamsOutput(params *types.Params) LiquidStakeParams {
 	}
 }
 
-func NewMsgLiquidStake(args []interface{}, denom string) (*types.MsgLiquidStake, error) {
+func NewMsgLiquidStake(args []interface{}, denom string) (*common.Address, *types.MsgLiquidStake, error) {
 	if len(args) != 2 {
-		return nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 6, len(args))
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 6, len(args))
 	}
 
 	delegatorAddress, ok := args[0].(common.Address)
 	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidDelegator, args[0])
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidDelegator, args[0])
 	}
 
 	amount, ok := args[1].(*big.Int)
 	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidAmount, args[1])
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidAmount, args[1])
 	}
 
 	msg := types.MsgLiquidStake{
@@ -173,32 +173,32 @@ func NewMsgLiquidStake(args []interface{}, denom string) (*types.MsgLiquidStake,
 		Amount:           sdk.NewCoin(denom, math.NewIntFromBigInt(amount)),
 	}
 
-	return &msg, nil
+	return &delegatorAddress, &msg, nil
 }
 
-func NewMsgStakeToLP(args []interface{}, liquidDenom string, denom string) (*types.MsgStakeToLP, error) {
+func NewMsgStakeToLP(args []interface{}, liquidDenom string, denom string) (*common.Address, *types.MsgStakeToLP, error) {
 	if len(args) != 4 {
-		return nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 6, len(args))
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 6, len(args))
 	}
 
 	delegatorAddress, ok := args[0].(common.Address)
 	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidDelegator, args[0])
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidDelegator, args[0])
 	}
 
 	validatorAddress, ok := args[1].(common.Address)
 	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidValidator, args[1])
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidValidator, args[1])
 	}
 
 	stakedAmount, ok := args[2].(*big.Int)
 	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidAmount, args[2])
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidAmount, args[2])
 	}
 
 	liquidAmount, ok := args[3].(*big.Int)
 	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidAmount, args[3])
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidAmount, args[3])
 	}
 
 	msg := types.MsgStakeToLP{
@@ -208,22 +208,22 @@ func NewMsgStakeToLP(args []interface{}, liquidDenom string, denom string) (*typ
 		LiquidAmount:     sdk.NewCoin(liquidDenom, math.NewIntFromBigInt(liquidAmount)),
 	}
 
-	return &msg, nil
+	return &delegatorAddress, &msg, nil
 }
 
-func NewMsgLiquidUnstake(args []interface{}, denom string) (*types.MsgLiquidUnstake, error) {
+func NewMsgLiquidUnstake(args []interface{}, denom string) (*common.Address, *types.MsgLiquidUnstake, error) {
 	if len(args) != 2 {
-		return nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 6, len(args))
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 6, len(args))
 	}
 
 	delegatorAddress, ok := args[0].(common.Address)
 	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidDelegator, args[0])
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidDelegator, args[0])
 	}
 
 	amount, ok := args[1].(*big.Int)
 	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidAmount, args[1])
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidAmount, args[1])
 	}
 
 	msg := types.MsgLiquidUnstake{
@@ -231,7 +231,7 @@ func NewMsgLiquidUnstake(args []interface{}, denom string) (*types.MsgLiquidUnst
 		Amount:           sdk.NewCoin(denom, math.NewIntFromBigInt(amount)),
 	}
 
-	return &msg, nil
+	return &delegatorAddress, &msg, nil
 }
 
 func NewMsgUpdateParams(args []interface{}, denom string) (*types.MsgUpdateParams, error) {
