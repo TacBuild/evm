@@ -21,6 +21,32 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 )
 
+// ApproveAndCheckAuthz is a helper function to approve a given authorization method and check if the authorization was created.
+func (s *LiquidStakePrecompileTestSuite) ApproveAndCheckAuthz(method abi.Method, granter, grantee testkeyring.Key, msgType string, amount *big.Int) {
+	approveMethod := s.precompile.Methods[authorization.ApproveMethod]
+	approveArgs := []interface{}{
+		grantee.Addr,
+		amount,
+		[]string{msgType},
+	}
+	resp, err := s.precompile.Approve(s.nw.GetContext(), granter.Addr, s.nw.GetStateDB(), &approveMethod, approveArgs)
+	s.Require().NoError(err)
+	s.Require().Equal(resp, cmn.TrueValue)
+
+	var authorizationType liquidstaketypes.AuthorizationType
+	switch msgType {
+	case liquidstake.LiquidStakeMsg:
+		authorizationType = liquidstake.LiquidStakeAuthz
+	case liquidstake.LiquidUnstakeMsg:
+		authorizationType = liquidstake.LiquidUnstakeAuthz
+	}
+
+	auth, _ := CheckAuthorizationWithContext(s.nw.GetContext(), s.nw.App.AuthzKeeper, authorizationType, grantee.Addr, granter.Addr)
+	s.Require().NotNil(auth)
+	s.Require().Equal(auth.AuthorizationType, authorizationType)
+	s.Require().Equal(auth.MaxTokens, &sdk.Coin{Denom: s.bondDenom, Amount: math.NewIntFromBigInt(amount)})
+}
+
 func (s *LiquidStakePrecompileTestSuite) TestRevoke() {
 	var (
 		ctx  sdk.Context
@@ -176,6 +202,141 @@ func (s *LiquidStakePrecompileTestSuite) TestRevoke() {
 		})
 	}
 }
+
+func (s *LiquidStakePrecompileTestSuite) TestIncreaseAllowance() {
+	var (
+		ctx  sdk.Context
+		stDB *statedb.StateDB
+	)
+	method := s.precompile.Methods[authorization.IncreaseAllowanceMethod]
+
+	testCases := []struct {
+		name        string
+		malleate    func(granter, grantee testkeyring.Key) []interface{}
+		postCheck   func(granter, grantee testkeyring.Key, data []byte, inputArgs []interface{})
+		gas         uint64
+		expError    bool
+		errContains string
+	}{
+		{
+			"fail - empty input args",
+			func(_, _ testkeyring.Key) []interface{} {
+				return []interface{}{}
+			},
+			func(_, _ testkeyring.Key, _ []byte, _ []interface{}) {},
+			200000,
+			true,
+			fmt.Sprintf(cmn.ErrInvalidNumberOfArgs, 3, 0),
+		},
+		{
+			"fail - authorization does not exist",
+			func(_, grantee testkeyring.Key) []interface{} {
+				return []interface{}{
+					grantee.Addr,
+					big.NewInt(15000),
+					[]string{liquidstake.LiquidStakeMsg},
+				}
+			},
+			func(_, _ testkeyring.Key, _ []byte, _ []interface{}) {},
+			200000,
+			true,
+			"does not exist or is expired",
+		},
+		{
+			"success - no-op, allowance amount is already set to the maximum value",
+			func(granter, grantee testkeyring.Key) []interface{} {
+				approveArgs := []interface{}{
+					grantee.Addr,
+					abi.MaxUint256,
+					[]string{liquidstake.LiquidStakeMsg},
+				}
+				resp, err := s.precompile.Approve(ctx, granter.Addr, stDB, &method, approveArgs)
+				s.Require().NoError(err)
+				s.Require().Equal(resp, cmn.TrueValue)
+
+				authz, _ := CheckAuthorizationWithContext(ctx, s.nw.App.AuthzKeeper, liquidstake.LiquidStakeAuthz, grantee.Addr, granter.Addr)
+				s.Require().NotNil(authz)
+				s.Require().Equal(authz.AuthorizationType, liquidstake.LiquidStakeAuthz)
+				var coin *sdk.Coin
+				s.Require().Equal(authz.MaxTokens, coin)
+
+				return []interface{}{
+					grantee.Addr,
+					big.NewInt(2e18),
+					[]string{liquidstake.LiquidStakeMsg},
+				}
+			},
+			func(_, _ testkeyring.Key, _ []byte, _ []interface{}) {},
+			200000,
+			false,
+			"",
+		},
+		{
+			"success - increase allowance by specific amount",
+			func(granter, grantee testkeyring.Key) []interface{} {
+				s.ApproveAndCheckAuthz(method, granter, grantee, liquidstake.LiquidStakeMsg, big.NewInt(1e18))
+				return []interface{}{
+					grantee.Addr,
+					big.NewInt(1e18),
+					[]string{liquidstake.LiquidStakeMsg},
+				}
+			},
+			func(granter, grantee testkeyring.Key, _ []byte, _ []interface{}) {
+				authz, _ := CheckAuthorizationWithContext(ctx, s.nw.App.AuthzKeeper, liquidstake.LiquidStakeAuthz, grantee.Addr, granter.Addr)
+				s.Require().NotNil(authz)
+				s.Require().Equal(authz.AuthorizationType, liquidstake.LiquidStakeAuthz)
+				s.Require().Equal(authz.MaxTokens, &sdk.Coin{Denom: s.bondDenom, Amount: math.NewInt(2e18)})
+			},
+			200000,
+			false,
+			"",
+		},
+		{
+			"success - increase allowance",
+			func(granter, grantee testkeyring.Key) []interface{} {
+				s.ApproveAndCheckAuthz(method, granter, grantee, liquidstake.LiquidStakeMsg, big.NewInt(1e18))
+				return []interface{}{
+					grantee.Addr,
+					big.NewInt(1e18),
+					[]string{liquidstake.LiquidStakeMsg},
+				}
+			},
+			func(granter, grantee testkeyring.Key, _ []byte, _ []interface{}) {
+				authz, _ := CheckAuthorizationWithContext(ctx, s.nw.App.AuthzKeeper, liquidstake.LiquidStakeAuthz, grantee.Addr, granter.Addr)
+				s.Require().NotNil(authz)
+				s.Require().Equal(authz.AuthorizationType, liquidstake.LiquidStakeAuthz)
+				s.Require().Equal(authz.MaxTokens, &sdk.Coin{Denom: s.bondDenom, Amount: math.NewInt(2e18)})
+			},
+			200000,
+			false,
+			"",
+		},
+	}
+
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			s.SetupTest()
+			ctx = s.nw.GetContext()
+			stDB = s.nw.GetStateDB()
+
+			granter := s.keyring.GetKey(0)
+			grantee := s.keyring.GetKey(1)
+
+			args := tc.malleate(granter, grantee)
+			bz, err := s.precompile.IncreaseAllowance(ctx, granter.Addr, stDB, &method, args)
+
+			if tc.expError {
+				s.Require().ErrorContains(err, tc.errContains)
+				s.Require().Empty(bz)
+			} else {
+				s.Require().NoError(err)
+				s.Require().NotEmpty(bz)
+				tc.postCheck(granter, grantee, bz, args)
+			}
+		})
+	}
+}
+
 
 func (s *LiquidStakePrecompileTestSuite) TestApprove() {
 	var (
