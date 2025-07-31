@@ -169,14 +169,14 @@ func (avs ActiveLiquidValidators) TotalWeight(whitelistedValsMap WhitelistedVals
 	return totalWeight
 }
 
-// NativeTokenToStkXPRT returns StkxprtTotalSupply * nativeTokenAmount / netAmount
-func NativeTokenToStkXPRT(nativeTokenAmount, stkXPRTTotalSupplyAmount math.Int, netAmount math.LegacyDec) (stkXPRTAmount math.Int) {
-	return math.LegacyNewDecFromInt(stkXPRTTotalSupplyAmount).MulTruncate(math.LegacyNewDecFromInt(nativeTokenAmount)).QuoTruncate(netAmount.TruncateDec()).TruncateInt()
+// NativeTokenToGTAC returns GtacTotalSupply * nativeTokenAmount / netAmount
+func NativeTokenToGTAC(nativeTokenAmount, gTACTotalSupplyAmount math.Int, netAmount math.LegacyDec) (gTACAmount math.Int) {
+	return math.LegacyNewDecFromInt(gTACTotalSupplyAmount).MulTruncate(math.LegacyNewDecFromInt(nativeTokenAmount)).QuoTruncate(netAmount.TruncateDec()).TruncateInt()
 }
 
-// StkXPRTToNativeToken returns stkXPRTAmount * netAmount / StkxprtTotalSupply with truncations
-func StkXPRTToNativeToken(stkXPRTAmount, stkXPRTTotalSupplyAmount math.Int, netAmount math.LegacyDec) (nativeTokenAmount math.LegacyDec) {
-	return math.LegacyNewDecFromInt(stkXPRTAmount).MulTruncate(netAmount).Quo(math.LegacyNewDecFromInt(stkXPRTTotalSupplyAmount)).TruncateDec()
+// GTACToNativeToken returns gTACAmount * netAmount / GtacTotalSupply with truncations
+func GTACToNativeToken(gTACAmount, gTACTotalSupplyAmount math.Int, netAmount math.LegacyDec) (nativeTokenAmount math.LegacyDec) {
+	return math.LegacyNewDecFromInt(gTACAmount).MulTruncate(netAmount).Quo(math.LegacyNewDecFromInt(gTACTotalSupplyAmount)).TruncateDec()
 }
 
 // DeductFeeRate returns Input * (1-FeeRate) with truncations
@@ -192,7 +192,7 @@ func (nas NetAmountState) CalcMintRate() math.LegacyDec {
 	if nas.NetAmount.IsNil() || !nas.NetAmount.IsPositive() {
 		return math.LegacyZeroDec()
 	}
-	return math.LegacyNewDecFromInt(nas.StkxprtTotalSupply).QuoTruncate(nas.NetAmount)
+	return math.LegacyNewDecFromInt(nas.GtacTotalSupply).QuoTruncate(nas.NetAmount)
 }
 
 type LiquidValidatorStates []LiquidValidatorState

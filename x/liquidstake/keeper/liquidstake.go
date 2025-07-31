@@ -27,7 +27,7 @@ func (k Keeper) BondDenom(ctx sdk.Context) (string, error) {
 }
 
 // GetNetAmountState calculates the sum of bondedDenom balance, total delegation tokens(slash applied LiquidTokens), total remaining reward of types.LiquidStakeProxyAcc
-// During liquid unstaking, stkxprt immediately burns and the unbonding queue belongs to the requester, so the liquid staker's unbonding values are excluded on netAmount
+// During liquid unstaking, gtac immediately burns and the unbonding queue belongs to the requester, so the liquid staker's unbonding values are excluded on netAmount
 // It is used only for calculation and query and is not stored in kv.
 func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas *types.NetAmountState, err error) {
 	totalRemainingRewards, totalDelShares, totalLiquidTokens, err := k.CheckDelegationStates(ctx, types.LiquidStakeProxyAcc)
@@ -54,7 +54,7 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas *types.NetAmountState, e
 	}
 
 	nas = &types.NetAmountState{
-		StkxprtTotalSupply:    k.bankKeeper.GetSupply(ctx, k.LiquidBondDenom(ctx)).Amount,
+		GtacTotalSupply:       k.bankKeeper.GetSupply(ctx, k.LiquidBondDenom(ctx)).Amount,
 		TotalDelShares:        totalDelShares,
 		TotalLiquidTokens:     totalLiquidTokens,
 		TotalRemainingRewards: totalRemainingRewards,
@@ -67,10 +67,10 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas *types.NetAmountState, e
 	return nas, nil
 }
 
-// LiquidStake mints stkXPRT worth of staking coin value according to NetAmount and performs LiquidDelegate.
+// LiquidStake mints gTAC worth of staking coin value according to NetAmount and performs LiquidDelegate.
 func (k Keeper) LiquidStake(
 	ctx sdk.Context, proxyAcc, liquidStaker sdk.AccAddress, stakingCoin sdk.Coin,
-) (stkXPRTMintAmount math.Int, err error) {
+) (gTACMintAmount math.Int, err error) {
 	params := k.GetParams(ctx)
 
 	if params.ModulePaused {
@@ -131,11 +131,11 @@ func (k Keeper) LiquidStake(
 		return math.ZeroInt(), err
 	}
 
-	// mint stkxprt, MintAmount = TotalSupply * StakeAmount/NetAmount
+	// mint gtac, MintAmount = TotalSupply * StakeAmount/NetAmount
 	liquidBondDenom := k.LiquidBondDenom(ctx)
-	stkXPRTMintAmount = stakingCoin.Amount
+	gTACMintAmount = stakingCoin.Amount
 
-	if nas.StkxprtTotalSupply.IsPositive() {
+	if nas.GtacTotalSupply.IsPositive() {
 		if nas.NetAmount.IsZero() {
 			// this case must not be reachable, consider stopping module for investigation
 			// c_value -> inf
@@ -148,18 +148,18 @@ func (k Keeper) LiquidStake(
 			return math.ZeroInt(), types.ErrInsufficientProxyAccBalance
 		}
 
-		stkXPRTMintAmount = types.NativeTokenToStkXPRT(stakingCoin.Amount, nas.StkxprtTotalSupply, nas.NetAmount)
+		gTACMintAmount = types.NativeTokenToGTAC(stakingCoin.Amount, nas.GtacTotalSupply, nas.NetAmount)
 	}
 
-	if !stkXPRTMintAmount.IsPositive() {
+	if !gTACMintAmount.IsPositive() {
 		return math.ZeroInt(), types.ErrTooSmallLiquidStakeAmount
 	}
 
 	// mint on module acc and send
-	mintCoin := sdk.NewCoins(sdk.NewCoin(liquidBondDenom, stkXPRTMintAmount))
+	mintCoin := sdk.NewCoins(sdk.NewCoin(liquidBondDenom, gTACMintAmount))
 	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, mintCoin)
 	if err != nil {
-		return stkXPRTMintAmount, err
+		return gTACMintAmount, err
 	}
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, liquidStaker, mintCoin)
 	if err != nil {
@@ -169,11 +169,11 @@ func (k Keeper) LiquidStake(
 			err,
 		)
 
-		return stkXPRTMintAmount, err
+		return gTACMintAmount, err
 	}
 
 	err = k.LiquidDelegate(ctx, proxyAcc, activeVals, stakingCoin.Amount, whitelistedValsMap)
-	return stkXPRTMintAmount, err
+	return gTACMintAmount, err
 }
 
 // LockOnLP sends tokens to a CW contract (Superfluid LP) with time locking.
@@ -530,14 +530,14 @@ func (k Keeper) RedelegateWithCap(
 }
 
 // LSMDelegate captures a staked amount from existing delegation using LSM, re-stakes from proxyAcc and
-// mints stkXPRT worth of stk coin value according to NetAmount and performs LiquidDelegate.
+// mints gTAC worth of stk coin value according to NetAmount and performs LiquidDelegate.
 func (k Keeper) LSMDelegate(
 	ctx sdk.Context,
 	delegator sdk.AccAddress,
 	validator sdk.ValAddress,
 	proxyAcc sdk.AccAddress,
 	preLsmStake sdk.Coin,
-) (stkXPRTMintAmount math.Int, err error) {
+) (gTACMintAmount math.Int, err error) {
 	params := k.GetParams(ctx)
 
 	if params.ModulePaused {
@@ -649,7 +649,7 @@ func (k Keeper) LSMDelegate(
 	// [2] send LSM shares to proxyAcc
 	err = k.bankKeeper.SendCoins(ctx, delegator, proxyAcc, sdk.NewCoins(lsmTokenizeResp.Amount))
 	if err != nil {
-		return stkXPRTMintAmount, err
+		return gTACMintAmount, err
 	}
 
 	lsmRedeemMsg := &stakingtypes.MsgRedeemTokensForShares{
@@ -696,42 +696,42 @@ func (k Keeper) LSMDelegate(
 		)
 	}
 
-	// mint stkxprt, MintAmount = TotalSupply * StakeAmount/NetAmount
+	// mint gtac, MintAmount = TotalSupply * StakeAmount/NetAmount
 	liquidBondDenom := k.LiquidBondDenom(ctx)
-	stkXPRTMintAmount = lsmRedeemResp.Amount.Amount
+	gTACMintAmount = lsmRedeemResp.Amount.Amount
 
-	if nas.StkxprtTotalSupply.IsPositive() {
-		stkXPRTMintAmount = types.NativeTokenToStkXPRT(
-			stkXPRTMintAmount,
-			nas.StkxprtTotalSupply,
+	if nas.GtacTotalSupply.IsPositive() {
+		gTACMintAmount = types.NativeTokenToGTAC(
+			gTACMintAmount,
+			nas.GtacTotalSupply,
 			nas.NetAmount,
 		)
 	}
 
-	if !stkXPRTMintAmount.IsPositive() {
+	if !gTACMintAmount.IsPositive() {
 		return math.ZeroInt(), types.ErrTooSmallLiquidStakeAmount
 	}
 
-	// mint stkXPRT on module acc
-	mintCoin := sdk.NewCoins(sdk.NewCoin(liquidBondDenom, stkXPRTMintAmount))
+	// mint gTAC on module acc
+	mintCoin := sdk.NewCoins(sdk.NewCoin(liquidBondDenom, gTACMintAmount))
 	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, mintCoin)
 	if err != nil {
-		return stkXPRTMintAmount, err
+		return gTACMintAmount, err
 	}
 
-	// send stkXPRT to delegator acc
+	// send gTAC to delegator acc
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, delegator, mintCoin)
 	if err != nil {
-		return stkXPRTMintAmount, err
+		return gTACMintAmount, err
 	}
 
-	// but immediately lock new stkXPRT into LP on behalf of the delegator
-	_, err = k.LockOnLP(ctx, delegator, sdk.NewCoin(liquidBondDenom, stkXPRTMintAmount))
+	// but immediately lock new gTAC into LP on behalf of the delegator
+	_, err = k.LockOnLP(ctx, delegator, sdk.NewCoin(liquidBondDenom, gTACMintAmount))
 	if err != nil {
-		return stkXPRTMintAmount, err
+		return gTACMintAmount, err
 	}
 
-	return stkXPRTMintAmount, err
+	return gTACMintAmount, err
 }
 
 // LiquidDelegate delegates staking amount to active validators by proxy account.
@@ -765,9 +765,9 @@ func (k Keeper) LiquidDelegate(ctx sdk.Context, proxyAcc sdk.AccAddress, activeV
 	return nil
 }
 
-// LiquidUnstake burns unstakingStkXPRT and performs LiquidUnbond to active liquid validators with del shares worth of shares according to NetAmount with each validators current weight.
+// LiquidUnstake burns unstakingGTAC and performs LiquidUnbond to active liquid validators with del shares worth of shares according to NetAmount with each validators current weight.
 func (k Keeper) LiquidUnstake(
-	ctx sdk.Context, proxyAcc, liquidStaker sdk.AccAddress, unstakingStkXPRT sdk.Coin,
+	ctx sdk.Context, proxyAcc, liquidStaker sdk.AccAddress, unstakingGTAC sdk.Coin,
 ) (time.Time, math.Int, []stakingtypes.UnbondingDelegation, math.Int, error) {
 	params := k.GetParams(ctx)
 	bondDenom, err := k.stakingKeeper.BondDenom(ctx)
@@ -781,9 +781,9 @@ func (k Keeper) LiquidUnstake(
 
 	// check bond denomination
 	liquidBondDenom := k.LiquidBondDenom(ctx)
-	if unstakingStkXPRT.Denom != liquidBondDenom {
+	if unstakingGTAC.Denom != liquidBondDenom {
 		return time.Time{}, math.ZeroInt(), []stakingtypes.UnbondingDelegation{}, math.ZeroInt(), errorsmod.Wrapf(
-			types.ErrInvalidLiquidBondDenom, "invalid coin denomination: got %s, expected %s", unstakingStkXPRT.Denom, liquidBondDenom,
+			types.ErrInvalidLiquidBondDenom, "invalid coin denomination: got %s, expected %s", unstakingGTAC.Denom, liquidBondDenom,
 		)
 	}
 
@@ -793,12 +793,12 @@ func (k Keeper) LiquidUnstake(
 		return time.Time{}, math.ZeroInt(), []stakingtypes.UnbondingDelegation{}, math.ZeroInt(), err
 	}
 
-	if unstakingStkXPRT.Amount.GT(nas.StkxprtTotalSupply) || nas.StkxprtTotalSupply.IsZero() {
-		return time.Time{}, math.ZeroInt(), []stakingtypes.UnbondingDelegation{}, math.ZeroInt(), types.ErrInvalidStkXPRTSupply
+	if unstakingGTAC.Amount.GT(nas.GtacTotalSupply) || nas.GtacTotalSupply.IsZero() {
+		return time.Time{}, math.ZeroInt(), []stakingtypes.UnbondingDelegation{}, math.ZeroInt(), types.ErrInvalidGTACSupply
 	}
 
-	// UnstakeAmount = NetAmount * StkXPRTAmount/TotalSupply * (1-UnstakeFeeRate)
-	unbondingAmount := types.StkXPRTToNativeToken(unstakingStkXPRT.Amount, nas.StkxprtTotalSupply, nas.NetAmount)
+	// UnstakeAmount = NetAmount * GTACAmount/TotalSupply * (1-UnstakeFeeRate)
+	unbondingAmount := types.GTACToNativeToken(unstakingGTAC.Amount, nas.GtacTotalSupply, nas.NetAmount)
 	unbondingAmount = types.DeductFeeRate(unbondingAmount, params.UnstakeFeeRate)
 	unbondingAmountInt := unbondingAmount.TruncateInt()
 
@@ -806,12 +806,12 @@ func (k Keeper) LiquidUnstake(
 		return time.Time{}, math.ZeroInt(), []stakingtypes.UnbondingDelegation{}, math.ZeroInt(), types.ErrTooSmallLiquidUnstakingAmount
 	}
 
-	// burn stkxprt
-	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, liquidStaker, types.ModuleName, sdk.NewCoins(unstakingStkXPRT))
+	// burn gtac
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, liquidStaker, types.ModuleName, sdk.NewCoins(unstakingGTAC))
 	if err != nil {
 		return time.Time{}, math.ZeroInt(), []stakingtypes.UnbondingDelegation{}, math.ZeroInt(), err
 	}
-	err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(liquidBondDenom, unstakingStkXPRT.Amount)))
+	err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(liquidBondDenom, unstakingGTAC.Amount)))
 	if err != nil {
 		return time.Time{}, math.ZeroInt(), []stakingtypes.UnbondingDelegation{}, math.ZeroInt(), err
 	}
@@ -864,7 +864,7 @@ func (k Keeper) LiquidUnstake(
 	// prioritize inactive liquid validators in the list to be used in DivideByCurrentWeight
 	liquidVals = k.PrioritiseInactiveLiquidValidators(ctx, liquidVals)
 
-	// crumb may occur due to a decimal error in dividing the unstaking stkXPRT into the weight of liquid validators, it will remain in the NetAmount
+	// crumb may occur due to a decimal error in dividing the unstaking gTAC into the weight of liquid validators, it will remain in the NetAmount
 	unbondingAmounts, crumb := types.DivideByCurrentWeight(liquidVals, unbondingAmount, totalLiquidTokens, liquidTokenMap)
 	if !unbondingAmount.Sub(crumb).IsPositive() {
 		return time.Time{}, math.ZeroInt(), []stakingtypes.UnbondingDelegation{}, math.ZeroInt(), types.ErrTooSmallLiquidUnstakingAmount

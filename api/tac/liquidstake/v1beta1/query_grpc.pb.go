@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: pstake/liquidstake/v1beta1/query.proto
+// source: tac/liquidstake/v1beta1/query.proto
 
 package liquidstakev1beta1
 
@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Query_Params_FullMethodName           = "/pstake.liquidstake.v1beta1.Query/Params"
-	Query_LiquidValidators_FullMethodName = "/pstake.liquidstake.v1beta1.Query/LiquidValidators"
-	Query_States_FullMethodName           = "/pstake.liquidstake.v1beta1.Query/States"
+	Query_Params_FullMethodName           = "/tac.liquidstake.v1beta1.Query/Params"
+	Query_LiquidValidators_FullMethodName = "/tac.liquidstake.v1beta1.Query/LiquidValidators"
+	Query_States_FullMethodName           = "/tac.liquidstake.v1beta1.Query/States"
 )
 
 // QueryClient is the client API for Query service.
@@ -170,7 +170,7 @@ func _Query_States_Handler(srv interface{}, ctx context.Context, dec func(interf
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Query_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "pstake.liquidstake.v1beta1.Query",
+	ServiceName: "tac.liquidstake.v1beta1.Query",
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -187,5 +187,5 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pstake/liquidstake/v1beta1/query.proto",
+	Metadata: "tac/liquidstake/v1beta1/query.proto",
 }

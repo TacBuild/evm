@@ -86,7 +86,7 @@ func PackLiquidValidatorOutputs(lvs []types.LiquidValidatorState, args abi.Argum
 func NewNetAmount(nas *types.NetAmountState) NetAmount {
 	return NetAmount{
 		MintRate:              nas.MintRate.BigInt(),
-		StkTACTotalSupply:     nas.StkxprtTotalSupply.BigInt(),
+		StkTACTotalSupply:     nas.GtacTotalSupply.BigInt(),
 		NetAmount:             nas.NetAmount.BigInt(),
 		TotalDelShares:        nas.TotalDelShares.BigInt(),
 		TotalLiquidTokens:     nas.TotalLiquidTokens.BigInt(),

@@ -10,7 +10,7 @@ var (
 	ErrInvalidLiquidBondDenom                       = errors.Register(ModuleName, 1003, "invalid liquid bond denom")
 	ErrNotImplementedYet                            = errors.Register(ModuleName, 1004, "not implemented yet")
 	ErrLessThanMinLiquidStakeAmount                 = errors.Register(ModuleName, 1005, "staking amount should be over params.min_liquid_stake_amount")
-	ErrInvalidStkXPRTSupply                         = errors.Register(ModuleName, 1006, "invalid liquid bond denom supply")
+	ErrInvalidGTACSupply                            = errors.Register(ModuleName, 1006, "invalid liquid bond denom supply")
 	ErrInvalidActiveLiquidValidators                = errors.Register(ModuleName, 1007, "invalid active liquid validators")
 	ErrLiquidValidatorsNotExists                    = errors.Register(ModuleName, 1008, "liquid validators not exists")
 	ErrInsufficientProxyAccBalance                  = errors.Register(ModuleName, 1009, "insufficient liquid tokens or balance of proxy account, need to wait for new liquid validator to be added or unbonding of proxy account to be completed")
