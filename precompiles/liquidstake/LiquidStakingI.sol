@@ -11,12 +11,12 @@ address constant LIQUIDSTAKING_PRECOMPILE_ADDRESS = 0x00000000000000000000000000
 LiquidStakingI constant LIQUIDSTAKING_CONTRACT = LiquidStakingI(LIQUIDSTAKING_PRECOMPILE_ADDRESS);
 
 /// @dev Define all the available liquidstake methods.
-string constant MSG_LIQUID_STAKE = "/pstake.liquidstake.v1beta1.MsgLiquidStake";
-string constant MSG_LIQUID_UNSTAKE = "/pstake.liquidstake.v1beta1.MsgLiquidUnstake";
-string constant MSG_STAKE_TO_LP = "/pstake.liquidstake.v1beta1.MsgStakeToLP";
-string constant MSG_UPDATE_PARAMS = "/pstake.liquidstake.v1beta1.MsgUpdateParams";
-string constant MSG_UPDATE_WHITELISTED_VALIDATORS = "/pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators";
-string constant MSG_SET_MODULE_PAUSED = "/pstake.liquidstake.v1beta1.MsgSetModulePaused";
+string constant MSG_LIQUID_STAKE = "/tac.liquidstake.v1beta1.MsgLiquidStake";
+string constant MSG_LIQUID_UNSTAKE = "/tac.liquidstake.v1beta1.MsgLiquidUnstake";
+string constant MSG_STAKE_TO_LP = "/tac.liquidstake.v1beta1.MsgStakeToLP";
+string constant MSG_UPDATE_PARAMS = "/tac.liquidstake.v1beta1.MsgUpdateParams";
+string constant MSG_UPDATE_WHITELISTED_VALIDATORS = "/tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators";
+string constant MSG_SET_MODULE_PAUSED = "/tac.liquidstake.v1beta1.MsgSetModulePaused";
 
 struct WhitelistedValidator {
     address     validatorAddress;
