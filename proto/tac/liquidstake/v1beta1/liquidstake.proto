@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package pstake.liquidstake.v1beta1;
+package tac.liquidstake.v1beta1;
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
@@ -29,7 +29,7 @@ message Params {
   ];
 
   // LsmDisabled allows to block any msgs that convert staked tokens into
-  // stkXPRT through LSM.
+  // gTAC through LSM.
   bool lsm_disabled = 4;
 
   // MinLiquidStakingAmount specifies the minimum number of coins to be staked
@@ -160,14 +160,14 @@ message NetAmountState {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = true;
 
-  // mint_rate is stkXPRTTotalSupply / NetAmount
+  // mint_rate is gTACTotalSupply / NetAmount
   string mint_rate = 1 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
 
-  // btoken_total_supply returns the total supply of stk/uxprt (stkXPRT denom)
-  string stkxprt_total_supply = 2 [
+  // btoken_total_supply returns the total supply of stk/utac (gTAC denom)
+  string gtac_total_supply = 2 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
   ];

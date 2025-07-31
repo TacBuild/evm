@@ -13,7 +13,7 @@ import (
 
 func TestMsgLiquidStake(t *testing.T) {
 	delegatorAddr := sdk.AccAddress(crypto.AddressHash([]byte("delegatorAddr")))
-	stakingCoin := sdk.NewCoin("uxprt", math.NewInt(1))
+	stakingCoin := sdk.NewCoin("utac", math.NewInt(1))
 
 	testCases := []struct {
 		expectedErr string
@@ -53,7 +53,7 @@ func TestMsgLiquidStake(t *testing.T) {
 
 func TestMsgLiquidUnstake(t *testing.T) {
 	delegatorAddr := sdk.AccAddress(crypto.AddressHash([]byte("delegatorAddr")))
-	stakingCoin := sdk.NewCoin("stk/uxprt", math.NewInt(1))
+	stakingCoin := sdk.NewCoin("stk/utac", math.NewInt(1))
 
 	testCases := []struct {
 		expectedErr string
@@ -94,8 +94,8 @@ func TestMsgLiquidUnstake(t *testing.T) {
 func TestMsgStakeToLP(t *testing.T) {
 	delegatorAddr := sdk.AccAddress(crypto.AddressHash([]byte("delegatorAddr")))
 	validatorAddr := sdk.ValAddress(crypto.AddressHash([]byte("validatorAddr")))
-	stakingCoin := sdk.NewCoin("uxprt", math.NewInt(1))
-	zeroStakingCoin := sdk.NewCoin("uxprt", math.NewInt(0))
+	stakingCoin := sdk.NewCoin("utac", math.NewInt(1))
+	zeroStakingCoin := sdk.NewCoin("utac", math.NewInt(0))
 
 	testCases := []struct {
 		expectedErr string

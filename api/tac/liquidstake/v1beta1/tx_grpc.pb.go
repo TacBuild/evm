@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: pstake/liquidstake/v1beta1/tx.proto
+// source: tac/liquidstake/v1beta1/tx.proto
 
 package liquidstakev1beta1
 
@@ -19,12 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Msg_LiquidStake_FullMethodName                 = "/pstake.liquidstake.v1beta1.Msg/LiquidStake"
-	Msg_LiquidUnstake_FullMethodName               = "/pstake.liquidstake.v1beta1.Msg/LiquidUnstake"
-	Msg_StakeToLP_FullMethodName                   = "/pstake.liquidstake.v1beta1.Msg/StakeToLP"
-	Msg_UpdateParams_FullMethodName                = "/pstake.liquidstake.v1beta1.Msg/UpdateParams"
-	Msg_UpdateWhitelistedValidators_FullMethodName = "/pstake.liquidstake.v1beta1.Msg/UpdateWhitelistedValidators"
-	Msg_SetModulePaused_FullMethodName             = "/pstake.liquidstake.v1beta1.Msg/SetModulePaused"
+	Msg_LiquidStake_FullMethodName                 = "/tac.liquidstake.v1beta1.Msg/LiquidStake"
+	Msg_LiquidUnstake_FullMethodName               = "/tac.liquidstake.v1beta1.Msg/LiquidUnstake"
+	Msg_StakeToLP_FullMethodName                   = "/tac.liquidstake.v1beta1.Msg/StakeToLP"
+	Msg_UpdateParams_FullMethodName                = "/tac.liquidstake.v1beta1.Msg/UpdateParams"
+	Msg_UpdateWhitelistedValidators_FullMethodName = "/tac.liquidstake.v1beta1.Msg/UpdateWhitelistedValidators"
+	Msg_SetModulePaused_FullMethodName             = "/tac.liquidstake.v1beta1.Msg/SetModulePaused"
 )
 
 // MsgClient is the client API for Msg service.
@@ -37,8 +37,8 @@ type MsgClient interface {
 	// LiquidUnstake defines a method for performing an undelegation of liquid
 	// staking from a delegate.
 	LiquidUnstake(ctx context.Context, in *MsgLiquidUnstake, opts ...grpc.CallOption) (*MsgLiquidUnstakeResponse, error)
-	// StakeToLP defines a method for LSM-transfer of staked XPRT
-	// into stkXPRT with locking into an LP.
+	// StakeToLP defines a method for LSM-transfer of staked TAC
+	// into gTAC with locking into an LP.
 	StakeToLP(ctx context.Context, in *MsgStakeToLP, opts ...grpc.CallOption) (*MsgStakeToLPResponse, error)
 	// UpdateParams defines a method to update the module params.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
@@ -122,8 +122,8 @@ type MsgServer interface {
 	// LiquidUnstake defines a method for performing an undelegation of liquid
 	// staking from a delegate.
 	LiquidUnstake(context.Context, *MsgLiquidUnstake) (*MsgLiquidUnstakeResponse, error)
-	// StakeToLP defines a method for LSM-transfer of staked XPRT
-	// into stkXPRT with locking into an LP.
+	// StakeToLP defines a method for LSM-transfer of staked TAC
+	// into gTAC with locking into an LP.
 	StakeToLP(context.Context, *MsgStakeToLP) (*MsgStakeToLPResponse, error)
 	// UpdateParams defines a method to update the module params.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
@@ -283,7 +283,7 @@ func _Msg_SetModulePaused_Handler(srv interface{}, ctx context.Context, dec func
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Msg_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "pstake.liquidstake.v1beta1.Msg",
+	ServiceName: "tac.liquidstake.v1beta1.Msg",
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -312,5 +312,5 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pstake/liquidstake/v1beta1/tx.proto",
+	Metadata: "tac/liquidstake/v1beta1/tx.proto",
 }

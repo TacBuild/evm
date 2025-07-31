@@ -20,8 +20,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_query_proto_init()
-	md_QueryParamsRequest = File_pstake_liquidstake_v1beta1_query_proto.Messages().ByName("QueryParamsRequest")
+	file_tac_liquidstake_v1beta1_query_proto_init()
+	md_QueryParamsRequest = File_tac_liquidstake_v1beta1_query_proto.Messages().ByName("QueryParamsRequest")
 }
 
 var _ protoreflect.Message = (*fastReflection_QueryParamsRequest)(nil)
@@ -33,7 +33,7 @@ func (x *QueryParamsRequest) ProtoReflect() protoreflect.Message {
 }
 
 func (x *QueryParamsRequest) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_query_proto_msgTypes[0]
+	mi := &file_tac_liquidstake_v1beta1_query_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -106,9 +106,9 @@ func (x *fastReflection_QueryParamsRequest) Has(fd protoreflect.FieldDescriptor)
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryParamsRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryParamsRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryParamsRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryParamsRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -122,9 +122,9 @@ func (x *fastReflection_QueryParamsRequest) Clear(fd protoreflect.FieldDescripto
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryParamsRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryParamsRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryParamsRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryParamsRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -138,9 +138,9 @@ func (x *fastReflection_QueryParamsRequest) Get(descriptor protoreflect.FieldDes
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryParamsRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryParamsRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryParamsRequest does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryParamsRequest does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -158,9 +158,9 @@ func (x *fastReflection_QueryParamsRequest) Set(fd protoreflect.FieldDescriptor,
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryParamsRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryParamsRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryParamsRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryParamsRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -178,9 +178,9 @@ func (x *fastReflection_QueryParamsRequest) Mutable(fd protoreflect.FieldDescrip
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryParamsRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryParamsRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryParamsRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryParamsRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -191,9 +191,9 @@ func (x *fastReflection_QueryParamsRequest) NewField(fd protoreflect.FieldDescri
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryParamsRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryParamsRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryParamsRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryParamsRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -203,7 +203,7 @@ func (x *fastReflection_QueryParamsRequest) NewField(fd protoreflect.FieldDescri
 func (x *fastReflection_QueryParamsRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.QueryParamsRequest", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.QueryParamsRequest", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -377,8 +377,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_query_proto_init()
-	md_QueryParamsResponse = File_pstake_liquidstake_v1beta1_query_proto.Messages().ByName("QueryParamsResponse")
+	file_tac_liquidstake_v1beta1_query_proto_init()
+	md_QueryParamsResponse = File_tac_liquidstake_v1beta1_query_proto.Messages().ByName("QueryParamsResponse")
 	fd_QueryParamsResponse_params = md_QueryParamsResponse.Fields().ByName("params")
 }
 
@@ -391,7 +391,7 @@ func (x *QueryParamsResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *QueryParamsResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_query_proto_msgTypes[1]
+	mi := &file_tac_liquidstake_v1beta1_query_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -468,13 +468,13 @@ func (x *fastReflection_QueryParamsResponse) Range(f func(protoreflect.FieldDesc
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_QueryParamsResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryParamsResponse.params":
+	case "tac.liquidstake.v1beta1.QueryParamsResponse.params":
 		return x.Params != nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryParamsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryParamsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryParamsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryParamsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -486,13 +486,13 @@ func (x *fastReflection_QueryParamsResponse) Has(fd protoreflect.FieldDescriptor
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryParamsResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryParamsResponse.params":
+	case "tac.liquidstake.v1beta1.QueryParamsResponse.params":
 		x.Params = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryParamsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryParamsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryParamsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryParamsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -504,14 +504,14 @@ func (x *fastReflection_QueryParamsResponse) Clear(fd protoreflect.FieldDescript
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_QueryParamsResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryParamsResponse.params":
+	case "tac.liquidstake.v1beta1.QueryParamsResponse.params":
 		value := x.Params
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryParamsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryParamsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryParamsResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryParamsResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -527,13 +527,13 @@ func (x *fastReflection_QueryParamsResponse) Get(descriptor protoreflect.FieldDe
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryParamsResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryParamsResponse.params":
+	case "tac.liquidstake.v1beta1.QueryParamsResponse.params":
 		x.Params = value.Message().Interface().(*Params)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryParamsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryParamsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryParamsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryParamsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -549,16 +549,16 @@ func (x *fastReflection_QueryParamsResponse) Set(fd protoreflect.FieldDescriptor
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryParamsResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryParamsResponse.params":
+	case "tac.liquidstake.v1beta1.QueryParamsResponse.params":
 		if x.Params == nil {
 			x.Params = new(Params)
 		}
 		return protoreflect.ValueOfMessage(x.Params.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryParamsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryParamsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryParamsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryParamsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -567,14 +567,14 @@ func (x *fastReflection_QueryParamsResponse) Mutable(fd protoreflect.FieldDescri
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_QueryParamsResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryParamsResponse.params":
+	case "tac.liquidstake.v1beta1.QueryParamsResponse.params":
 		m := new(Params)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryParamsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryParamsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryParamsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryParamsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -584,7 +584,7 @@ func (x *fastReflection_QueryParamsResponse) NewField(fd protoreflect.FieldDescr
 func (x *fastReflection_QueryParamsResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.QueryParamsResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.QueryParamsResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -811,8 +811,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_query_proto_init()
-	md_QueryLiquidValidatorsRequest = File_pstake_liquidstake_v1beta1_query_proto.Messages().ByName("QueryLiquidValidatorsRequest")
+	file_tac_liquidstake_v1beta1_query_proto_init()
+	md_QueryLiquidValidatorsRequest = File_tac_liquidstake_v1beta1_query_proto.Messages().ByName("QueryLiquidValidatorsRequest")
 }
 
 var _ protoreflect.Message = (*fastReflection_QueryLiquidValidatorsRequest)(nil)
@@ -824,7 +824,7 @@ func (x *QueryLiquidValidatorsRequest) ProtoReflect() protoreflect.Message {
 }
 
 func (x *QueryLiquidValidatorsRequest) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_query_proto_msgTypes[2]
+	mi := &file_tac_liquidstake_v1beta1_query_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -897,9 +897,9 @@ func (x *fastReflection_QueryLiquidValidatorsRequest) Has(fd protoreflect.FieldD
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -913,9 +913,9 @@ func (x *fastReflection_QueryLiquidValidatorsRequest) Clear(fd protoreflect.Fiel
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -929,9 +929,9 @@ func (x *fastReflection_QueryLiquidValidatorsRequest) Get(descriptor protoreflec
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -949,9 +949,9 @@ func (x *fastReflection_QueryLiquidValidatorsRequest) Set(fd protoreflect.FieldD
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -969,9 +969,9 @@ func (x *fastReflection_QueryLiquidValidatorsRequest) Mutable(fd protoreflect.Fi
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -982,9 +982,9 @@ func (x *fastReflection_QueryLiquidValidatorsRequest) NewField(fd protoreflect.F
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -994,7 +994,7 @@ func (x *fastReflection_QueryLiquidValidatorsRequest) NewField(fd protoreflect.F
 func (x *fastReflection_QueryLiquidValidatorsRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -1219,8 +1219,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_query_proto_init()
-	md_QueryLiquidValidatorsResponse = File_pstake_liquidstake_v1beta1_query_proto.Messages().ByName("QueryLiquidValidatorsResponse")
+	file_tac_liquidstake_v1beta1_query_proto_init()
+	md_QueryLiquidValidatorsResponse = File_tac_liquidstake_v1beta1_query_proto.Messages().ByName("QueryLiquidValidatorsResponse")
 	fd_QueryLiquidValidatorsResponse_liquid_validators = md_QueryLiquidValidatorsResponse.Fields().ByName("liquid_validators")
 }
 
@@ -1233,7 +1233,7 @@ func (x *QueryLiquidValidatorsResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *QueryLiquidValidatorsResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_query_proto_msgTypes[3]
+	mi := &file_tac_liquidstake_v1beta1_query_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1310,13 +1310,13 @@ func (x *fastReflection_QueryLiquidValidatorsResponse) Range(f func(protoreflect
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_QueryLiquidValidatorsResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators":
+	case "tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators":
 		return len(x.LiquidValidators) != 0
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1328,13 +1328,13 @@ func (x *fastReflection_QueryLiquidValidatorsResponse) Has(fd protoreflect.Field
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryLiquidValidatorsResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators":
+	case "tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators":
 		x.LiquidValidators = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1346,7 +1346,7 @@ func (x *fastReflection_QueryLiquidValidatorsResponse) Clear(fd protoreflect.Fie
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_QueryLiquidValidatorsResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators":
+	case "tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators":
 		if len(x.LiquidValidators) == 0 {
 			return protoreflect.ValueOfList(&_QueryLiquidValidatorsResponse_1_list{})
 		}
@@ -1354,9 +1354,9 @@ func (x *fastReflection_QueryLiquidValidatorsResponse) Get(descriptor protorefle
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -1372,15 +1372,15 @@ func (x *fastReflection_QueryLiquidValidatorsResponse) Get(descriptor protorefle
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryLiquidValidatorsResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators":
+	case "tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators":
 		lv := value.List()
 		clv := lv.(*_QueryLiquidValidatorsResponse_1_list)
 		x.LiquidValidators = *clv.list
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1396,7 +1396,7 @@ func (x *fastReflection_QueryLiquidValidatorsResponse) Set(fd protoreflect.Field
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryLiquidValidatorsResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators":
+	case "tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators":
 		if x.LiquidValidators == nil {
 			x.LiquidValidators = []*LiquidValidatorState{}
 		}
@@ -1404,9 +1404,9 @@ func (x *fastReflection_QueryLiquidValidatorsResponse) Mutable(fd protoreflect.F
 		return protoreflect.ValueOfList(value)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1415,14 +1415,14 @@ func (x *fastReflection_QueryLiquidValidatorsResponse) Mutable(fd protoreflect.F
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_QueryLiquidValidatorsResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators":
+	case "tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators":
 		list := []*LiquidValidatorState{}
 		return protoreflect.ValueOfList(&_QueryLiquidValidatorsResponse_1_list{list: &list})
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1432,7 +1432,7 @@ func (x *fastReflection_QueryLiquidValidatorsResponse) NewField(fd protoreflect.
 func (x *fastReflection_QueryLiquidValidatorsResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -1661,8 +1661,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_query_proto_init()
-	md_QueryStatesRequest = File_pstake_liquidstake_v1beta1_query_proto.Messages().ByName("QueryStatesRequest")
+	file_tac_liquidstake_v1beta1_query_proto_init()
+	md_QueryStatesRequest = File_tac_liquidstake_v1beta1_query_proto.Messages().ByName("QueryStatesRequest")
 }
 
 var _ protoreflect.Message = (*fastReflection_QueryStatesRequest)(nil)
@@ -1674,7 +1674,7 @@ func (x *QueryStatesRequest) ProtoReflect() protoreflect.Message {
 }
 
 func (x *QueryStatesRequest) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_query_proto_msgTypes[4]
+	mi := &file_tac_liquidstake_v1beta1_query_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1747,9 +1747,9 @@ func (x *fastReflection_QueryStatesRequest) Has(fd protoreflect.FieldDescriptor)
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryStatesRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryStatesRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryStatesRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryStatesRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1763,9 +1763,9 @@ func (x *fastReflection_QueryStatesRequest) Clear(fd protoreflect.FieldDescripto
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryStatesRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryStatesRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryStatesRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryStatesRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1779,9 +1779,9 @@ func (x *fastReflection_QueryStatesRequest) Get(descriptor protoreflect.FieldDes
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryStatesRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryStatesRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryStatesRequest does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryStatesRequest does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -1799,9 +1799,9 @@ func (x *fastReflection_QueryStatesRequest) Set(fd protoreflect.FieldDescriptor,
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryStatesRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryStatesRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryStatesRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryStatesRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1819,9 +1819,9 @@ func (x *fastReflection_QueryStatesRequest) Mutable(fd protoreflect.FieldDescrip
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryStatesRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryStatesRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryStatesRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryStatesRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1832,9 +1832,9 @@ func (x *fastReflection_QueryStatesRequest) NewField(fd protoreflect.FieldDescri
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryStatesRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryStatesRequest"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryStatesRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryStatesRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1844,7 +1844,7 @@ func (x *fastReflection_QueryStatesRequest) NewField(fd protoreflect.FieldDescri
 func (x *fastReflection_QueryStatesRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.QueryStatesRequest", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.QueryStatesRequest", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -2018,8 +2018,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_query_proto_init()
-	md_QueryStatesResponse = File_pstake_liquidstake_v1beta1_query_proto.Messages().ByName("QueryStatesResponse")
+	file_tac_liquidstake_v1beta1_query_proto_init()
+	md_QueryStatesResponse = File_tac_liquidstake_v1beta1_query_proto.Messages().ByName("QueryStatesResponse")
 	fd_QueryStatesResponse_net_amount_state = md_QueryStatesResponse.Fields().ByName("net_amount_state")
 }
 
@@ -2032,7 +2032,7 @@ func (x *QueryStatesResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *QueryStatesResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_query_proto_msgTypes[5]
+	mi := &file_tac_liquidstake_v1beta1_query_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2109,13 +2109,13 @@ func (x *fastReflection_QueryStatesResponse) Range(f func(protoreflect.FieldDesc
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_QueryStatesResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryStatesResponse.net_amount_state":
+	case "tac.liquidstake.v1beta1.QueryStatesResponse.net_amount_state":
 		return x.NetAmountState != nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryStatesResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryStatesResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryStatesResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryStatesResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2127,13 +2127,13 @@ func (x *fastReflection_QueryStatesResponse) Has(fd protoreflect.FieldDescriptor
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryStatesResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryStatesResponse.net_amount_state":
+	case "tac.liquidstake.v1beta1.QueryStatesResponse.net_amount_state":
 		x.NetAmountState = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryStatesResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryStatesResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryStatesResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryStatesResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2145,14 +2145,14 @@ func (x *fastReflection_QueryStatesResponse) Clear(fd protoreflect.FieldDescript
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_QueryStatesResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryStatesResponse.net_amount_state":
+	case "tac.liquidstake.v1beta1.QueryStatesResponse.net_amount_state":
 		value := x.NetAmountState
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryStatesResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryStatesResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryStatesResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryStatesResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -2168,13 +2168,13 @@ func (x *fastReflection_QueryStatesResponse) Get(descriptor protoreflect.FieldDe
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryStatesResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryStatesResponse.net_amount_state":
+	case "tac.liquidstake.v1beta1.QueryStatesResponse.net_amount_state":
 		x.NetAmountState = value.Message().Interface().(*NetAmountState)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryStatesResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryStatesResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryStatesResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryStatesResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2190,16 +2190,16 @@ func (x *fastReflection_QueryStatesResponse) Set(fd protoreflect.FieldDescriptor
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryStatesResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryStatesResponse.net_amount_state":
+	case "tac.liquidstake.v1beta1.QueryStatesResponse.net_amount_state":
 		if x.NetAmountState == nil {
 			x.NetAmountState = new(NetAmountState)
 		}
 		return protoreflect.ValueOfMessage(x.NetAmountState.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryStatesResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryStatesResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryStatesResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryStatesResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2208,14 +2208,14 @@ func (x *fastReflection_QueryStatesResponse) Mutable(fd protoreflect.FieldDescri
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_QueryStatesResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.QueryStatesResponse.net_amount_state":
+	case "tac.liquidstake.v1beta1.QueryStatesResponse.net_amount_state":
 		m := new(NetAmountState)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.QueryStatesResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.QueryStatesResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.QueryStatesResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.QueryStatesResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2225,7 +2225,7 @@ func (x *fastReflection_QueryStatesResponse) NewField(fd protoreflect.FieldDescr
 func (x *fastReflection_QueryStatesResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.QueryStatesResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.QueryStatesResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -2451,7 +2451,7 @@ func (x *fastReflection_QueryStatesResponse) ProtoMethods() *protoiface.Methods 
 // versions:
 // 	protoc-gen-go v1.27.0
 // 	protoc        (unknown)
-// source: pstake/liquidstake/v1beta1/query.proto
+// source: tac/liquidstake/v1beta1/query.proto
 
 const (
 	// Verify that this generated code is sufficiently up-to-date.
@@ -2470,7 +2470,7 @@ type QueryParamsRequest struct {
 func (x *QueryParamsRequest) Reset() {
 	*x = QueryParamsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_query_proto_msgTypes[0]
+		mi := &file_tac_liquidstake_v1beta1_query_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2484,7 +2484,7 @@ func (*QueryParamsRequest) ProtoMessage() {}
 
 // Deprecated: Use QueryParamsRequest.ProtoReflect.Descriptor instead.
 func (*QueryParamsRequest) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_query_proto_rawDescGZIP(), []int{0}
+	return file_tac_liquidstake_v1beta1_query_proto_rawDescGZIP(), []int{0}
 }
 
 // QueryParamsResponse is the response type for the Query/Params RPC method.
@@ -2499,7 +2499,7 @@ type QueryParamsResponse struct {
 func (x *QueryParamsResponse) Reset() {
 	*x = QueryParamsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_query_proto_msgTypes[1]
+		mi := &file_tac_liquidstake_v1beta1_query_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2513,7 +2513,7 @@ func (*QueryParamsResponse) ProtoMessage() {}
 
 // Deprecated: Use QueryParamsResponse.ProtoReflect.Descriptor instead.
 func (*QueryParamsResponse) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_query_proto_rawDescGZIP(), []int{1}
+	return file_tac_liquidstake_v1beta1_query_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *QueryParamsResponse) GetParams() *Params {
@@ -2534,7 +2534,7 @@ type QueryLiquidValidatorsRequest struct {
 func (x *QueryLiquidValidatorsRequest) Reset() {
 	*x = QueryLiquidValidatorsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_query_proto_msgTypes[2]
+		mi := &file_tac_liquidstake_v1beta1_query_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2548,7 +2548,7 @@ func (*QueryLiquidValidatorsRequest) ProtoMessage() {}
 
 // Deprecated: Use QueryLiquidValidatorsRequest.ProtoReflect.Descriptor instead.
 func (*QueryLiquidValidatorsRequest) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_query_proto_rawDescGZIP(), []int{2}
+	return file_tac_liquidstake_v1beta1_query_proto_rawDescGZIP(), []int{2}
 }
 
 // QueryLiquidValidatorsResponse is the response type for the
@@ -2564,7 +2564,7 @@ type QueryLiquidValidatorsResponse struct {
 func (x *QueryLiquidValidatorsResponse) Reset() {
 	*x = QueryLiquidValidatorsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_query_proto_msgTypes[3]
+		mi := &file_tac_liquidstake_v1beta1_query_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2578,7 +2578,7 @@ func (*QueryLiquidValidatorsResponse) ProtoMessage() {}
 
 // Deprecated: Use QueryLiquidValidatorsResponse.ProtoReflect.Descriptor instead.
 func (*QueryLiquidValidatorsResponse) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_query_proto_rawDescGZIP(), []int{3}
+	return file_tac_liquidstake_v1beta1_query_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *QueryLiquidValidatorsResponse) GetLiquidValidators() []*LiquidValidatorState {
@@ -2598,7 +2598,7 @@ type QueryStatesRequest struct {
 func (x *QueryStatesRequest) Reset() {
 	*x = QueryStatesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_query_proto_msgTypes[4]
+		mi := &file_tac_liquidstake_v1beta1_query_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2612,7 +2612,7 @@ func (*QueryStatesRequest) ProtoMessage() {}
 
 // Deprecated: Use QueryStatesRequest.ProtoReflect.Descriptor instead.
 func (*QueryStatesRequest) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_query_proto_rawDescGZIP(), []int{4}
+	return file_tac_liquidstake_v1beta1_query_proto_rawDescGZIP(), []int{4}
 }
 
 // QueryStatesResponse is the response type for the Query/States RPC method.
@@ -2627,7 +2627,7 @@ type QueryStatesResponse struct {
 func (x *QueryStatesResponse) Reset() {
 	*x = QueryStatesResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_query_proto_msgTypes[5]
+		mi := &file_tac_liquidstake_v1beta1_query_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2641,7 +2641,7 @@ func (*QueryStatesResponse) ProtoMessage() {}
 
 // Deprecated: Use QueryStatesResponse.ProtoReflect.Descriptor instead.
 func (*QueryStatesResponse) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_query_proto_rawDescGZIP(), []int{5}
+	return file_tac_liquidstake_v1beta1_query_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *QueryStatesResponse) GetNetAmountState() *NetAmountState {
@@ -2651,131 +2651,127 @@ func (x *QueryStatesResponse) GetNetAmountState() *NetAmountState {
 	return nil
 }
 
-var File_pstake_liquidstake_v1beta1_query_proto protoreflect.FileDescriptor
+var File_tac_liquidstake_v1beta1_query_proto protoreflect.FileDescriptor
 
-var file_pstake_liquidstake_v1beta1_query_proto_rawDesc = []byte{
-	0x0a, 0x26, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73,
-	0x74, 0x61, 0x6b, 0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x71, 0x75, 0x65,
-	0x72, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x1a, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65,
+var file_tac_liquidstake_v1beta1_query_proto_rawDesc = []byte{
+	0x0a, 0x23, 0x74, 0x61, 0x63, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b,
+	0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x71, 0x75, 0x65, 0x72, 0x79, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x17, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69,
+	0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x1a, 0x1c,
+	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x6e, 0x6e, 0x6f, 0x74,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x29, 0x74, 0x61,
+	0x63, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x76, 0x31,
+	0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x17, 0x63,
+	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2f, 0x6d, 0x73, 0x67, 0x2f, 0x76, 0x31, 0x2f, 0x6d, 0x73, 0x67,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x14, 0x0a, 0x12, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50,
+	0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x54, 0x0a, 0x13,
+	0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x3d, 0x0a, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64,
+	0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x73, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x06, 0x70, 0x61, 0x72, 0x61,
+	0x6d, 0x73, 0x22, 0x1e, 0x0a, 0x1c, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4c, 0x69, 0x71, 0x75, 0x69,
+	0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x22, 0x81, 0x01, 0x0a, 0x1d, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4c, 0x69, 0x71, 0x75,
+	0x69, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x60, 0x0a, 0x11, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x5f, 0x76,
+	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32,
+	0x2d, 0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b,
+	0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64,
+	0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x53, 0x74, 0x61, 0x74, 0x65, 0x42, 0x04,
+	0xc8, 0xde, 0x1f, 0x00, 0x52, 0x10, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x56, 0x61, 0x6c, 0x69,
+	0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x22, 0x14, 0x0a, 0x12, 0x51, 0x75, 0x65, 0x72, 0x79, 0x53,
+	0x74, 0x61, 0x74, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x6e, 0x0a, 0x13,
+	0x51, 0x75, 0x65, 0x72, 0x79, 0x53, 0x74, 0x61, 0x74, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x57, 0x0a, 0x10, 0x6e, 0x65, 0x74, 0x5f, 0x61, 0x6d, 0x6f, 0x75, 0x6e,
+	0x74, 0x5f, 0x73, 0x74, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x27, 0x2e,
+	0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e,
+	0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4e, 0x65, 0x74, 0x41, 0x6d, 0x6f, 0x75, 0x6e,
+	0x74, 0x53, 0x74, 0x61, 0x74, 0x65, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x0e, 0x6e, 0x65,
+	0x74, 0x41, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x74, 0x61, 0x74, 0x65, 0x32, 0xdd, 0x03, 0x0a,
+	0x05, 0x51, 0x75, 0x65, 0x72, 0x79, 0x12, 0x8c, 0x01, 0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d,
+	0x73, 0x12, 0x2b, 0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74,
+	0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x51, 0x75, 0x65, 0x72,
+	0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2c,
+	0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65,
+	0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x27, 0x82, 0xd3,
+	0xe4, 0x93, 0x02, 0x21, 0x12, 0x1f, 0x2f, 0x74, 0x61, 0x63, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69,
+	0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x70,
+	0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0xae, 0x01, 0x0a, 0x10, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64,
+	0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x12, 0x35, 0x2e, 0x74, 0x61, 0x63,
 	0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62,
-	0x65, 0x74, 0x61, 0x31, 0x1a, 0x1c, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x61, 0x70, 0x69,
-	0x2f, 0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x1a, 0x2c, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69,
-	0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x6c,
-	0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x17, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2f, 0x6d,
-	0x73, 0x67, 0x2f, 0x76, 0x31, 0x2f, 0x6d, 0x73, 0x67, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22,
-	0x14, 0x0a, 0x12, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x57, 0x0a, 0x13, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x61,
-	0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x40, 0x0a, 0x06,
-	0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x70,
-	0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b,
-	0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73,
-	0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x22, 0x1e,
-	0x0a, 0x1c, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x56, 0x61, 0x6c,
-	0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x84,
-	0x01, 0x0a, 0x1d, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x56, 0x61,
-	0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x63, 0x0a, 0x11, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x5f, 0x76, 0x61, 0x6c, 0x69, 0x64,
-	0x61, 0x74, 0x6f, 0x72, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x30, 0x2e, 0x70, 0x73,
-	0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65,
-	0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x56,
-	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x53, 0x74, 0x61, 0x74, 0x65, 0x42, 0x04, 0xc8,
-	0xde, 0x1f, 0x00, 0x52, 0x10, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64,
-	0x61, 0x74, 0x6f, 0x72, 0x73, 0x22, 0x14, 0x0a, 0x12, 0x51, 0x75, 0x65, 0x72, 0x79, 0x53, 0x74,
-	0x61, 0x74, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x71, 0x0a, 0x13, 0x51,
-	0x75, 0x65, 0x72, 0x79, 0x53, 0x74, 0x61, 0x74, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x12, 0x5a, 0x0a, 0x10, 0x6e, 0x65, 0x74, 0x5f, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74,
-	0x5f, 0x73, 0x74, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2a, 0x2e, 0x70,
-	0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b,
-	0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4e, 0x65, 0x74, 0x41, 0x6d, 0x6f,
-	0x75, 0x6e, 0x74, 0x53, 0x74, 0x61, 0x74, 0x65, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x0e,
-	0x6e, 0x65, 0x74, 0x41, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x74, 0x61, 0x74, 0x65, 0x32, 0xf8,
-	0x03, 0x0a, 0x05, 0x51, 0x75, 0x65, 0x72, 0x79, 0x12, 0x95, 0x01, 0x0a, 0x06, 0x50, 0x61, 0x72,
-	0x61, 0x6d, 0x73, 0x12, 0x2e, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71,
-	0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31,
-	0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x1a, 0x2f, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71,
-	0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31,
-	0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2a, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x24, 0x12, 0x22, 0x2f, 0x70,
-	0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b,
-	0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73,
-	0x12, 0xb7, 0x01, 0x0a, 0x10, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64,
-	0x61, 0x74, 0x6f, 0x72, 0x73, 0x12, 0x38, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c,
-	0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74,
-	0x61, 0x31, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x56, 0x61,
-	0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x39, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73,
-	0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x51, 0x75, 0x65,
-	0x72, 0x79, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f,
-	0x72, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2e, 0x82, 0xd3, 0xe4, 0x93,
-	0x02, 0x28, 0x12, 0x26, 0x2f, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x6c, 0x69, 0x71, 0x75,
-	0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f,
-	0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x12, 0x95, 0x01, 0x0a, 0x06, 0x53,
-	0x74, 0x61, 0x74, 0x65, 0x73, 0x12, 0x2e, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c,
-	0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74,
-	0x61, 0x31, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x53, 0x74, 0x61, 0x74, 0x65, 0x73, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2f, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c,
-	0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74,
-	0x61, 0x31, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x53, 0x74, 0x61, 0x74, 0x65, 0x73, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2a, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x24, 0x12, 0x22,
-	0x2f, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74,
-	0x61, 0x6b, 0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x73, 0x74, 0x61, 0x74,
-	0x65, 0x73, 0x1a, 0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0xf6, 0x01, 0x0a, 0x1e, 0x63, 0x6f,
-	0x6d, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73,
+	0x65, 0x74, 0x61, 0x31, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64,
+	0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x36, 0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74,
+	0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x51, 0x75, 0x65, 0x72,
+	0x79, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2b, 0x82, 0xd3, 0xe4, 0x93, 0x02,
+	0x25, 0x12, 0x23, 0x2f, 0x74, 0x61, 0x63, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74,
+	0x61, 0x6b, 0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x76, 0x61, 0x6c, 0x69,
+	0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x12, 0x8c, 0x01, 0x0a, 0x06, 0x53, 0x74, 0x61, 0x74, 0x65,
+	0x73, 0x12, 0x2b, 0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74,
+	0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x51, 0x75, 0x65, 0x72,
+	0x79, 0x53, 0x74, 0x61, 0x74, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2c,
+	0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65,
+	0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x53, 0x74,
+	0x61, 0x74, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x27, 0x82, 0xd3,
+	0xe4, 0x93, 0x02, 0x21, 0x12, 0x1f, 0x2f, 0x74, 0x61, 0x63, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69,
+	0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x73,
+	0x74, 0x61, 0x74, 0x65, 0x73, 0x1a, 0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0xe4, 0x01, 0x0a,
+	0x1b, 0x63, 0x6f, 0x6d, 0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73,
 	0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x42, 0x0a, 0x51, 0x75,
-	0x65, 0x72, 0x79, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x3e, 0x63, 0x6f, 0x73, 0x6d,
-	0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x73, 0x74,
-	0x61, 0x6b, 0x65, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f,
-	0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x3b, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74,
-	0x61, 0x6b, 0x65, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0xa2, 0x02, 0x03, 0x50, 0x4c, 0x58,
-	0xaa, 0x02, 0x1a, 0x50, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64,
-	0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0xca, 0x02, 0x1a,
-	0x50, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x5c, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61,
-	0x6b, 0x65, 0x5c, 0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0xe2, 0x02, 0x26, 0x50, 0x73, 0x74,
-	0x61, 0x6b, 0x65, 0x5c, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x5c,
-	0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64,
-	0x61, 0x74, 0x61, 0xea, 0x02, 0x1c, 0x50, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x3a, 0x3a, 0x4c, 0x69,
-	0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x65, 0x74,
-	0x61, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x65, 0x72, 0x79, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x3b, 0x63, 0x6f, 0x73, 0x6d,
+	0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x74, 0x61, 0x63,
+	0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x76, 0x31, 0x62,
+	0x65, 0x74, 0x61, 0x31, 0x3b, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65,
+	0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0xa2, 0x02, 0x03, 0x54, 0x4c, 0x58, 0xaa, 0x02, 0x17,
+	0x54, 0x61, 0x63, 0x2e, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e,
+	0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0xca, 0x02, 0x17, 0x54, 0x61, 0x63, 0x5c, 0x4c, 0x69,
+	0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x5c, 0x56, 0x31, 0x62, 0x65, 0x74, 0x61,
+	0x31, 0xe2, 0x02, 0x23, 0x54, 0x61, 0x63, 0x5c, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74,
+	0x61, 0x6b, 0x65, 0x5c, 0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d,
+	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x19, 0x54, 0x61, 0x63, 0x3a, 0x3a, 0x4c,
+	0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x65,
+	0x74, 0x61, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
-	file_pstake_liquidstake_v1beta1_query_proto_rawDescOnce sync.Once
-	file_pstake_liquidstake_v1beta1_query_proto_rawDescData = file_pstake_liquidstake_v1beta1_query_proto_rawDesc
+	file_tac_liquidstake_v1beta1_query_proto_rawDescOnce sync.Once
+	file_tac_liquidstake_v1beta1_query_proto_rawDescData = file_tac_liquidstake_v1beta1_query_proto_rawDesc
 )
 
-func file_pstake_liquidstake_v1beta1_query_proto_rawDescGZIP() []byte {
-	file_pstake_liquidstake_v1beta1_query_proto_rawDescOnce.Do(func() {
-		file_pstake_liquidstake_v1beta1_query_proto_rawDescData = protoimpl.X.CompressGZIP(file_pstake_liquidstake_v1beta1_query_proto_rawDescData)
+func file_tac_liquidstake_v1beta1_query_proto_rawDescGZIP() []byte {
+	file_tac_liquidstake_v1beta1_query_proto_rawDescOnce.Do(func() {
+		file_tac_liquidstake_v1beta1_query_proto_rawDescData = protoimpl.X.CompressGZIP(file_tac_liquidstake_v1beta1_query_proto_rawDescData)
 	})
-	return file_pstake_liquidstake_v1beta1_query_proto_rawDescData
+	return file_tac_liquidstake_v1beta1_query_proto_rawDescData
 }
 
-var file_pstake_liquidstake_v1beta1_query_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_pstake_liquidstake_v1beta1_query_proto_goTypes = []interface{}{
-	(*QueryParamsRequest)(nil),            // 0: pstake.liquidstake.v1beta1.QueryParamsRequest
-	(*QueryParamsResponse)(nil),           // 1: pstake.liquidstake.v1beta1.QueryParamsResponse
-	(*QueryLiquidValidatorsRequest)(nil),  // 2: pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest
-	(*QueryLiquidValidatorsResponse)(nil), // 3: pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse
-	(*QueryStatesRequest)(nil),            // 4: pstake.liquidstake.v1beta1.QueryStatesRequest
-	(*QueryStatesResponse)(nil),           // 5: pstake.liquidstake.v1beta1.QueryStatesResponse
-	(*Params)(nil),                        // 6: pstake.liquidstake.v1beta1.Params
-	(*LiquidValidatorState)(nil),          // 7: pstake.liquidstake.v1beta1.LiquidValidatorState
-	(*NetAmountState)(nil),                // 8: pstake.liquidstake.v1beta1.NetAmountState
+var file_tac_liquidstake_v1beta1_query_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_tac_liquidstake_v1beta1_query_proto_goTypes = []interface{}{
+	(*QueryParamsRequest)(nil),            // 0: tac.liquidstake.v1beta1.QueryParamsRequest
+	(*QueryParamsResponse)(nil),           // 1: tac.liquidstake.v1beta1.QueryParamsResponse
+	(*QueryLiquidValidatorsRequest)(nil),  // 2: tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest
+	(*QueryLiquidValidatorsResponse)(nil), // 3: tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse
+	(*QueryStatesRequest)(nil),            // 4: tac.liquidstake.v1beta1.QueryStatesRequest
+	(*QueryStatesResponse)(nil),           // 5: tac.liquidstake.v1beta1.QueryStatesResponse
+	(*Params)(nil),                        // 6: tac.liquidstake.v1beta1.Params
+	(*LiquidValidatorState)(nil),          // 7: tac.liquidstake.v1beta1.LiquidValidatorState
+	(*NetAmountState)(nil),                // 8: tac.liquidstake.v1beta1.NetAmountState
 }
-var file_pstake_liquidstake_v1beta1_query_proto_depIdxs = []int32{
-	6, // 0: pstake.liquidstake.v1beta1.QueryParamsResponse.params:type_name -> pstake.liquidstake.v1beta1.Params
-	7, // 1: pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators:type_name -> pstake.liquidstake.v1beta1.LiquidValidatorState
-	8, // 2: pstake.liquidstake.v1beta1.QueryStatesResponse.net_amount_state:type_name -> pstake.liquidstake.v1beta1.NetAmountState
-	0, // 3: pstake.liquidstake.v1beta1.Query.Params:input_type -> pstake.liquidstake.v1beta1.QueryParamsRequest
-	2, // 4: pstake.liquidstake.v1beta1.Query.LiquidValidators:input_type -> pstake.liquidstake.v1beta1.QueryLiquidValidatorsRequest
-	4, // 5: pstake.liquidstake.v1beta1.Query.States:input_type -> pstake.liquidstake.v1beta1.QueryStatesRequest
-	1, // 6: pstake.liquidstake.v1beta1.Query.Params:output_type -> pstake.liquidstake.v1beta1.QueryParamsResponse
-	3, // 7: pstake.liquidstake.v1beta1.Query.LiquidValidators:output_type -> pstake.liquidstake.v1beta1.QueryLiquidValidatorsResponse
-	5, // 8: pstake.liquidstake.v1beta1.Query.States:output_type -> pstake.liquidstake.v1beta1.QueryStatesResponse
+var file_tac_liquidstake_v1beta1_query_proto_depIdxs = []int32{
+	6, // 0: tac.liquidstake.v1beta1.QueryParamsResponse.params:type_name -> tac.liquidstake.v1beta1.Params
+	7, // 1: tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse.liquid_validators:type_name -> tac.liquidstake.v1beta1.LiquidValidatorState
+	8, // 2: tac.liquidstake.v1beta1.QueryStatesResponse.net_amount_state:type_name -> tac.liquidstake.v1beta1.NetAmountState
+	0, // 3: tac.liquidstake.v1beta1.Query.Params:input_type -> tac.liquidstake.v1beta1.QueryParamsRequest
+	2, // 4: tac.liquidstake.v1beta1.Query.LiquidValidators:input_type -> tac.liquidstake.v1beta1.QueryLiquidValidatorsRequest
+	4, // 5: tac.liquidstake.v1beta1.Query.States:input_type -> tac.liquidstake.v1beta1.QueryStatesRequest
+	1, // 6: tac.liquidstake.v1beta1.Query.Params:output_type -> tac.liquidstake.v1beta1.QueryParamsResponse
+	3, // 7: tac.liquidstake.v1beta1.Query.LiquidValidators:output_type -> tac.liquidstake.v1beta1.QueryLiquidValidatorsResponse
+	5, // 8: tac.liquidstake.v1beta1.Query.States:output_type -> tac.liquidstake.v1beta1.QueryStatesResponse
 	6, // [6:9] is the sub-list for method output_type
 	3, // [3:6] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
@@ -2783,14 +2779,14 @@ var file_pstake_liquidstake_v1beta1_query_proto_depIdxs = []int32{
 	0, // [0:3] is the sub-list for field type_name
 }
 
-func init() { file_pstake_liquidstake_v1beta1_query_proto_init() }
-func file_pstake_liquidstake_v1beta1_query_proto_init() {
-	if File_pstake_liquidstake_v1beta1_query_proto != nil {
+func init() { file_tac_liquidstake_v1beta1_query_proto_init() }
+func file_tac_liquidstake_v1beta1_query_proto_init() {
+	if File_tac_liquidstake_v1beta1_query_proto != nil {
 		return
 	}
-	file_pstake_liquidstake_v1beta1_liquidstake_proto_init()
+	file_tac_liquidstake_v1beta1_liquidstake_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_pstake_liquidstake_v1beta1_query_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_query_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*QueryParamsRequest); i {
 			case 0:
 				return &v.state
@@ -2802,7 +2798,7 @@ func file_pstake_liquidstake_v1beta1_query_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_query_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_query_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*QueryParamsResponse); i {
 			case 0:
 				return &v.state
@@ -2814,7 +2810,7 @@ func file_pstake_liquidstake_v1beta1_query_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_query_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_query_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*QueryLiquidValidatorsRequest); i {
 			case 0:
 				return &v.state
@@ -2826,7 +2822,7 @@ func file_pstake_liquidstake_v1beta1_query_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_query_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_query_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*QueryLiquidValidatorsResponse); i {
 			case 0:
 				return &v.state
@@ -2838,7 +2834,7 @@ func file_pstake_liquidstake_v1beta1_query_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_query_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_query_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*QueryStatesRequest); i {
 			case 0:
 				return &v.state
@@ -2850,7 +2846,7 @@ func file_pstake_liquidstake_v1beta1_query_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_query_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_query_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*QueryStatesResponse); i {
 			case 0:
 				return &v.state
@@ -2867,18 +2863,18 @@ func file_pstake_liquidstake_v1beta1_query_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_pstake_liquidstake_v1beta1_query_proto_rawDesc,
+			RawDescriptor: file_tac_liquidstake_v1beta1_query_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_pstake_liquidstake_v1beta1_query_proto_goTypes,
-		DependencyIndexes: file_pstake_liquidstake_v1beta1_query_proto_depIdxs,
-		MessageInfos:      file_pstake_liquidstake_v1beta1_query_proto_msgTypes,
+		GoTypes:           file_tac_liquidstake_v1beta1_query_proto_goTypes,
+		DependencyIndexes: file_tac_liquidstake_v1beta1_query_proto_depIdxs,
+		MessageInfos:      file_tac_liquidstake_v1beta1_query_proto_msgTypes,
 	}.Build()
-	File_pstake_liquidstake_v1beta1_query_proto = out.File
-	file_pstake_liquidstake_v1beta1_query_proto_rawDesc = nil
-	file_pstake_liquidstake_v1beta1_query_proto_goTypes = nil
-	file_pstake_liquidstake_v1beta1_query_proto_depIdxs = nil
+	File_tac_liquidstake_v1beta1_query_proto = out.File
+	file_tac_liquidstake_v1beta1_query_proto_rawDesc = nil
+	file_tac_liquidstake_v1beta1_query_proto_goTypes = nil
+	file_tac_liquidstake_v1beta1_query_proto_depIdxs = nil
 }

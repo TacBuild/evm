@@ -25,8 +25,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_tx_proto_init()
-	md_MsgLiquidStake = File_pstake_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgLiquidStake")
+	file_tac_liquidstake_v1beta1_tx_proto_init()
+	md_MsgLiquidStake = File_tac_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgLiquidStake")
 	fd_MsgLiquidStake_delegator_address = md_MsgLiquidStake.Fields().ByName("delegator_address")
 	fd_MsgLiquidStake_amount = md_MsgLiquidStake.Fields().ByName("amount")
 }
@@ -40,7 +40,7 @@ func (x *MsgLiquidStake) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgLiquidStake) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[0]
+	mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -123,15 +123,15 @@ func (x *fastReflection_MsgLiquidStake) Range(f func(protoreflect.FieldDescripto
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_MsgLiquidStake) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidStake.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgLiquidStake.delegator_address":
 		return x.DelegatorAddress != ""
-	case "pstake.liquidstake.v1beta1.MsgLiquidStake.amount":
+	case "tac.liquidstake.v1beta1.MsgLiquidStake.amount":
 		return x.Amount != nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidStake"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidStake"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidStake does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidStake does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -143,15 +143,15 @@ func (x *fastReflection_MsgLiquidStake) Has(fd protoreflect.FieldDescriptor) boo
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgLiquidStake) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidStake.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgLiquidStake.delegator_address":
 		x.DelegatorAddress = ""
-	case "pstake.liquidstake.v1beta1.MsgLiquidStake.amount":
+	case "tac.liquidstake.v1beta1.MsgLiquidStake.amount":
 		x.Amount = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidStake"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidStake"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidStake does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidStake does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -163,17 +163,17 @@ func (x *fastReflection_MsgLiquidStake) Clear(fd protoreflect.FieldDescriptor) {
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_MsgLiquidStake) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidStake.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgLiquidStake.delegator_address":
 		value := x.DelegatorAddress
 		return protoreflect.ValueOfString(value)
-	case "pstake.liquidstake.v1beta1.MsgLiquidStake.amount":
+	case "tac.liquidstake.v1beta1.MsgLiquidStake.amount":
 		value := x.Amount
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidStake"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidStake"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidStake does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidStake does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -189,15 +189,15 @@ func (x *fastReflection_MsgLiquidStake) Get(descriptor protoreflect.FieldDescrip
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgLiquidStake) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidStake.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgLiquidStake.delegator_address":
 		x.DelegatorAddress = value.Interface().(string)
-	case "pstake.liquidstake.v1beta1.MsgLiquidStake.amount":
+	case "tac.liquidstake.v1beta1.MsgLiquidStake.amount":
 		x.Amount = value.Message().Interface().(*v1beta1.Coin)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidStake"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidStake"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidStake does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidStake does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -213,18 +213,18 @@ func (x *fastReflection_MsgLiquidStake) Set(fd protoreflect.FieldDescriptor, val
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgLiquidStake) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidStake.amount":
+	case "tac.liquidstake.v1beta1.MsgLiquidStake.amount":
 		if x.Amount == nil {
 			x.Amount = new(v1beta1.Coin)
 		}
 		return protoreflect.ValueOfMessage(x.Amount.ProtoReflect())
-	case "pstake.liquidstake.v1beta1.MsgLiquidStake.delegator_address":
-		panic(fmt.Errorf("field delegator_address of message pstake.liquidstake.v1beta1.MsgLiquidStake is not mutable"))
+	case "tac.liquidstake.v1beta1.MsgLiquidStake.delegator_address":
+		panic(fmt.Errorf("field delegator_address of message tac.liquidstake.v1beta1.MsgLiquidStake is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidStake"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidStake"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidStake does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidStake does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -233,16 +233,16 @@ func (x *fastReflection_MsgLiquidStake) Mutable(fd protoreflect.FieldDescriptor)
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_MsgLiquidStake) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidStake.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgLiquidStake.delegator_address":
 		return protoreflect.ValueOfString("")
-	case "pstake.liquidstake.v1beta1.MsgLiquidStake.amount":
+	case "tac.liquidstake.v1beta1.MsgLiquidStake.amount":
 		m := new(v1beta1.Coin)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidStake"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidStake"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidStake does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidStake does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -252,7 +252,7 @@ func (x *fastReflection_MsgLiquidStake) NewField(fd protoreflect.FieldDescriptor
 func (x *fastReflection_MsgLiquidStake) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.MsgLiquidStake", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.MsgLiquidStake", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -522,8 +522,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_tx_proto_init()
-	md_MsgLiquidStakeResponse = File_pstake_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgLiquidStakeResponse")
+	file_tac_liquidstake_v1beta1_tx_proto_init()
+	md_MsgLiquidStakeResponse = File_tac_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgLiquidStakeResponse")
 }
 
 var _ protoreflect.Message = (*fastReflection_MsgLiquidStakeResponse)(nil)
@@ -535,7 +535,7 @@ func (x *MsgLiquidStakeResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgLiquidStakeResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[1]
+	mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -608,9 +608,9 @@ func (x *fastReflection_MsgLiquidStakeResponse) Has(fd protoreflect.FieldDescrip
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidStakeResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidStakeResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidStakeResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidStakeResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -624,9 +624,9 @@ func (x *fastReflection_MsgLiquidStakeResponse) Clear(fd protoreflect.FieldDescr
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidStakeResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidStakeResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidStakeResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidStakeResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -640,9 +640,9 @@ func (x *fastReflection_MsgLiquidStakeResponse) Get(descriptor protoreflect.Fiel
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidStakeResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidStakeResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidStakeResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidStakeResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -660,9 +660,9 @@ func (x *fastReflection_MsgLiquidStakeResponse) Set(fd protoreflect.FieldDescrip
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidStakeResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidStakeResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidStakeResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidStakeResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -680,9 +680,9 @@ func (x *fastReflection_MsgLiquidStakeResponse) Mutable(fd protoreflect.FieldDes
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidStakeResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidStakeResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidStakeResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidStakeResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -693,9 +693,9 @@ func (x *fastReflection_MsgLiquidStakeResponse) NewField(fd protoreflect.FieldDe
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidStakeResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidStakeResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidStakeResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidStakeResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -705,7 +705,7 @@ func (x *fastReflection_MsgLiquidStakeResponse) NewField(fd protoreflect.FieldDe
 func (x *fastReflection_MsgLiquidStakeResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.MsgLiquidStakeResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.MsgLiquidStakeResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -882,8 +882,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_tx_proto_init()
-	md_MsgStakeToLP = File_pstake_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgStakeToLP")
+	file_tac_liquidstake_v1beta1_tx_proto_init()
+	md_MsgStakeToLP = File_tac_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgStakeToLP")
 	fd_MsgStakeToLP_delegator_address = md_MsgStakeToLP.Fields().ByName("delegator_address")
 	fd_MsgStakeToLP_validator_address = md_MsgStakeToLP.Fields().ByName("validator_address")
 	fd_MsgStakeToLP_staked_amount = md_MsgStakeToLP.Fields().ByName("staked_amount")
@@ -899,7 +899,7 @@ func (x *MsgStakeToLP) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgStakeToLP) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[2]
+	mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -994,19 +994,19 @@ func (x *fastReflection_MsgStakeToLP) Range(f func(protoreflect.FieldDescriptor,
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_MsgStakeToLP) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.delegator_address":
 		return x.DelegatorAddress != ""
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.validator_address":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.validator_address":
 		return x.ValidatorAddress != ""
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.staked_amount":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.staked_amount":
 		return x.StakedAmount != nil
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.liquid_amount":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.liquid_amount":
 		return x.LiquidAmount != nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgStakeToLP"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgStakeToLP"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgStakeToLP does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgStakeToLP does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1018,19 +1018,19 @@ func (x *fastReflection_MsgStakeToLP) Has(fd protoreflect.FieldDescriptor) bool 
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgStakeToLP) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.delegator_address":
 		x.DelegatorAddress = ""
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.validator_address":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.validator_address":
 		x.ValidatorAddress = ""
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.staked_amount":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.staked_amount":
 		x.StakedAmount = nil
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.liquid_amount":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.liquid_amount":
 		x.LiquidAmount = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgStakeToLP"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgStakeToLP"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgStakeToLP does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgStakeToLP does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1042,23 +1042,23 @@ func (x *fastReflection_MsgStakeToLP) Clear(fd protoreflect.FieldDescriptor) {
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_MsgStakeToLP) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.delegator_address":
 		value := x.DelegatorAddress
 		return protoreflect.ValueOfString(value)
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.validator_address":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.validator_address":
 		value := x.ValidatorAddress
 		return protoreflect.ValueOfString(value)
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.staked_amount":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.staked_amount":
 		value := x.StakedAmount
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.liquid_amount":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.liquid_amount":
 		value := x.LiquidAmount
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgStakeToLP"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgStakeToLP"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgStakeToLP does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgStakeToLP does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -1074,19 +1074,19 @@ func (x *fastReflection_MsgStakeToLP) Get(descriptor protoreflect.FieldDescripto
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgStakeToLP) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.delegator_address":
 		x.DelegatorAddress = value.Interface().(string)
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.validator_address":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.validator_address":
 		x.ValidatorAddress = value.Interface().(string)
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.staked_amount":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.staked_amount":
 		x.StakedAmount = value.Message().Interface().(*v1beta1.Coin)
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.liquid_amount":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.liquid_amount":
 		x.LiquidAmount = value.Message().Interface().(*v1beta1.Coin)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgStakeToLP"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgStakeToLP"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgStakeToLP does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgStakeToLP does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1102,25 +1102,25 @@ func (x *fastReflection_MsgStakeToLP) Set(fd protoreflect.FieldDescriptor, value
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgStakeToLP) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.staked_amount":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.staked_amount":
 		if x.StakedAmount == nil {
 			x.StakedAmount = new(v1beta1.Coin)
 		}
 		return protoreflect.ValueOfMessage(x.StakedAmount.ProtoReflect())
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.liquid_amount":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.liquid_amount":
 		if x.LiquidAmount == nil {
 			x.LiquidAmount = new(v1beta1.Coin)
 		}
 		return protoreflect.ValueOfMessage(x.LiquidAmount.ProtoReflect())
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.delegator_address":
-		panic(fmt.Errorf("field delegator_address of message pstake.liquidstake.v1beta1.MsgStakeToLP is not mutable"))
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.validator_address":
-		panic(fmt.Errorf("field validator_address of message pstake.liquidstake.v1beta1.MsgStakeToLP is not mutable"))
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.delegator_address":
+		panic(fmt.Errorf("field delegator_address of message tac.liquidstake.v1beta1.MsgStakeToLP is not mutable"))
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.validator_address":
+		panic(fmt.Errorf("field validator_address of message tac.liquidstake.v1beta1.MsgStakeToLP is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgStakeToLP"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgStakeToLP"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgStakeToLP does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgStakeToLP does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1129,21 +1129,21 @@ func (x *fastReflection_MsgStakeToLP) Mutable(fd protoreflect.FieldDescriptor) p
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_MsgStakeToLP) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.delegator_address":
 		return protoreflect.ValueOfString("")
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.validator_address":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.validator_address":
 		return protoreflect.ValueOfString("")
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.staked_amount":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.staked_amount":
 		m := new(v1beta1.Coin)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "pstake.liquidstake.v1beta1.MsgStakeToLP.liquid_amount":
+	case "tac.liquidstake.v1beta1.MsgStakeToLP.liquid_amount":
 		m := new(v1beta1.Coin)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgStakeToLP"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgStakeToLP"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgStakeToLP does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgStakeToLP does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1153,7 +1153,7 @@ func (x *fastReflection_MsgStakeToLP) NewField(fd protoreflect.FieldDescriptor) 
 func (x *fastReflection_MsgStakeToLP) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.MsgStakeToLP", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.MsgStakeToLP", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -1520,8 +1520,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_tx_proto_init()
-	md_MsgStakeToLPResponse = File_pstake_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgStakeToLPResponse")
+	file_tac_liquidstake_v1beta1_tx_proto_init()
+	md_MsgStakeToLPResponse = File_tac_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgStakeToLPResponse")
 }
 
 var _ protoreflect.Message = (*fastReflection_MsgStakeToLPResponse)(nil)
@@ -1533,7 +1533,7 @@ func (x *MsgStakeToLPResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgStakeToLPResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[3]
+	mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1606,9 +1606,9 @@ func (x *fastReflection_MsgStakeToLPResponse) Has(fd protoreflect.FieldDescripto
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgStakeToLPResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgStakeToLPResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgStakeToLPResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgStakeToLPResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1622,9 +1622,9 @@ func (x *fastReflection_MsgStakeToLPResponse) Clear(fd protoreflect.FieldDescrip
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgStakeToLPResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgStakeToLPResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgStakeToLPResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgStakeToLPResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1638,9 +1638,9 @@ func (x *fastReflection_MsgStakeToLPResponse) Get(descriptor protoreflect.FieldD
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgStakeToLPResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgStakeToLPResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgStakeToLPResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgStakeToLPResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -1658,9 +1658,9 @@ func (x *fastReflection_MsgStakeToLPResponse) Set(fd protoreflect.FieldDescripto
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgStakeToLPResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgStakeToLPResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgStakeToLPResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgStakeToLPResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1678,9 +1678,9 @@ func (x *fastReflection_MsgStakeToLPResponse) Mutable(fd protoreflect.FieldDescr
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgStakeToLPResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgStakeToLPResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgStakeToLPResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgStakeToLPResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1691,9 +1691,9 @@ func (x *fastReflection_MsgStakeToLPResponse) NewField(fd protoreflect.FieldDesc
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgStakeToLPResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgStakeToLPResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgStakeToLPResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgStakeToLPResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1703,7 +1703,7 @@ func (x *fastReflection_MsgStakeToLPResponse) NewField(fd protoreflect.FieldDesc
 func (x *fastReflection_MsgStakeToLPResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.MsgStakeToLPResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.MsgStakeToLPResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -1878,8 +1878,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_tx_proto_init()
-	md_MsgLiquidUnstake = File_pstake_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgLiquidUnstake")
+	file_tac_liquidstake_v1beta1_tx_proto_init()
+	md_MsgLiquidUnstake = File_tac_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgLiquidUnstake")
 	fd_MsgLiquidUnstake_delegator_address = md_MsgLiquidUnstake.Fields().ByName("delegator_address")
 	fd_MsgLiquidUnstake_amount = md_MsgLiquidUnstake.Fields().ByName("amount")
 }
@@ -1893,7 +1893,7 @@ func (x *MsgLiquidUnstake) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgLiquidUnstake) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[4]
+	mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1976,15 +1976,15 @@ func (x *fastReflection_MsgLiquidUnstake) Range(f func(protoreflect.FieldDescrip
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_MsgLiquidUnstake) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstake.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstake.delegator_address":
 		return x.DelegatorAddress != ""
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstake.amount":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstake.amount":
 		return x.Amount != nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidUnstake"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidUnstake"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidUnstake does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidUnstake does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1996,15 +1996,15 @@ func (x *fastReflection_MsgLiquidUnstake) Has(fd protoreflect.FieldDescriptor) b
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgLiquidUnstake) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstake.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstake.delegator_address":
 		x.DelegatorAddress = ""
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstake.amount":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstake.amount":
 		x.Amount = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidUnstake"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidUnstake"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidUnstake does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidUnstake does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2016,17 +2016,17 @@ func (x *fastReflection_MsgLiquidUnstake) Clear(fd protoreflect.FieldDescriptor)
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_MsgLiquidUnstake) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstake.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstake.delegator_address":
 		value := x.DelegatorAddress
 		return protoreflect.ValueOfString(value)
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstake.amount":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstake.amount":
 		value := x.Amount
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidUnstake"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidUnstake"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidUnstake does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidUnstake does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -2042,15 +2042,15 @@ func (x *fastReflection_MsgLiquidUnstake) Get(descriptor protoreflect.FieldDescr
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgLiquidUnstake) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstake.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstake.delegator_address":
 		x.DelegatorAddress = value.Interface().(string)
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstake.amount":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstake.amount":
 		x.Amount = value.Message().Interface().(*v1beta1.Coin)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidUnstake"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidUnstake"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidUnstake does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidUnstake does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2066,18 +2066,18 @@ func (x *fastReflection_MsgLiquidUnstake) Set(fd protoreflect.FieldDescriptor, v
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgLiquidUnstake) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstake.amount":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstake.amount":
 		if x.Amount == nil {
 			x.Amount = new(v1beta1.Coin)
 		}
 		return protoreflect.ValueOfMessage(x.Amount.ProtoReflect())
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstake.delegator_address":
-		panic(fmt.Errorf("field delegator_address of message pstake.liquidstake.v1beta1.MsgLiquidUnstake is not mutable"))
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstake.delegator_address":
+		panic(fmt.Errorf("field delegator_address of message tac.liquidstake.v1beta1.MsgLiquidUnstake is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidUnstake"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidUnstake"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidUnstake does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidUnstake does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2086,16 +2086,16 @@ func (x *fastReflection_MsgLiquidUnstake) Mutable(fd protoreflect.FieldDescripto
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_MsgLiquidUnstake) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstake.delegator_address":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstake.delegator_address":
 		return protoreflect.ValueOfString("")
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstake.amount":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstake.amount":
 		m := new(v1beta1.Coin)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidUnstake"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidUnstake"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidUnstake does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidUnstake does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2105,7 +2105,7 @@ func (x *fastReflection_MsgLiquidUnstake) NewField(fd protoreflect.FieldDescript
 func (x *fastReflection_MsgLiquidUnstake) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.MsgLiquidUnstake", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.MsgLiquidUnstake", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -2376,8 +2376,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_tx_proto_init()
-	md_MsgLiquidUnstakeResponse = File_pstake_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgLiquidUnstakeResponse")
+	file_tac_liquidstake_v1beta1_tx_proto_init()
+	md_MsgLiquidUnstakeResponse = File_tac_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgLiquidUnstakeResponse")
 	fd_MsgLiquidUnstakeResponse_completion_time = md_MsgLiquidUnstakeResponse.Fields().ByName("completion_time")
 }
 
@@ -2390,7 +2390,7 @@ func (x *MsgLiquidUnstakeResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgLiquidUnstakeResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[5]
+	mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2467,13 +2467,13 @@ func (x *fastReflection_MsgLiquidUnstakeResponse) Range(f func(protoreflect.Fiel
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_MsgLiquidUnstakeResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time":
 		return x.CompletionTime != nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2485,13 +2485,13 @@ func (x *fastReflection_MsgLiquidUnstakeResponse) Has(fd protoreflect.FieldDescr
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgLiquidUnstakeResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time":
 		x.CompletionTime = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2503,14 +2503,14 @@ func (x *fastReflection_MsgLiquidUnstakeResponse) Clear(fd protoreflect.FieldDes
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_MsgLiquidUnstakeResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time":
 		value := x.CompletionTime
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -2526,13 +2526,13 @@ func (x *fastReflection_MsgLiquidUnstakeResponse) Get(descriptor protoreflect.Fi
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgLiquidUnstakeResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time":
 		x.CompletionTime = value.Message().Interface().(*timestamppb.Timestamp)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2548,16 +2548,16 @@ func (x *fastReflection_MsgLiquidUnstakeResponse) Set(fd protoreflect.FieldDescr
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgLiquidUnstakeResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time":
 		if x.CompletionTime == nil {
 			x.CompletionTime = new(timestamppb.Timestamp)
 		}
 		return protoreflect.ValueOfMessage(x.CompletionTime.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2566,14 +2566,14 @@ func (x *fastReflection_MsgLiquidUnstakeResponse) Mutable(fd protoreflect.FieldD
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_MsgLiquidUnstakeResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time":
+	case "tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time":
 		m := new(timestamppb.Timestamp)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2583,7 +2583,7 @@ func (x *fastReflection_MsgLiquidUnstakeResponse) NewField(fd protoreflect.Field
 func (x *fastReflection_MsgLiquidUnstakeResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -2812,8 +2812,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_tx_proto_init()
-	md_MsgUpdateParams = File_pstake_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgUpdateParams")
+	file_tac_liquidstake_v1beta1_tx_proto_init()
+	md_MsgUpdateParams = File_tac_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgUpdateParams")
 	fd_MsgUpdateParams_authority = md_MsgUpdateParams.Fields().ByName("authority")
 	fd_MsgUpdateParams_params = md_MsgUpdateParams.Fields().ByName("params")
 }
@@ -2827,7 +2827,7 @@ func (x *MsgUpdateParams) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgUpdateParams) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[6]
+	mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2910,15 +2910,15 @@ func (x *fastReflection_MsgUpdateParams) Range(f func(protoreflect.FieldDescript
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_MsgUpdateParams) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgUpdateParams.authority":
+	case "tac.liquidstake.v1beta1.MsgUpdateParams.authority":
 		return x.Authority != ""
-	case "pstake.liquidstake.v1beta1.MsgUpdateParams.params":
+	case "tac.liquidstake.v1beta1.MsgUpdateParams.params":
 		return x.Params != nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateParams"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateParams"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateParams does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateParams does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2930,15 +2930,15 @@ func (x *fastReflection_MsgUpdateParams) Has(fd protoreflect.FieldDescriptor) bo
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgUpdateParams) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgUpdateParams.authority":
+	case "tac.liquidstake.v1beta1.MsgUpdateParams.authority":
 		x.Authority = ""
-	case "pstake.liquidstake.v1beta1.MsgUpdateParams.params":
+	case "tac.liquidstake.v1beta1.MsgUpdateParams.params":
 		x.Params = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateParams"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateParams"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateParams does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateParams does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2950,17 +2950,17 @@ func (x *fastReflection_MsgUpdateParams) Clear(fd protoreflect.FieldDescriptor) 
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_MsgUpdateParams) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgUpdateParams.authority":
+	case "tac.liquidstake.v1beta1.MsgUpdateParams.authority":
 		value := x.Authority
 		return protoreflect.ValueOfString(value)
-	case "pstake.liquidstake.v1beta1.MsgUpdateParams.params":
+	case "tac.liquidstake.v1beta1.MsgUpdateParams.params":
 		value := x.Params
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateParams"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateParams"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateParams does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateParams does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -2976,15 +2976,15 @@ func (x *fastReflection_MsgUpdateParams) Get(descriptor protoreflect.FieldDescri
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgUpdateParams) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgUpdateParams.authority":
+	case "tac.liquidstake.v1beta1.MsgUpdateParams.authority":
 		x.Authority = value.Interface().(string)
-	case "pstake.liquidstake.v1beta1.MsgUpdateParams.params":
+	case "tac.liquidstake.v1beta1.MsgUpdateParams.params":
 		x.Params = value.Message().Interface().(*Params)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateParams"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateParams"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateParams does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateParams does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3000,18 +3000,18 @@ func (x *fastReflection_MsgUpdateParams) Set(fd protoreflect.FieldDescriptor, va
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgUpdateParams) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgUpdateParams.params":
+	case "tac.liquidstake.v1beta1.MsgUpdateParams.params":
 		if x.Params == nil {
 			x.Params = new(Params)
 		}
 		return protoreflect.ValueOfMessage(x.Params.ProtoReflect())
-	case "pstake.liquidstake.v1beta1.MsgUpdateParams.authority":
-		panic(fmt.Errorf("field authority of message pstake.liquidstake.v1beta1.MsgUpdateParams is not mutable"))
+	case "tac.liquidstake.v1beta1.MsgUpdateParams.authority":
+		panic(fmt.Errorf("field authority of message tac.liquidstake.v1beta1.MsgUpdateParams is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateParams"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateParams"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateParams does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateParams does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3020,16 +3020,16 @@ func (x *fastReflection_MsgUpdateParams) Mutable(fd protoreflect.FieldDescriptor
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_MsgUpdateParams) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgUpdateParams.authority":
+	case "tac.liquidstake.v1beta1.MsgUpdateParams.authority":
 		return protoreflect.ValueOfString("")
-	case "pstake.liquidstake.v1beta1.MsgUpdateParams.params":
+	case "tac.liquidstake.v1beta1.MsgUpdateParams.params":
 		m := new(Params)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateParams"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateParams"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateParams does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateParams does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3039,7 +3039,7 @@ func (x *fastReflection_MsgUpdateParams) NewField(fd protoreflect.FieldDescripto
 func (x *fastReflection_MsgUpdateParams) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.MsgUpdateParams", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.MsgUpdateParams", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -3309,8 +3309,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_tx_proto_init()
-	md_MsgUpdateParamsResponse = File_pstake_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgUpdateParamsResponse")
+	file_tac_liquidstake_v1beta1_tx_proto_init()
+	md_MsgUpdateParamsResponse = File_tac_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgUpdateParamsResponse")
 }
 
 var _ protoreflect.Message = (*fastReflection_MsgUpdateParamsResponse)(nil)
@@ -3322,7 +3322,7 @@ func (x *MsgUpdateParamsResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgUpdateParamsResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[7]
+	mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3395,9 +3395,9 @@ func (x *fastReflection_MsgUpdateParamsResponse) Has(fd protoreflect.FieldDescri
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateParamsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateParamsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3411,9 +3411,9 @@ func (x *fastReflection_MsgUpdateParamsResponse) Clear(fd protoreflect.FieldDesc
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateParamsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateParamsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3427,9 +3427,9 @@ func (x *fastReflection_MsgUpdateParamsResponse) Get(descriptor protoreflect.Fie
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateParamsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateParamsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateParamsResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateParamsResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -3447,9 +3447,9 @@ func (x *fastReflection_MsgUpdateParamsResponse) Set(fd protoreflect.FieldDescri
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateParamsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateParamsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3467,9 +3467,9 @@ func (x *fastReflection_MsgUpdateParamsResponse) Mutable(fd protoreflect.FieldDe
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateParamsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateParamsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3480,9 +3480,9 @@ func (x *fastReflection_MsgUpdateParamsResponse) NewField(fd protoreflect.FieldD
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateParamsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateParamsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3492,7 +3492,7 @@ func (x *fastReflection_MsgUpdateParamsResponse) NewField(fd protoreflect.FieldD
 func (x *fastReflection_MsgUpdateParamsResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.MsgUpdateParamsResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.MsgUpdateParamsResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -3718,8 +3718,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_tx_proto_init()
-	md_MsgUpdateWhitelistedValidators = File_pstake_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgUpdateWhitelistedValidators")
+	file_tac_liquidstake_v1beta1_tx_proto_init()
+	md_MsgUpdateWhitelistedValidators = File_tac_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgUpdateWhitelistedValidators")
 	fd_MsgUpdateWhitelistedValidators_authority = md_MsgUpdateWhitelistedValidators.Fields().ByName("authority")
 	fd_MsgUpdateWhitelistedValidators_whitelisted_validators = md_MsgUpdateWhitelistedValidators.Fields().ByName("whitelisted_validators")
 }
@@ -3733,7 +3733,7 @@ func (x *MsgUpdateWhitelistedValidators) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgUpdateWhitelistedValidators) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[8]
+	mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3816,15 +3816,15 @@ func (x *fastReflection_MsgUpdateWhitelistedValidators) Range(f func(protoreflec
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_MsgUpdateWhitelistedValidators) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.authority":
+	case "tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.authority":
 		return x.Authority != ""
-	case "pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators":
+	case "tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators":
 		return len(x.WhitelistedValidators) != 0
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3836,15 +3836,15 @@ func (x *fastReflection_MsgUpdateWhitelistedValidators) Has(fd protoreflect.Fiel
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgUpdateWhitelistedValidators) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.authority":
+	case "tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.authority":
 		x.Authority = ""
-	case "pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators":
+	case "tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators":
 		x.WhitelistedValidators = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3856,10 +3856,10 @@ func (x *fastReflection_MsgUpdateWhitelistedValidators) Clear(fd protoreflect.Fi
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_MsgUpdateWhitelistedValidators) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.authority":
+	case "tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.authority":
 		value := x.Authority
 		return protoreflect.ValueOfString(value)
-	case "pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators":
+	case "tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators":
 		if len(x.WhitelistedValidators) == 0 {
 			return protoreflect.ValueOfList(&_MsgUpdateWhitelistedValidators_2_list{})
 		}
@@ -3867,9 +3867,9 @@ func (x *fastReflection_MsgUpdateWhitelistedValidators) Get(descriptor protorefl
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -3885,17 +3885,17 @@ func (x *fastReflection_MsgUpdateWhitelistedValidators) Get(descriptor protorefl
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgUpdateWhitelistedValidators) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.authority":
+	case "tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.authority":
 		x.Authority = value.Interface().(string)
-	case "pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators":
+	case "tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators":
 		lv := value.List()
 		clv := lv.(*_MsgUpdateWhitelistedValidators_2_list)
 		x.WhitelistedValidators = *clv.list
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3911,19 +3911,19 @@ func (x *fastReflection_MsgUpdateWhitelistedValidators) Set(fd protoreflect.Fiel
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgUpdateWhitelistedValidators) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators":
+	case "tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators":
 		if x.WhitelistedValidators == nil {
 			x.WhitelistedValidators = []*WhitelistedValidator{}
 		}
 		value := &_MsgUpdateWhitelistedValidators_2_list{list: &x.WhitelistedValidators}
 		return protoreflect.ValueOfList(value)
-	case "pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.authority":
-		panic(fmt.Errorf("field authority of message pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators is not mutable"))
+	case "tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.authority":
+		panic(fmt.Errorf("field authority of message tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3932,16 +3932,16 @@ func (x *fastReflection_MsgUpdateWhitelistedValidators) Mutable(fd protoreflect.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_MsgUpdateWhitelistedValidators) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.authority":
+	case "tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.authority":
 		return protoreflect.ValueOfString("")
-	case "pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators":
+	case "tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators":
 		list := []*WhitelistedValidator{}
 		return protoreflect.ValueOfList(&_MsgUpdateWhitelistedValidators_2_list{list: &list})
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3951,7 +3951,7 @@ func (x *fastReflection_MsgUpdateWhitelistedValidators) NewField(fd protoreflect
 func (x *fastReflection_MsgUpdateWhitelistedValidators) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -4223,8 +4223,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_tx_proto_init()
-	md_MsgUpdateWhitelistedValidatorsResponse = File_pstake_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgUpdateWhitelistedValidatorsResponse")
+	file_tac_liquidstake_v1beta1_tx_proto_init()
+	md_MsgUpdateWhitelistedValidatorsResponse = File_tac_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgUpdateWhitelistedValidatorsResponse")
 }
 
 var _ protoreflect.Message = (*fastReflection_MsgUpdateWhitelistedValidatorsResponse)(nil)
@@ -4236,7 +4236,7 @@ func (x *MsgUpdateWhitelistedValidatorsResponse) ProtoReflect() protoreflect.Mes
 }
 
 func (x *MsgUpdateWhitelistedValidatorsResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[9]
+	mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4309,9 +4309,9 @@ func (x *fastReflection_MsgUpdateWhitelistedValidatorsResponse) Has(fd protorefl
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4325,9 +4325,9 @@ func (x *fastReflection_MsgUpdateWhitelistedValidatorsResponse) Clear(fd protore
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4341,9 +4341,9 @@ func (x *fastReflection_MsgUpdateWhitelistedValidatorsResponse) Get(descriptor p
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -4361,9 +4361,9 @@ func (x *fastReflection_MsgUpdateWhitelistedValidatorsResponse) Set(fd protorefl
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4381,9 +4381,9 @@ func (x *fastReflection_MsgUpdateWhitelistedValidatorsResponse) Mutable(fd proto
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4394,9 +4394,9 @@ func (x *fastReflection_MsgUpdateWhitelistedValidatorsResponse) NewField(fd prot
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4406,7 +4406,7 @@ func (x *fastReflection_MsgUpdateWhitelistedValidatorsResponse) NewField(fd prot
 func (x *fastReflection_MsgUpdateWhitelistedValidatorsResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -4581,8 +4581,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_tx_proto_init()
-	md_MsgSetModulePaused = File_pstake_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgSetModulePaused")
+	file_tac_liquidstake_v1beta1_tx_proto_init()
+	md_MsgSetModulePaused = File_tac_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgSetModulePaused")
 	fd_MsgSetModulePaused_authority = md_MsgSetModulePaused.Fields().ByName("authority")
 	fd_MsgSetModulePaused_is_paused = md_MsgSetModulePaused.Fields().ByName("is_paused")
 }
@@ -4596,7 +4596,7 @@ func (x *MsgSetModulePaused) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgSetModulePaused) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[10]
+	mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4679,15 +4679,15 @@ func (x *fastReflection_MsgSetModulePaused) Range(f func(protoreflect.FieldDescr
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_MsgSetModulePaused) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgSetModulePaused.authority":
+	case "tac.liquidstake.v1beta1.MsgSetModulePaused.authority":
 		return x.Authority != ""
-	case "pstake.liquidstake.v1beta1.MsgSetModulePaused.is_paused":
+	case "tac.liquidstake.v1beta1.MsgSetModulePaused.is_paused":
 		return x.IsPaused != false
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgSetModulePaused"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgSetModulePaused"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgSetModulePaused does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgSetModulePaused does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4699,15 +4699,15 @@ func (x *fastReflection_MsgSetModulePaused) Has(fd protoreflect.FieldDescriptor)
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgSetModulePaused) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgSetModulePaused.authority":
+	case "tac.liquidstake.v1beta1.MsgSetModulePaused.authority":
 		x.Authority = ""
-	case "pstake.liquidstake.v1beta1.MsgSetModulePaused.is_paused":
+	case "tac.liquidstake.v1beta1.MsgSetModulePaused.is_paused":
 		x.IsPaused = false
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgSetModulePaused"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgSetModulePaused"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgSetModulePaused does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgSetModulePaused does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4719,17 +4719,17 @@ func (x *fastReflection_MsgSetModulePaused) Clear(fd protoreflect.FieldDescripto
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_MsgSetModulePaused) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgSetModulePaused.authority":
+	case "tac.liquidstake.v1beta1.MsgSetModulePaused.authority":
 		value := x.Authority
 		return protoreflect.ValueOfString(value)
-	case "pstake.liquidstake.v1beta1.MsgSetModulePaused.is_paused":
+	case "tac.liquidstake.v1beta1.MsgSetModulePaused.is_paused":
 		value := x.IsPaused
 		return protoreflect.ValueOfBool(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgSetModulePaused"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgSetModulePaused"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgSetModulePaused does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgSetModulePaused does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -4745,15 +4745,15 @@ func (x *fastReflection_MsgSetModulePaused) Get(descriptor protoreflect.FieldDes
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgSetModulePaused) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgSetModulePaused.authority":
+	case "tac.liquidstake.v1beta1.MsgSetModulePaused.authority":
 		x.Authority = value.Interface().(string)
-	case "pstake.liquidstake.v1beta1.MsgSetModulePaused.is_paused":
+	case "tac.liquidstake.v1beta1.MsgSetModulePaused.is_paused":
 		x.IsPaused = value.Bool()
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgSetModulePaused"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgSetModulePaused"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgSetModulePaused does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgSetModulePaused does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4769,15 +4769,15 @@ func (x *fastReflection_MsgSetModulePaused) Set(fd protoreflect.FieldDescriptor,
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgSetModulePaused) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgSetModulePaused.authority":
-		panic(fmt.Errorf("field authority of message pstake.liquidstake.v1beta1.MsgSetModulePaused is not mutable"))
-	case "pstake.liquidstake.v1beta1.MsgSetModulePaused.is_paused":
-		panic(fmt.Errorf("field is_paused of message pstake.liquidstake.v1beta1.MsgSetModulePaused is not mutable"))
+	case "tac.liquidstake.v1beta1.MsgSetModulePaused.authority":
+		panic(fmt.Errorf("field authority of message tac.liquidstake.v1beta1.MsgSetModulePaused is not mutable"))
+	case "tac.liquidstake.v1beta1.MsgSetModulePaused.is_paused":
+		panic(fmt.Errorf("field is_paused of message tac.liquidstake.v1beta1.MsgSetModulePaused is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgSetModulePaused"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgSetModulePaused"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgSetModulePaused does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgSetModulePaused does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4786,15 +4786,15 @@ func (x *fastReflection_MsgSetModulePaused) Mutable(fd protoreflect.FieldDescrip
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_MsgSetModulePaused) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "pstake.liquidstake.v1beta1.MsgSetModulePaused.authority":
+	case "tac.liquidstake.v1beta1.MsgSetModulePaused.authority":
 		return protoreflect.ValueOfString("")
-	case "pstake.liquidstake.v1beta1.MsgSetModulePaused.is_paused":
+	case "tac.liquidstake.v1beta1.MsgSetModulePaused.is_paused":
 		return protoreflect.ValueOfBool(false)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgSetModulePaused"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgSetModulePaused"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgSetModulePaused does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgSetModulePaused does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4804,7 +4804,7 @@ func (x *fastReflection_MsgSetModulePaused) NewField(fd protoreflect.FieldDescri
 func (x *fastReflection_MsgSetModulePaused) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.MsgSetModulePaused", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.MsgSetModulePaused", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -5053,8 +5053,8 @@ var (
 )
 
 func init() {
-	file_pstake_liquidstake_v1beta1_tx_proto_init()
-	md_MsgSetModulePausedResponse = File_pstake_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgSetModulePausedResponse")
+	file_tac_liquidstake_v1beta1_tx_proto_init()
+	md_MsgSetModulePausedResponse = File_tac_liquidstake_v1beta1_tx_proto.Messages().ByName("MsgSetModulePausedResponse")
 }
 
 var _ protoreflect.Message = (*fastReflection_MsgSetModulePausedResponse)(nil)
@@ -5066,7 +5066,7 @@ func (x *MsgSetModulePausedResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgSetModulePausedResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[11]
+	mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5139,9 +5139,9 @@ func (x *fastReflection_MsgSetModulePausedResponse) Has(fd protoreflect.FieldDes
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgSetModulePausedResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgSetModulePausedResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgSetModulePausedResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgSetModulePausedResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -5155,9 +5155,9 @@ func (x *fastReflection_MsgSetModulePausedResponse) Clear(fd protoreflect.FieldD
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgSetModulePausedResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgSetModulePausedResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgSetModulePausedResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgSetModulePausedResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -5171,9 +5171,9 @@ func (x *fastReflection_MsgSetModulePausedResponse) Get(descriptor protoreflect.
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgSetModulePausedResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgSetModulePausedResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgSetModulePausedResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgSetModulePausedResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -5191,9 +5191,9 @@ func (x *fastReflection_MsgSetModulePausedResponse) Set(fd protoreflect.FieldDes
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgSetModulePausedResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgSetModulePausedResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgSetModulePausedResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgSetModulePausedResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -5211,9 +5211,9 @@ func (x *fastReflection_MsgSetModulePausedResponse) Mutable(fd protoreflect.Fiel
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgSetModulePausedResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgSetModulePausedResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgSetModulePausedResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgSetModulePausedResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -5224,9 +5224,9 @@ func (x *fastReflection_MsgSetModulePausedResponse) NewField(fd protoreflect.Fie
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: pstake.liquidstake.v1beta1.MsgSetModulePausedResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: tac.liquidstake.v1beta1.MsgSetModulePausedResponse"))
 		}
-		panic(fmt.Errorf("message pstake.liquidstake.v1beta1.MsgSetModulePausedResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message tac.liquidstake.v1beta1.MsgSetModulePausedResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -5236,7 +5236,7 @@ func (x *fastReflection_MsgSetModulePausedResponse) NewField(fd protoreflect.Fie
 func (x *fastReflection_MsgSetModulePausedResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in pstake.liquidstake.v1beta1.MsgSetModulePausedResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in tac.liquidstake.v1beta1.MsgSetModulePausedResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -5408,7 +5408,7 @@ func (x *fastReflection_MsgSetModulePausedResponse) ProtoMethods() *protoiface.M
 // versions:
 // 	protoc-gen-go v1.27.0
 // 	protoc        (unknown)
-// source: pstake/liquidstake/v1beta1/tx.proto
+// source: tac/liquidstake/v1beta1/tx.proto
 
 const (
 	// Verify that this generated code is sufficiently up-to-date.
@@ -5431,7 +5431,7 @@ type MsgLiquidStake struct {
 func (x *MsgLiquidStake) Reset() {
 	*x = MsgLiquidStake{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[0]
+		mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5445,7 +5445,7 @@ func (*MsgLiquidStake) ProtoMessage() {}
 
 // Deprecated: Use MsgLiquidStake.ProtoReflect.Descriptor instead.
 func (*MsgLiquidStake) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{0}
+	return file_tac_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *MsgLiquidStake) GetDelegatorAddress() string {
@@ -5472,7 +5472,7 @@ type MsgLiquidStakeResponse struct {
 func (x *MsgLiquidStakeResponse) Reset() {
 	*x = MsgLiquidStakeResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[1]
+		mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5486,11 +5486,11 @@ func (*MsgLiquidStakeResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgLiquidStakeResponse.ProtoReflect.Descriptor instead.
 func (*MsgLiquidStakeResponse) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{1}
+	return file_tac_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{1}
 }
 
 // MsgStakeToLP defines a SDK message for performing an LSM-transfer of staked
-// XPRT into stkXPRT with locking into an LP.
+// TAC into gTAC with locking into an LP.
 type MsgStakeToLP struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -5505,7 +5505,7 @@ type MsgStakeToLP struct {
 func (x *MsgStakeToLP) Reset() {
 	*x = MsgStakeToLP{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[2]
+		mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5519,7 +5519,7 @@ func (*MsgStakeToLP) ProtoMessage() {}
 
 // Deprecated: Use MsgStakeToLP.ProtoReflect.Descriptor instead.
 func (*MsgStakeToLP) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{2}
+	return file_tac_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *MsgStakeToLP) GetDelegatorAddress() string {
@@ -5560,7 +5560,7 @@ type MsgStakeToLPResponse struct {
 func (x *MsgStakeToLPResponse) Reset() {
 	*x = MsgStakeToLPResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[3]
+		mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5574,7 +5574,7 @@ func (*MsgStakeToLPResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgStakeToLPResponse.ProtoReflect.Descriptor instead.
 func (*MsgStakeToLPResponse) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{3}
+	return file_tac_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{3}
 }
 
 // MsgLiquidUnstake defines a SDK message for performing an undelegation of
@@ -5591,7 +5591,7 @@ type MsgLiquidUnstake struct {
 func (x *MsgLiquidUnstake) Reset() {
 	*x = MsgLiquidUnstake{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[4]
+		mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5605,7 +5605,7 @@ func (*MsgLiquidUnstake) ProtoMessage() {}
 
 // Deprecated: Use MsgLiquidUnstake.ProtoReflect.Descriptor instead.
 func (*MsgLiquidUnstake) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{4}
+	return file_tac_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *MsgLiquidUnstake) GetDelegatorAddress() string {
@@ -5634,7 +5634,7 @@ type MsgLiquidUnstakeResponse struct {
 func (x *MsgLiquidUnstakeResponse) Reset() {
 	*x = MsgLiquidUnstakeResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[5]
+		mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5648,7 +5648,7 @@ func (*MsgLiquidUnstakeResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgLiquidUnstakeResponse.ProtoReflect.Descriptor instead.
 func (*MsgLiquidUnstakeResponse) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{5}
+	return file_tac_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *MsgLiquidUnstakeResponse) GetCompletionTime() *timestamppb.Timestamp {
@@ -5675,7 +5675,7 @@ type MsgUpdateParams struct {
 func (x *MsgUpdateParams) Reset() {
 	*x = MsgUpdateParams{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[6]
+		mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5689,7 +5689,7 @@ func (*MsgUpdateParams) ProtoMessage() {}
 
 // Deprecated: Use MsgUpdateParams.ProtoReflect.Descriptor instead.
 func (*MsgUpdateParams) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{6}
+	return file_tac_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *MsgUpdateParams) GetAuthority() string {
@@ -5716,7 +5716,7 @@ type MsgUpdateParamsResponse struct {
 func (x *MsgUpdateParamsResponse) Reset() {
 	*x = MsgUpdateParamsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[7]
+		mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5730,7 +5730,7 @@ func (*MsgUpdateParamsResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgUpdateParamsResponse.ProtoReflect.Descriptor instead.
 func (*MsgUpdateParamsResponse) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{7}
+	return file_tac_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{7}
 }
 
 type MsgUpdateWhitelistedValidators struct {
@@ -5749,7 +5749,7 @@ type MsgUpdateWhitelistedValidators struct {
 func (x *MsgUpdateWhitelistedValidators) Reset() {
 	*x = MsgUpdateWhitelistedValidators{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[8]
+		mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5763,7 +5763,7 @@ func (*MsgUpdateWhitelistedValidators) ProtoMessage() {}
 
 // Deprecated: Use MsgUpdateWhitelistedValidators.ProtoReflect.Descriptor instead.
 func (*MsgUpdateWhitelistedValidators) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{8}
+	return file_tac_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *MsgUpdateWhitelistedValidators) GetAuthority() string {
@@ -5791,7 +5791,7 @@ type MsgUpdateWhitelistedValidatorsResponse struct {
 func (x *MsgUpdateWhitelistedValidatorsResponse) Reset() {
 	*x = MsgUpdateWhitelistedValidatorsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[9]
+		mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5805,7 +5805,7 @@ func (*MsgUpdateWhitelistedValidatorsResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgUpdateWhitelistedValidatorsResponse.ProtoReflect.Descriptor instead.
 func (*MsgUpdateWhitelistedValidatorsResponse) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{9}
+	return file_tac_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{9}
 }
 
 type MsgSetModulePaused struct {
@@ -5823,7 +5823,7 @@ type MsgSetModulePaused struct {
 func (x *MsgSetModulePaused) Reset() {
 	*x = MsgSetModulePaused{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[10]
+		mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5837,7 +5837,7 @@ func (*MsgSetModulePaused) ProtoMessage() {}
 
 // Deprecated: Use MsgSetModulePaused.ProtoReflect.Descriptor instead.
 func (*MsgSetModulePaused) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{10}
+	return file_tac_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *MsgSetModulePaused) GetAuthority() string {
@@ -5865,7 +5865,7 @@ type MsgSetModulePausedResponse struct {
 func (x *MsgSetModulePausedResponse) Reset() {
 	*x = MsgSetModulePausedResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[11]
+		mi := &file_tac_liquidstake_v1beta1_tx_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5879,250 +5879,245 @@ func (*MsgSetModulePausedResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgSetModulePausedResponse.ProtoReflect.Descriptor instead.
 func (*MsgSetModulePausedResponse) Descriptor() ([]byte, []int) {
-	return file_pstake_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{11}
+	return file_tac_liquidstake_v1beta1_tx_proto_rawDescGZIP(), []int{11}
 }
 
-var File_pstake_liquidstake_v1beta1_tx_proto protoreflect.FileDescriptor
+var File_tac_liquidstake_v1beta1_tx_proto protoreflect.FileDescriptor
 
-var file_pstake_liquidstake_v1beta1_tx_proto_rawDesc = []byte{
-	0x0a, 0x23, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73,
-	0x74, 0x61, 0x6b, 0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x74, 0x78, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x1a, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69,
-	0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61,
-	0x31, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67,
-	0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x19, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x5f,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x1a, 0x1e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2f, 0x62, 0x61, 0x73, 0x65, 0x2f,
-	0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x63, 0x6f, 0x69, 0x6e, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x1a, 0x17, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2f, 0x6d, 0x73, 0x67, 0x2f, 0x76,
-	0x31, 0x2f, 0x6d, 0x73, 0x67, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1f, 0x67, 0x6f, 0x6f,
-	0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d,
-	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x2c, 0x70, 0x73,
-	0x74, 0x61, 0x6b, 0x65, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65,
-	0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73,
-	0x74, 0x61, 0x6b, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x11, 0x61, 0x6d, 0x69, 0x6e,
-	0x6f, 0x2f, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xcf, 0x01,
-	0x0a, 0x0e, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x53, 0x74, 0x61, 0x6b, 0x65,
-	0x12, 0x45, 0x0a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64,
-	0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d,
-	0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53,
-	0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72,
-	0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x37, 0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e,
-	0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73,
-	0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f,
-	0x69, 0x6e, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74,
-	0x3a, 0x3d, 0x88, 0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0, 0x2a, 0x11, 0x64,
-	0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
-	0x8a, 0xe7, 0xb0, 0x2a, 0x1a, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65,
-	0x2f, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x53, 0x74, 0x61, 0x6b, 0x65, 0x22,
-	0x18, 0x0a, 0x16, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x53, 0x74, 0x61, 0x6b,
-	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xe5, 0x02, 0x0a, 0x0c, 0x4d, 0x73,
-	0x67, 0x53, 0x74, 0x61, 0x6b, 0x65, 0x54, 0x6f, 0x4c, 0x50, 0x12, 0x45, 0x0a, 0x11, 0x64, 0x65,
-	0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18,
+var file_tac_liquidstake_v1beta1_tx_proto_rawDesc = []byte{
+	0x0a, 0x20, 0x74, 0x61, 0x63, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b,
+	0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x74, 0x78, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x12, 0x17, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74,
+	0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x1a, 0x14, 0x67, 0x6f, 0x67,
+	0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x1a, 0x19, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f,
+	0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1e, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x2f, 0x62, 0x61, 0x73, 0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61,
+	0x31, 0x2f, 0x63, 0x6f, 0x69, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x17, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x2f, 0x6d, 0x73, 0x67, 0x2f, 0x76, 0x31, 0x2f, 0x6d, 0x73, 0x67, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x29, 0x74, 0x61, 0x63, 0x2f, 0x6c, 0x69, 0x71, 0x75,
+	0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f,
+	0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x1a, 0x11, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x22, 0xcf, 0x01, 0x0a, 0x0e, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71, 0x75,
+	0x69, 0x64, 0x53, 0x74, 0x61, 0x6b, 0x65, 0x12, 0x45, 0x0a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67,
+	0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41,
+	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x64, 0x65,
+	0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x37,
+	0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19,
+	0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62,
+	0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52,
+	0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x3a, 0x3d, 0x88, 0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f,
+	0x00, 0x82, 0xe7, 0xb0, 0x2a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f,
+	0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x8a, 0xe7, 0xb0, 0x2a, 0x1a, 0x6c, 0x69, 0x71, 0x75,
+	0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71, 0x75, 0x69,
+	0x64, 0x53, 0x74, 0x61, 0x6b, 0x65, 0x22, 0x18, 0x0a, 0x16, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71,
+	0x75, 0x69, 0x64, 0x53, 0x74, 0x61, 0x6b, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0xe5, 0x02, 0x0a, 0x0c, 0x4d, 0x73, 0x67, 0x53, 0x74, 0x61, 0x6b, 0x65, 0x54, 0x6f, 0x4c,
+	0x50, 0x12, 0x45, 0x0a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61,
+	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4,
+	0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
+	0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f,
+	0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x45, 0x0a, 0x11, 0x76, 0x61, 0x6c, 0x69,
+	0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e,
+	0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x76,
+	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12,
+	0x44, 0x0a, 0x0d, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x64, 0x5f, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e,
+	0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69,
+	0x6e, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x0c, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x64, 0x41,
+	0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x44, 0x0a, 0x0d, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x5f,
+	0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63,
+	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74,
+	0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x0c, 0x6c,
+	0x69, 0x71, 0x75, 0x69, 0x64, 0x41, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x3a, 0x3b, 0x88, 0xa0, 0x1f,
+	0x00, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0, 0x2a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61,
+	0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x8a, 0xe7, 0xb0, 0x2a, 0x18,
+	0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x4d, 0x73, 0x67, 0x53,
+	0x74, 0x61, 0x6b, 0x65, 0x54, 0x6f, 0x4c, 0x50, 0x22, 0x16, 0x0a, 0x14, 0x4d, 0x73, 0x67, 0x53,
+	0x74, 0x61, 0x6b, 0x65, 0x54, 0x6f, 0x4c, 0x50, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0xd3, 0x01, 0x0a, 0x10, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x55, 0x6e,
+	0x73, 0x74, 0x61, 0x6b, 0x65, 0x12, 0x45, 0x0a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74,
+	0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65,
+	0x67, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x37, 0x0a, 0x06,
+	0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63,
+	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74,
+	0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x06, 0x61,
+	0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x3a, 0x3f, 0x88, 0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x00, 0x82,
+	0xe7, 0xb0, 0x2a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64,
+	0x64, 0x72, 0x65, 0x73, 0x73, 0x8a, 0xe7, 0xb0, 0x2a, 0x1c, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64,
+	0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x55,
+	0x6e, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x22, 0x69, 0x0a, 0x18, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71,
+	0x75, 0x69, 0x64, 0x55, 0x6e, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x4d, 0x0a, 0x0f, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f, 0x6e,
+	0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f,
+	0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69,
+	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x42, 0x08, 0xc8, 0xde, 0x1f, 0x00, 0x90, 0xdf, 0x1f,
+	0x01, 0x52, 0x0e, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x69, 0x6d,
+	0x65, 0x22, 0xc0, 0x01, 0x0a, 0x0f, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50,
+	0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x36, 0x0a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69,
+	0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69,
+	0x6e, 0x67, 0x52, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x3d, 0x0a,
+	0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e,
+	0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e,
+	0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42, 0x04,
+	0xc8, 0xde, 0x1f, 0x00, 0x52, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x3a, 0x36, 0x88, 0xa0,
+	0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f,
+	0x72, 0x69, 0x74, 0x79, 0x8a, 0xe7, 0xb0, 0x2a, 0x1b, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73,
+	0x74, 0x61, 0x6b, 0x65, 0x2f, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x73, 0x22, 0x19, 0x0a, 0x17, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74,
+	0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x8b, 0x02, 0x0a, 0x1e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x57, 0x68, 0x69,
+	0x74, 0x65, 0x6c, 0x69, 0x73, 0x74, 0x65, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f,
+	0x72, 0x73, 0x12, 0x36, 0x0a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f,
 	0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52,
-	0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73,
-	0x73, 0x12, 0x45, 0x0a, 0x11, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61,
-	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4,
-	0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
-	0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f,
-	0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x44, 0x0a, 0x0d, 0x73, 0x74, 0x61, 0x6b,
-	0x65, 0x64, 0x5f, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32,
-	0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31,
-	0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00,
-	0x52, 0x0c, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x64, 0x41, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x44,
-	0x0a, 0x0d, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x5f, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18,
-	0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62,
-	0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e,
-	0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x0c, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x41, 0x6d,
-	0x6f, 0x75, 0x6e, 0x74, 0x3a, 0x3b, 0x88, 0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7,
-	0xb0, 0x2a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64,
-	0x72, 0x65, 0x73, 0x73, 0x8a, 0xe7, 0xb0, 0x2a, 0x18, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73,
-	0x74, 0x61, 0x6b, 0x65, 0x2f, 0x4d, 0x73, 0x67, 0x53, 0x74, 0x61, 0x6b, 0x65, 0x54, 0x6f, 0x4c,
-	0x50, 0x22, 0x16, 0x0a, 0x14, 0x4d, 0x73, 0x67, 0x53, 0x74, 0x61, 0x6b, 0x65, 0x54, 0x6f, 0x4c,
-	0x50, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xd3, 0x01, 0x0a, 0x10, 0x4d, 0x73,
-	0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x55, 0x6e, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x12, 0x45,
-	0x0a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72,
-	0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63,
-	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72,
-	0x69, 0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64,
-	0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x37, 0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62,
-	0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e,
-	0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x3a, 0x3f,
-	0x88, 0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0, 0x2a, 0x11, 0x64, 0x65, 0x6c,
-	0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x8a, 0xe7,
-	0xb0, 0x2a, 0x1c, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x4d,
-	0x73, 0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x55, 0x6e, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x22,
-	0x69, 0x0a, 0x18, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x55, 0x6e, 0x73, 0x74,
-	0x61, 0x6b, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4d, 0x0a, 0x0f, 0x63,
-	0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70,
-	0x42, 0x08, 0xc8, 0xde, 0x1f, 0x00, 0x90, 0xdf, 0x1f, 0x01, 0x52, 0x0e, 0x63, 0x6f, 0x6d, 0x70,
-	0x6c, 0x65, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x22, 0xc3, 0x01, 0x0a, 0x0f, 0x4d,
-	0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x36,
+	0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x6a, 0x0a, 0x16, 0x77, 0x68,
+	0x69, 0x74, 0x65, 0x6c, 0x69, 0x73, 0x74, 0x65, 0x64, 0x5f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61,
+	0x74, 0x6f, 0x72, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x2d, 0x2e, 0x74, 0x61, 0x63,
+	0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62,
+	0x65, 0x74, 0x61, 0x31, 0x2e, 0x57, 0x68, 0x69, 0x74, 0x65, 0x6c, 0x69, 0x73, 0x74, 0x65, 0x64,
+	0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52,
+	0x15, 0x77, 0x68, 0x69, 0x74, 0x65, 0x6c, 0x69, 0x73, 0x74, 0x65, 0x64, 0x56, 0x61, 0x6c, 0x69,
+	0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x3a, 0x45, 0x88, 0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x00,
+	0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x8a, 0xe7,
+	0xb0, 0x2a, 0x2a, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x4d,
+	0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x57, 0x68, 0x69, 0x74, 0x65, 0x6c, 0x69, 0x73,
+	0x74, 0x65, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x22, 0x28, 0x0a,
+	0x26, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x57, 0x68, 0x69, 0x74, 0x65, 0x6c,
+	0x69, 0x73, 0x74, 0x65, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xa4, 0x01, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x53,
+	0x65, 0x74, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50, 0x61, 0x75, 0x73, 0x65, 0x64, 0x12, 0x36,
 	0x0a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64,
 	0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x61, 0x75, 0x74,
-	0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x40, 0x0a, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e,
-	0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65,
-	0x74, 0x61, 0x31, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00,
-	0x52, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x3a, 0x36, 0x88, 0xa0, 0x1f, 0x00, 0xe8, 0xa0,
-	0x1f, 0x00, 0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79,
-	0x8a, 0xe7, 0xb0, 0x2a, 0x1b, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65,
-	0x2f, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73,
-	0x22, 0x19, 0x0a, 0x17, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72,
-	0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x8e, 0x02, 0x0a, 0x1e,
-	0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x57, 0x68, 0x69, 0x74, 0x65, 0x6c, 0x69,
-	0x73, 0x74, 0x65, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x12, 0x36,
-	0x0a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64,
-	0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x61, 0x75, 0x74,
-	0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x6d, 0x0a, 0x16, 0x77, 0x68, 0x69, 0x74, 0x65, 0x6c,
-	0x69, 0x73, 0x74, 0x65, 0x64, 0x5f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73,
-	0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x30, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e,
-	0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65,
-	0x74, 0x61, 0x31, 0x2e, 0x57, 0x68, 0x69, 0x74, 0x65, 0x6c, 0x69, 0x73, 0x74, 0x65, 0x64, 0x56,
-	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x15,
-	0x77, 0x68, 0x69, 0x74, 0x65, 0x6c, 0x69, 0x73, 0x74, 0x65, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64,
-	0x61, 0x74, 0x6f, 0x72, 0x73, 0x3a, 0x45, 0x88, 0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x00, 0x82,
-	0xe7, 0xb0, 0x2a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x8a, 0xe7, 0xb0,
-	0x2a, 0x2a, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x4d, 0x73,
-	0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x57, 0x68, 0x69, 0x74, 0x65, 0x6c, 0x69, 0x73, 0x74,
-	0x65, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x22, 0x28, 0x0a, 0x26,
-	0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x57, 0x68, 0x69, 0x74, 0x65, 0x6c, 0x69,
-	0x73, 0x74, 0x65, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xa4, 0x01, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x53, 0x65,
-	0x74, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50, 0x61, 0x75, 0x73, 0x65, 0x64, 0x12, 0x36, 0x0a,
-	0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64,
-	0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x61, 0x75, 0x74, 0x68,
-	0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x1b, 0x0a, 0x09, 0x69, 0x73, 0x5f, 0x70, 0x61, 0x75, 0x73,
-	0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x08, 0x69, 0x73, 0x50, 0x61, 0x75, 0x73,
-	0x65, 0x64, 0x3a, 0x39, 0x88, 0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0, 0x2a,
-	0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x8a, 0xe7, 0xb0, 0x2a, 0x1e, 0x6c,
-	0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x4d, 0x73, 0x67, 0x53, 0x65,
-	0x74, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50, 0x61, 0x75, 0x73, 0x65, 0x64, 0x22, 0x1c, 0x0a,
-	0x1a, 0x4d, 0x73, 0x67, 0x53, 0x65, 0x74, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50, 0x61, 0x75,
-	0x73, 0x65, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xe6, 0x05, 0x0a, 0x03,
-	0x4d, 0x73, 0x67, 0x12, 0x6d, 0x0a, 0x0b, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x53, 0x74, 0x61,
-	0x6b, 0x65, 0x12, 0x2a, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75,
-	0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e,
-	0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x53, 0x74, 0x61, 0x6b, 0x65, 0x1a, 0x32,
-	0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74,
-	0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x4c,
-	0x69, 0x71, 0x75, 0x69, 0x64, 0x53, 0x74, 0x61, 0x6b, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x12, 0x73, 0x0a, 0x0d, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x55, 0x6e, 0x73, 0x74,
-	0x61, 0x6b, 0x65, 0x12, 0x2c, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71,
-	0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31,
-	0x2e, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x55, 0x6e, 0x73, 0x74, 0x61, 0x6b,
-	0x65, 0x1a, 0x34, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69,
-	0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d,
-	0x73, 0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x55, 0x6e, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x67, 0x0a, 0x09, 0x53, 0x74, 0x61, 0x6b, 0x65,
-	0x54, 0x6f, 0x4c, 0x50, 0x12, 0x28, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69,
-	0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61,
-	0x31, 0x2e, 0x4d, 0x73, 0x67, 0x53, 0x74, 0x61, 0x6b, 0x65, 0x54, 0x6f, 0x4c, 0x50, 0x1a, 0x30,
-	0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74,
-	0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x53,
-	0x74, 0x61, 0x6b, 0x65, 0x54, 0x6f, 0x4c, 0x50, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x70, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73,
-	0x12, 0x2b, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64,
+	0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x1b, 0x0a, 0x09, 0x69, 0x73, 0x5f, 0x70, 0x61, 0x75,
+	0x73, 0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x08, 0x69, 0x73, 0x50, 0x61, 0x75,
+	0x73, 0x65, 0x64, 0x3a, 0x39, 0x88, 0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0,
+	0x2a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x8a, 0xe7, 0xb0, 0x2a, 0x1e,
+	0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x4d, 0x73, 0x67, 0x53,
+	0x65, 0x74, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50, 0x61, 0x75, 0x73, 0x65, 0x64, 0x22, 0x1c,
+	0x0a, 0x1a, 0x4d, 0x73, 0x67, 0x53, 0x65, 0x74, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50, 0x61,
+	0x75, 0x73, 0x65, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xc2, 0x05, 0x0a,
+	0x03, 0x4d, 0x73, 0x67, 0x12, 0x67, 0x0a, 0x0b, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x53, 0x74,
+	0x61, 0x6b, 0x65, 0x12, 0x27, 0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64,
 	0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73,
-	0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x33, 0x2e,
-	0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61,
-	0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70,
-	0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x12, 0x9d, 0x01, 0x0a, 0x1b, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x57, 0x68, 0x69,
-	0x74, 0x65, 0x6c, 0x69, 0x73, 0x74, 0x65, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f,
-	0x72, 0x73, 0x12, 0x3a, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75,
+	0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x53, 0x74, 0x61, 0x6b, 0x65, 0x1a, 0x2f, 0x2e, 0x74,
+	0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76,
+	0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64,
+	0x53, 0x74, 0x61, 0x6b, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x6d, 0x0a,
+	0x0d, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x55, 0x6e, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x12, 0x29,
+	0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65,
+	0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71, 0x75,
+	0x69, 0x64, 0x55, 0x6e, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x1a, 0x31, 0x2e, 0x74, 0x61, 0x63, 0x2e,
+	0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65,
+	0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x55, 0x6e, 0x73,
+	0x74, 0x61, 0x6b, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x61, 0x0a, 0x09,
+	0x53, 0x74, 0x61, 0x6b, 0x65, 0x54, 0x6f, 0x4c, 0x50, 0x12, 0x25, 0x2e, 0x74, 0x61, 0x63, 0x2e,
+	0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65,
+	0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x53, 0x74, 0x61, 0x6b, 0x65, 0x54, 0x6f, 0x4c, 0x50,
+	0x1a, 0x2d, 0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61,
+	0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x53, 0x74,
+	0x61, 0x6b, 0x65, 0x54, 0x6f, 0x4c, 0x50, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x6a, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12,
+	0x28, 0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b,
+	0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x30, 0x2e, 0x74, 0x61, 0x63, 0x2e,
+	0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65,
+	0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72,
+	0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x97, 0x01, 0x0a, 0x1b,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x57, 0x68, 0x69, 0x74, 0x65, 0x6c, 0x69, 0x73, 0x74, 0x65,
+	0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x12, 0x37, 0x2e, 0x74, 0x61,
+	0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31,
+	0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x57,
+	0x68, 0x69, 0x74, 0x65, 0x6c, 0x69, 0x73, 0x74, 0x65, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61,
+	0x74, 0x6f, 0x72, 0x73, 0x1a, 0x3f, 0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69,
+	0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d,
+	0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x57, 0x68, 0x69, 0x74, 0x65, 0x6c, 0x69, 0x73,
+	0x74, 0x65, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x73, 0x0a, 0x0f, 0x53, 0x65, 0x74, 0x4d, 0x6f, 0x64, 0x75,
+	0x6c, 0x65, 0x50, 0x61, 0x75, 0x73, 0x65, 0x64, 0x12, 0x2b, 0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c,
+	0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74,
+	0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x53, 0x65, 0x74, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50,
+	0x61, 0x75, 0x73, 0x65, 0x64, 0x1a, 0x33, 0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69, 0x71, 0x75,
 	0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e,
-	0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x57, 0x68, 0x69, 0x74, 0x65, 0x6c, 0x69,
-	0x73, 0x74, 0x65, 0x64, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x1a, 0x42,
-	0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74,
-	0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55,
-	0x70, 0x64, 0x61, 0x74, 0x65, 0x57, 0x68, 0x69, 0x74, 0x65, 0x6c, 0x69, 0x73, 0x74, 0x65, 0x64,
-	0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x12, 0x79, 0x0a, 0x0f, 0x53, 0x65, 0x74, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50,
-	0x61, 0x75, 0x73, 0x65, 0x64, 0x12, 0x2e, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c,
-	0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74,
-	0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x53, 0x65, 0x74, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50,
-	0x61, 0x75, 0x73, 0x65, 0x64, 0x1a, 0x36, 0x2e, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x6c,
-	0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74,
-	0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x53, 0x65, 0x74, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50,
-	0x61, 0x75, 0x73, 0x65, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x1a, 0x05, 0x80,
-	0xe7, 0xb0, 0x2a, 0x01, 0x42, 0xf3, 0x01, 0x0a, 0x1e, 0x63, 0x6f, 0x6d, 0x2e, 0x70, 0x73, 0x74,
-	0x61, 0x6b, 0x65, 0x2e, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e,
-	0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x42, 0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f,
-	0x50, 0x01, 0x5a, 0x3e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f,
-	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x6c, 0x69, 0x71, 0x75,
-	0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x3b,
-	0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x76, 0x31, 0x62, 0x65, 0x74,
-	0x61, 0x31, 0xa2, 0x02, 0x03, 0x50, 0x4c, 0x58, 0xaa, 0x02, 0x1a, 0x50, 0x73, 0x74, 0x61, 0x6b,
-	0x65, 0x2e, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x56, 0x31,
-	0x62, 0x65, 0x74, 0x61, 0x31, 0xca, 0x02, 0x1a, 0x50, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x5c, 0x4c,
-	0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x5c, 0x56, 0x31, 0x62, 0x65, 0x74,
-	0x61, 0x31, 0xe2, 0x02, 0x26, 0x50, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x5c, 0x4c, 0x69, 0x71, 0x75,
-	0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x5c, 0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x5c,
-	0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x1c, 0x50, 0x73,
-	0x74, 0x61, 0x6b, 0x65, 0x3a, 0x3a, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b,
-	0x65, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x4d, 0x73, 0x67, 0x53, 0x65, 0x74, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50, 0x61, 0x75, 0x73,
+	0x65, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x1a, 0x05, 0x80, 0xe7, 0xb0, 0x2a,
+	0x01, 0x42, 0xe1, 0x01, 0x0a, 0x1b, 0x63, 0x6f, 0x6d, 0x2e, 0x74, 0x61, 0x63, 0x2e, 0x6c, 0x69,
+	0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61,
+	0x31, 0x42, 0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x3b, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x74,
+	0x61, 0x63, 0x2f, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x2f, 0x76,
+	0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x3b, 0x6c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61,
+	0x6b, 0x65, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0xa2, 0x02, 0x03, 0x54, 0x4c, 0x58, 0xaa,
+	0x02, 0x17, 0x54, 0x61, 0x63, 0x2e, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b,
+	0x65, 0x2e, 0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0xca, 0x02, 0x17, 0x54, 0x61, 0x63, 0x5c,
+	0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x5c, 0x56, 0x31, 0x62, 0x65,
+	0x74, 0x61, 0x31, 0xe2, 0x02, 0x23, 0x54, 0x61, 0x63, 0x5c, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64,
+	0x73, 0x74, 0x61, 0x6b, 0x65, 0x5c, 0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x5c, 0x47, 0x50,
+	0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x19, 0x54, 0x61, 0x63, 0x3a,
+	0x3a, 0x4c, 0x69, 0x71, 0x75, 0x69, 0x64, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x3a, 0x3a, 0x56, 0x31,
+	0x62, 0x65, 0x74, 0x61, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
-	file_pstake_liquidstake_v1beta1_tx_proto_rawDescOnce sync.Once
-	file_pstake_liquidstake_v1beta1_tx_proto_rawDescData = file_pstake_liquidstake_v1beta1_tx_proto_rawDesc
+	file_tac_liquidstake_v1beta1_tx_proto_rawDescOnce sync.Once
+	file_tac_liquidstake_v1beta1_tx_proto_rawDescData = file_tac_liquidstake_v1beta1_tx_proto_rawDesc
 )
 
-func file_pstake_liquidstake_v1beta1_tx_proto_rawDescGZIP() []byte {
-	file_pstake_liquidstake_v1beta1_tx_proto_rawDescOnce.Do(func() {
-		file_pstake_liquidstake_v1beta1_tx_proto_rawDescData = protoimpl.X.CompressGZIP(file_pstake_liquidstake_v1beta1_tx_proto_rawDescData)
+func file_tac_liquidstake_v1beta1_tx_proto_rawDescGZIP() []byte {
+	file_tac_liquidstake_v1beta1_tx_proto_rawDescOnce.Do(func() {
+		file_tac_liquidstake_v1beta1_tx_proto_rawDescData = protoimpl.X.CompressGZIP(file_tac_liquidstake_v1beta1_tx_proto_rawDescData)
 	})
-	return file_pstake_liquidstake_v1beta1_tx_proto_rawDescData
+	return file_tac_liquidstake_v1beta1_tx_proto_rawDescData
 }
 
-var file_pstake_liquidstake_v1beta1_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
-var file_pstake_liquidstake_v1beta1_tx_proto_goTypes = []interface{}{
-	(*MsgLiquidStake)(nil),                         // 0: pstake.liquidstake.v1beta1.MsgLiquidStake
-	(*MsgLiquidStakeResponse)(nil),                 // 1: pstake.liquidstake.v1beta1.MsgLiquidStakeResponse
-	(*MsgStakeToLP)(nil),                           // 2: pstake.liquidstake.v1beta1.MsgStakeToLP
-	(*MsgStakeToLPResponse)(nil),                   // 3: pstake.liquidstake.v1beta1.MsgStakeToLPResponse
-	(*MsgLiquidUnstake)(nil),                       // 4: pstake.liquidstake.v1beta1.MsgLiquidUnstake
-	(*MsgLiquidUnstakeResponse)(nil),               // 5: pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse
-	(*MsgUpdateParams)(nil),                        // 6: pstake.liquidstake.v1beta1.MsgUpdateParams
-	(*MsgUpdateParamsResponse)(nil),                // 7: pstake.liquidstake.v1beta1.MsgUpdateParamsResponse
-	(*MsgUpdateWhitelistedValidators)(nil),         // 8: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators
-	(*MsgUpdateWhitelistedValidatorsResponse)(nil), // 9: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse
-	(*MsgSetModulePaused)(nil),                     // 10: pstake.liquidstake.v1beta1.MsgSetModulePaused
-	(*MsgSetModulePausedResponse)(nil),             // 11: pstake.liquidstake.v1beta1.MsgSetModulePausedResponse
+var file_tac_liquidstake_v1beta1_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_tac_liquidstake_v1beta1_tx_proto_goTypes = []interface{}{
+	(*MsgLiquidStake)(nil),                         // 0: tac.liquidstake.v1beta1.MsgLiquidStake
+	(*MsgLiquidStakeResponse)(nil),                 // 1: tac.liquidstake.v1beta1.MsgLiquidStakeResponse
+	(*MsgStakeToLP)(nil),                           // 2: tac.liquidstake.v1beta1.MsgStakeToLP
+	(*MsgStakeToLPResponse)(nil),                   // 3: tac.liquidstake.v1beta1.MsgStakeToLPResponse
+	(*MsgLiquidUnstake)(nil),                       // 4: tac.liquidstake.v1beta1.MsgLiquidUnstake
+	(*MsgLiquidUnstakeResponse)(nil),               // 5: tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse
+	(*MsgUpdateParams)(nil),                        // 6: tac.liquidstake.v1beta1.MsgUpdateParams
+	(*MsgUpdateParamsResponse)(nil),                // 7: tac.liquidstake.v1beta1.MsgUpdateParamsResponse
+	(*MsgUpdateWhitelistedValidators)(nil),         // 8: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators
+	(*MsgUpdateWhitelistedValidatorsResponse)(nil), // 9: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse
+	(*MsgSetModulePaused)(nil),                     // 10: tac.liquidstake.v1beta1.MsgSetModulePaused
+	(*MsgSetModulePausedResponse)(nil),             // 11: tac.liquidstake.v1beta1.MsgSetModulePausedResponse
 	(*v1beta1.Coin)(nil),                           // 12: cosmos.base.v1beta1.Coin
 	(*timestamppb.Timestamp)(nil),                  // 13: google.protobuf.Timestamp
-	(*Params)(nil),                                 // 14: pstake.liquidstake.v1beta1.Params
-	(*WhitelistedValidator)(nil),                   // 15: pstake.liquidstake.v1beta1.WhitelistedValidator
+	(*Params)(nil),                                 // 14: tac.liquidstake.v1beta1.Params
+	(*WhitelistedValidator)(nil),                   // 15: tac.liquidstake.v1beta1.WhitelistedValidator
 }
-var file_pstake_liquidstake_v1beta1_tx_proto_depIdxs = []int32{
-	12, // 0: pstake.liquidstake.v1beta1.MsgLiquidStake.amount:type_name -> cosmos.base.v1beta1.Coin
-	12, // 1: pstake.liquidstake.v1beta1.MsgStakeToLP.staked_amount:type_name -> cosmos.base.v1beta1.Coin
-	12, // 2: pstake.liquidstake.v1beta1.MsgStakeToLP.liquid_amount:type_name -> cosmos.base.v1beta1.Coin
-	12, // 3: pstake.liquidstake.v1beta1.MsgLiquidUnstake.amount:type_name -> cosmos.base.v1beta1.Coin
-	13, // 4: pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time:type_name -> google.protobuf.Timestamp
-	14, // 5: pstake.liquidstake.v1beta1.MsgUpdateParams.params:type_name -> pstake.liquidstake.v1beta1.Params
-	15, // 6: pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators:type_name -> pstake.liquidstake.v1beta1.WhitelistedValidator
-	0,  // 7: pstake.liquidstake.v1beta1.Msg.LiquidStake:input_type -> pstake.liquidstake.v1beta1.MsgLiquidStake
-	4,  // 8: pstake.liquidstake.v1beta1.Msg.LiquidUnstake:input_type -> pstake.liquidstake.v1beta1.MsgLiquidUnstake
-	2,  // 9: pstake.liquidstake.v1beta1.Msg.StakeToLP:input_type -> pstake.liquidstake.v1beta1.MsgStakeToLP
-	6,  // 10: pstake.liquidstake.v1beta1.Msg.UpdateParams:input_type -> pstake.liquidstake.v1beta1.MsgUpdateParams
-	8,  // 11: pstake.liquidstake.v1beta1.Msg.UpdateWhitelistedValidators:input_type -> pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators
-	10, // 12: pstake.liquidstake.v1beta1.Msg.SetModulePaused:input_type -> pstake.liquidstake.v1beta1.MsgSetModulePaused
-	1,  // 13: pstake.liquidstake.v1beta1.Msg.LiquidStake:output_type -> pstake.liquidstake.v1beta1.MsgLiquidStakeResponse
-	5,  // 14: pstake.liquidstake.v1beta1.Msg.LiquidUnstake:output_type -> pstake.liquidstake.v1beta1.MsgLiquidUnstakeResponse
-	3,  // 15: pstake.liquidstake.v1beta1.Msg.StakeToLP:output_type -> pstake.liquidstake.v1beta1.MsgStakeToLPResponse
-	7,  // 16: pstake.liquidstake.v1beta1.Msg.UpdateParams:output_type -> pstake.liquidstake.v1beta1.MsgUpdateParamsResponse
-	9,  // 17: pstake.liquidstake.v1beta1.Msg.UpdateWhitelistedValidators:output_type -> pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse
-	11, // 18: pstake.liquidstake.v1beta1.Msg.SetModulePaused:output_type -> pstake.liquidstake.v1beta1.MsgSetModulePausedResponse
+var file_tac_liquidstake_v1beta1_tx_proto_depIdxs = []int32{
+	12, // 0: tac.liquidstake.v1beta1.MsgLiquidStake.amount:type_name -> cosmos.base.v1beta1.Coin
+	12, // 1: tac.liquidstake.v1beta1.MsgStakeToLP.staked_amount:type_name -> cosmos.base.v1beta1.Coin
+	12, // 2: tac.liquidstake.v1beta1.MsgStakeToLP.liquid_amount:type_name -> cosmos.base.v1beta1.Coin
+	12, // 3: tac.liquidstake.v1beta1.MsgLiquidUnstake.amount:type_name -> cosmos.base.v1beta1.Coin
+	13, // 4: tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse.completion_time:type_name -> google.protobuf.Timestamp
+	14, // 5: tac.liquidstake.v1beta1.MsgUpdateParams.params:type_name -> tac.liquidstake.v1beta1.Params
+	15, // 6: tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators.whitelisted_validators:type_name -> tac.liquidstake.v1beta1.WhitelistedValidator
+	0,  // 7: tac.liquidstake.v1beta1.Msg.LiquidStake:input_type -> tac.liquidstake.v1beta1.MsgLiquidStake
+	4,  // 8: tac.liquidstake.v1beta1.Msg.LiquidUnstake:input_type -> tac.liquidstake.v1beta1.MsgLiquidUnstake
+	2,  // 9: tac.liquidstake.v1beta1.Msg.StakeToLP:input_type -> tac.liquidstake.v1beta1.MsgStakeToLP
+	6,  // 10: tac.liquidstake.v1beta1.Msg.UpdateParams:input_type -> tac.liquidstake.v1beta1.MsgUpdateParams
+	8,  // 11: tac.liquidstake.v1beta1.Msg.UpdateWhitelistedValidators:input_type -> tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidators
+	10, // 12: tac.liquidstake.v1beta1.Msg.SetModulePaused:input_type -> tac.liquidstake.v1beta1.MsgSetModulePaused
+	1,  // 13: tac.liquidstake.v1beta1.Msg.LiquidStake:output_type -> tac.liquidstake.v1beta1.MsgLiquidStakeResponse
+	5,  // 14: tac.liquidstake.v1beta1.Msg.LiquidUnstake:output_type -> tac.liquidstake.v1beta1.MsgLiquidUnstakeResponse
+	3,  // 15: tac.liquidstake.v1beta1.Msg.StakeToLP:output_type -> tac.liquidstake.v1beta1.MsgStakeToLPResponse
+	7,  // 16: tac.liquidstake.v1beta1.Msg.UpdateParams:output_type -> tac.liquidstake.v1beta1.MsgUpdateParamsResponse
+	9,  // 17: tac.liquidstake.v1beta1.Msg.UpdateWhitelistedValidators:output_type -> tac.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse
+	11, // 18: tac.liquidstake.v1beta1.Msg.SetModulePaused:output_type -> tac.liquidstake.v1beta1.MsgSetModulePausedResponse
 	13, // [13:19] is the sub-list for method output_type
 	7,  // [7:13] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
@@ -6130,14 +6125,14 @@ var file_pstake_liquidstake_v1beta1_tx_proto_depIdxs = []int32{
 	0,  // [0:7] is the sub-list for field type_name
 }
 
-func init() { file_pstake_liquidstake_v1beta1_tx_proto_init() }
-func file_pstake_liquidstake_v1beta1_tx_proto_init() {
-	if File_pstake_liquidstake_v1beta1_tx_proto != nil {
+func init() { file_tac_liquidstake_v1beta1_tx_proto_init() }
+func file_tac_liquidstake_v1beta1_tx_proto_init() {
+	if File_tac_liquidstake_v1beta1_tx_proto != nil {
 		return
 	}
-	file_pstake_liquidstake_v1beta1_liquidstake_proto_init()
+	file_tac_liquidstake_v1beta1_liquidstake_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_tx_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgLiquidStake); i {
 			case 0:
 				return &v.state
@@ -6149,7 +6144,7 @@ func file_pstake_liquidstake_v1beta1_tx_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_tx_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgLiquidStakeResponse); i {
 			case 0:
 				return &v.state
@@ -6161,7 +6156,7 @@ func file_pstake_liquidstake_v1beta1_tx_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_tx_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgStakeToLP); i {
 			case 0:
 				return &v.state
@@ -6173,7 +6168,7 @@ func file_pstake_liquidstake_v1beta1_tx_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_tx_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgStakeToLPResponse); i {
 			case 0:
 				return &v.state
@@ -6185,7 +6180,7 @@ func file_pstake_liquidstake_v1beta1_tx_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_tx_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgLiquidUnstake); i {
 			case 0:
 				return &v.state
@@ -6197,7 +6192,7 @@ func file_pstake_liquidstake_v1beta1_tx_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_tx_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgLiquidUnstakeResponse); i {
 			case 0:
 				return &v.state
@@ -6209,7 +6204,7 @@ func file_pstake_liquidstake_v1beta1_tx_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_tx_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgUpdateParams); i {
 			case 0:
 				return &v.state
@@ -6221,7 +6216,7 @@ func file_pstake_liquidstake_v1beta1_tx_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_tx_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgUpdateParamsResponse); i {
 			case 0:
 				return &v.state
@@ -6233,7 +6228,7 @@ func file_pstake_liquidstake_v1beta1_tx_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_tx_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgUpdateWhitelistedValidators); i {
 			case 0:
 				return &v.state
@@ -6245,7 +6240,7 @@ func file_pstake_liquidstake_v1beta1_tx_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_tx_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgUpdateWhitelistedValidatorsResponse); i {
 			case 0:
 				return &v.state
@@ -6257,7 +6252,7 @@ func file_pstake_liquidstake_v1beta1_tx_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_tx_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgSetModulePaused); i {
 			case 0:
 				return &v.state
@@ -6269,7 +6264,7 @@ func file_pstake_liquidstake_v1beta1_tx_proto_init() {
 				return nil
 			}
 		}
-		file_pstake_liquidstake_v1beta1_tx_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_tac_liquidstake_v1beta1_tx_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgSetModulePausedResponse); i {
 			case 0:
 				return &v.state
@@ -6286,18 +6281,18 @@ func file_pstake_liquidstake_v1beta1_tx_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_pstake_liquidstake_v1beta1_tx_proto_rawDesc,
+			RawDescriptor: file_tac_liquidstake_v1beta1_tx_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_pstake_liquidstake_v1beta1_tx_proto_goTypes,
-		DependencyIndexes: file_pstake_liquidstake_v1beta1_tx_proto_depIdxs,
-		MessageInfos:      file_pstake_liquidstake_v1beta1_tx_proto_msgTypes,
+		GoTypes:           file_tac_liquidstake_v1beta1_tx_proto_goTypes,
+		DependencyIndexes: file_tac_liquidstake_v1beta1_tx_proto_depIdxs,
+		MessageInfos:      file_tac_liquidstake_v1beta1_tx_proto_msgTypes,
 	}.Build()
-	File_pstake_liquidstake_v1beta1_tx_proto = out.File
-	file_pstake_liquidstake_v1beta1_tx_proto_rawDesc = nil
-	file_pstake_liquidstake_v1beta1_tx_proto_goTypes = nil
-	file_pstake_liquidstake_v1beta1_tx_proto_depIdxs = nil
+	File_tac_liquidstake_v1beta1_tx_proto = out.File
+	file_tac_liquidstake_v1beta1_tx_proto_rawDesc = nil
+	file_tac_liquidstake_v1beta1_tx_proto_goTypes = nil
+	file_tac_liquidstake_v1beta1_tx_proto_depIdxs = nil
 }

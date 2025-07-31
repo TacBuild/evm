@@ -7,7 +7,7 @@ package keeper_test
 //	sdk "github.com/cosmos/cosmos-sdk/types"
 //	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 //
-//	testhelpers "github.com/cosmos/evm/app/helpers"
+//	testhelpers "github.com/Asphere-xyz/tacchain/app/helpers"
 //	"github.com/cosmos/evm/x/liquidstake/types"
 //)
 //
@@ -262,7 +262,7 @@ package keeper_test
 //	// no btoken supply and netAmount after unbond all
 //	nas, err := s.keeper.GetNetAmountState(s.ctx)
 //	s.Require().NoError(err)
-//	s.Require().EqualValues(nas.StkxprtTotalSupply, sdk.ZeroInt())
+//	s.Require().EqualValues(nas.GtacTotalSupply, sdk.ZeroInt())
 //	s.Require().Equal(nas.TotalRemainingRewards, sdk.ZeroDec())
 //	s.Require().Equal(nas.TotalDelShares, sdk.ZeroDec())
 //	s.Require().Equal(nas.TotalLiquidTokens, sdk.ZeroInt())

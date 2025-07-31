@@ -1,5 +1,5 @@
 package keeper_test
-//
+
 //import (
 //	"fmt"
 //	"testing"
@@ -20,7 +20,7 @@ package keeper_test
 //	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 //	"github.com/stretchr/testify/suite"
 //
-//	chain "github.com/cosmos/evm/evmd"
+//	chain "github.com/Asphere-xyz/tacchain/app"
 //	"github.com/cosmos/evm/x/liquidstake/keeper"
 //	"github.com/cosmos/evm/x/liquidstake/types"
 //	dbm "github.com/cosmos/cosmos-db"
@@ -118,11 +118,11 @@ package keeper_test
 //	ctx, writeCache := s.ctx.CacheContext()
 //	params := s.keeper.GetParams(ctx)
 //
-//	stkxprtBalanceBefore := s.app.BankKeeper.GetBalance(
+//	gtacBalanceBefore := s.app.BankKeeper.GetBalance(
 //		ctx, liquidStaker, params.LiquidBondDenom,
 //	).Amount
 //
-//	stkXPRTMintAmt, err := s.keeper.LiquidStake(
+//	gTACMintAmt, err := s.keeper.LiquidStake(
 //		ctx,
 //		types.LiquidStakeProxyAcc,
 //		liquidStaker,
@@ -132,13 +132,13 @@ package keeper_test
 //		return err
 //	}
 //
-//	stkxprtBalanceAfter := s.app.BankKeeper.GetBalance(
+//	gtacBalanceAfter := s.app.BankKeeper.GetBalance(
 //		ctx, liquidStaker, params.LiquidBondDenom,
 //	).Amount
 //
 //	s.Require().NoError(err)
 //	s.Require().EqualValues(
-//		stkXPRTMintAmt, stkxprtBalanceAfter.Sub(stkxprtBalanceBefore),
+//		gTACMintAmt, gtacBalanceAfter.Sub(gtacBalanceBefore),
 //	)
 //	writeCache()
 //
@@ -147,7 +147,7 @@ package keeper_test
 //
 //func (s *KeeperTestSuite) liquidUnstaking(
 //	liquidStaker sdk.AccAddress,
-//	ubdStkXPRTAmt math.Int,
+//	ubdGTACAmt math.Int,
 //	ubdComplete bool,
 //) error {
 //	ctx := s.ctx
@@ -161,7 +161,7 @@ package keeper_test
 //
 //	ubdTime, unbondingAmt, _, unbondedAmt, err := s.liquidUnstakingWithResult(
 //		liquidStaker,
-//		sdk.NewCoin(params.LiquidBondDenom, ubdStkXPRTAmt),
+//		sdk.NewCoin(params.LiquidBondDenom, ubdGTACAmt),
 //	)
 //	if err != nil {
 //		return err
@@ -199,7 +199,7 @@ package keeper_test
 //}
 //
 //func (s *KeeperTestSuite) liquidUnstakingWithResult(
-//	liquidStaker sdk.AccAddress, unstakingStkXPRT sdk.Coin,
+//	liquidStaker sdk.AccAddress, unstakingGTAC sdk.Coin,
 //) (time.Time, math.Int, []stakingtypes.UnbondingDelegation, math.Int, error) {
 //	ctx, writeCache := s.ctx.CacheContext()
 //	params := s.keeper.GetParams(ctx)
@@ -208,12 +208,12 @@ package keeper_test
 //	balanceBefore := s.app.BankKeeper.GetBalance(
 //		ctx, liquidStaker, sdk.DefaultBondDenom,
 //	).Amount
-//	stkxprtBalanceBefore := s.app.BankKeeper.GetBalance(
+//	gtacBalanceBefore := s.app.BankKeeper.GetBalance(
 //		ctx, liquidStaker, params.LiquidBondDenom,
 //	).Amount
 //
 //	ubdTime, unbondingAmt, ubds, unbondedAmt, err := s.keeper.LiquidUnstake(
-//		ctx, types.LiquidStakeProxyAcc, liquidStaker, unstakingStkXPRT,
+//		ctx, types.LiquidStakeProxyAcc, liquidStaker, unstakingGTAC,
 //	)
 //	if err != nil {
 //		return ubdTime, unbondingAmt, ubds, unbondedAmt, err
@@ -222,11 +222,11 @@ package keeper_test
 //	balanceAfter := s.app.BankKeeper.GetBalance(
 //		ctx, liquidStaker, sdk.DefaultBondDenom,
 //	).Amount
-//	stkxprtBalanceAfter := s.app.BankKeeper.GetBalance(
+//	gtacBalanceAfter := s.app.BankKeeper.GetBalance(
 //		ctx, liquidStaker, params.LiquidBondDenom,
 //	).Amount
 //	s.Require().EqualValues(
-//		unstakingStkXPRT.Amount, stkxprtBalanceBefore.Sub(stkxprtBalanceAfter),
+//		unstakingGTAC.Amount, gtacBalanceBefore.Sub(gtacBalanceAfter),
 //	)
 //
 //	if unbondedAmt.IsPositive() {
@@ -250,7 +250,7 @@ package keeper_test
 //	nas, err := s.keeper.GetNetAmountState(s.ctx)
 //	s.Require().NoError(err)
 //	s.Require().EqualValues(nas.MintRate, sdk.ZeroDec())
-//	s.Require().EqualValues(nas.StkxprtTotalSupply, sdk.ZeroInt())
+//	s.Require().EqualValues(nas.GtacTotalSupply, sdk.ZeroInt())
 //	s.Require().EqualValues(nas.NetAmount, sdk.ZeroDec())
 //	s.Require().EqualValues(nas.TotalDelShares, sdk.ZeroDec())
 //	s.Require().EqualValues(nas.TotalLiquidTokens, sdk.ZeroInt())

@@ -24,7 +24,7 @@ func GetTxCmd() *cobra.Command {
 	liquidstakeTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Aliases:                    []string{"ls"},
-		Short:                      "XPRT liquid stake transaction subcommands",
+		Short:                      "TAC liquid stake transaction subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -42,17 +42,17 @@ func GetTxCmd() *cobra.Command {
 	return liquidstakeTxCmd
 }
 
-// NewLiquidStakeCmd implements the liquid stake XPRT command handler.
+// NewLiquidStakeCmd implements the liquid stake TAC command handler.
 func NewLiquidStakeCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "liquid-stake [amount]",
 		Args:  cobra.ExactArgs(1),
-		Short: "Liquid-stake XPRT",
+		Short: "Liquid-stake TAC",
 		Long: strings.TrimSpace(
-			fmt.Sprintf(`Liquid-stake XPRT.
+			fmt.Sprintf(`Liquid-stake TAC.
 
 Example:
-$ %s tx %s liquid-stake 1000uxprt --from mykey
+$ %s tx %s liquid-stake 1000utac --from mykey
 `,
 				version.AppName, types.ModuleName,
 			),
@@ -81,21 +81,21 @@ $ %s tx %s liquid-stake 1000uxprt --from mykey
 	return cmd
 }
 
-// NewStakeToLPCmd implements the liquid stake XPRT command handler.
+// NewStakeToLPCmd implements the liquid stake TAC command handler.
 func NewStakeToLPCmd() *cobra.Command {
 	bech32PrefixValAddr := sdk.GetConfig().GetBech32ValidatorAddrPrefix()
 
 	cmd := &cobra.Command{
 		Use:   "stake-to-lp [validator-addr] [staked_amount] [liquid_amount]",
 		Args:  cobra.RangeArgs(2, 3),
-		Short: "Convert delegation into stkXPRT and lock into LP.",
+		Short: "Convert delegation into gTAC and lock into LP.",
 		Long: strings.TrimSpace(
-			fmt.Sprintf(`Convert delegation into stkXPRT and lock into LP.
-Allows to specify both staked and non-staked XPRT amounts to convert into stkXPRT and lock into LP.
+			fmt.Sprintf(`Convert delegation into gTAC and lock into LP.
+Allows to specify both staked and non-staked TAC amounts to convert into gTAC and lock into LP.
 
 Examples:
-$ %s tx %s stake-to-lp %s1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 1000uxprt --from mykey
-$ %s tx %s stake-to-lp %s1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 1000uxprt 5000uxprt --from mykey
+$ %s tx %s stake-to-lp %s1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 1000utac --from mykey
+$ %s tx %s stake-to-lp %s1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 1000utac 5000utac --from mykey
 `,
 				version.AppName, types.ModuleName, bech32PrefixValAddr,
 				version.AppName, types.ModuleName, bech32PrefixValAddr,
@@ -138,17 +138,17 @@ $ %s tx %s stake-to-lp %s1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 1000uxprt 5000u
 	return cmd
 }
 
-// NewLiquidUnstakeCmd implements the liquid unstake XPRT command handler.
+// NewLiquidUnstakeCmd implements the liquid unstake TAC command handler.
 func NewLiquidUnstakeCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "liquid-unstake [amount]",
 		Args:  cobra.ExactArgs(1),
-		Short: "Liquid-unstake stkXPRT",
+		Short: "Liquid-unstake gTAC",
 		Long: strings.TrimSpace(
-			fmt.Sprintf(`Liquid-unstake stkXPRT.
+			fmt.Sprintf(`Liquid-unstake gTAC.
 
 Example:
-$ %s tx %s liquid-unstake 500stk/uxprt --from mykey
+$ %s tx %s liquid-unstake 500stk/utac --from mykey
 `,
 				version.AppName, types.ModuleName,
 			),
@@ -191,17 +191,17 @@ $ %s tx %s update-params ~/params.json --from mykey
 
 Example params.json
 {
-  "liquid_bond_denom": "stk/uxprt",
+  "liquid_bond_denom": "stk/utac",
   "whitelisted_validators": [
     {
-      "validator_address": "persistencevaloper1hcqg5wj9t42zawqkqucs7la85ffyv08lmnhye9",
+      "validator_address": "tacvaloper15lvhklny0khnwy7hgrxsxut6t6ku2cgkwu9tyt",
       "target_weight": "10"
     }
   ],
   "lsm_disabled": false,
   "unstake_fee_rate": "0.000000000000000000",
   "min_liquid_staking_amount": "10000",
-  "cw_locked_pool_address": "persistence14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sjvz4fk"
+  "cw_locked_pool_address": "tac14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sjvz4fk"
 }
 `,
 				version.AppName, types.ModuleName,
@@ -252,7 +252,7 @@ $ %s tx %s update-whitelisted-validators ~/validators_list.json --from mykey
 Example validators_list.json
 [
   {
-    "validator_address": "persistencevaloper1hcqg5wj9t42zawqkqucs7la85ffyv08lmnhye9",
+    "validator_address": "tacvaloper15lvhklny0khnwy7hgrxsxut6t6ku2cgkwu9tyt",
     "target_weight": "10"
   }
 ]

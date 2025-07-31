@@ -37,14 +37,14 @@ var _ types.MsgServer = msgServer{}
 func (k msgServer) LiquidStake(goCtx context.Context, msg *types.MsgLiquidStake) (*types.MsgLiquidStakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	stkXPRTMintAmount, err := k.Keeper.LiquidStake(ctx, types.LiquidStakeProxyAcc, msg.GetDelegator(), msg.Amount)
+	gTACMintAmount, err := k.Keeper.LiquidStake(ctx, types.LiquidStakeProxyAcc, msg.GetDelegator(), msg.Amount)
 	if err != nil {
 		return nil, err
 	}
 
 	var cValue math.LegacyDec
-	if stkXPRTMintAmount.IsPositive() {
-		cValue = stkXPRTMintAmount.ToLegacyDec().Quo(msg.Amount.Amount.ToLegacyDec())
+	if gTACMintAmount.IsPositive() {
+		cValue = gTACMintAmount.ToLegacyDec().Quo(msg.Amount.Amount.ToLegacyDec())
 	}
 
 	liquidBondDenom := k.LiquidBondDenom(ctx)
@@ -57,7 +57,7 @@ func (k msgServer) LiquidStake(goCtx context.Context, msg *types.MsgLiquidStake)
 			types.EventTypeMsgLiquidStake,
 			sdk.NewAttribute(types.AttributeKeyDelegator, msg.DelegatorAddress),
 			sdk.NewAttribute(types.AttributeKeyLiquidAmount, msg.Amount.String()),
-			sdk.NewAttribute(types.AttributeKeyStkXPRTMintedAmount, sdk.Coin{Denom: liquidBondDenom, Amount: stkXPRTMintAmount}.String()),
+			sdk.NewAttribute(types.AttributeKeyGTACMintedAmount, sdk.Coin{Denom: liquidBondDenom, Amount: gTACMintAmount}.String()),
 			sdk.NewAttribute(types.AttributeKeyCValue, cValue.String()),
 		),
 	})
@@ -67,7 +67,7 @@ func (k msgServer) LiquidStake(goCtx context.Context, msg *types.MsgLiquidStake)
 func (k msgServer) StakeToLP(goCtx context.Context, msg *types.MsgStakeToLP) (*types.MsgStakeToLPResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	stkXPRTMintAmount, err := k.LSMDelegate(
+	gTACMintAmount, err := k.LSMDelegate(
 		ctx,
 		msg.GetDelegator(),
 		msg.GetValidator(),
@@ -79,14 +79,14 @@ func (k msgServer) StakeToLP(goCtx context.Context, msg *types.MsgStakeToLP) (*t
 	}
 
 	liquidBondDenom := k.LiquidBondDenom(ctx)
-	stkXPRTMinted := sdk.Coin{
+	gTACMinted := sdk.Coin{
 		Denom:  liquidBondDenom,
-		Amount: stkXPRTMintAmount,
+		Amount: gTACMintAmount,
 	}
 
 	var cValue math.LegacyDec
-	if stkXPRTMintAmount.IsPositive() {
-		cValue = stkXPRTMintAmount.ToLegacyDec().Quo(msg.StakedAmount.Amount.ToLegacyDec())
+	if gTACMintAmount.IsPositive() {
+		cValue = gTACMintAmount.ToLegacyDec().Quo(msg.StakedAmount.Amount.ToLegacyDec())
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
@@ -98,25 +98,25 @@ func (k msgServer) StakeToLP(goCtx context.Context, msg *types.MsgStakeToLP) (*t
 			types.EventTypeMsgStakeToLP,
 			sdk.NewAttribute(types.AttributeKeyDelegator, msg.DelegatorAddress),
 			sdk.NewAttribute(types.AttributeKeyStakedAmount, msg.StakedAmount.String()),
-			sdk.NewAttribute(types.AttributeKeyStkXPRTMintedAmount, stkXPRTMinted.String()),
+			sdk.NewAttribute(types.AttributeKeyGTACMintedAmount, gTACMinted.String()),
 			sdk.NewAttribute(types.AttributeKeyCValue, cValue.String()),
 		),
 	})
 
 	if (msg.LiquidAmount != sdk.Coin{}) && (msg.LiquidAmount.Amount != math.Int{}) && msg.LiquidAmount.Amount.IsPositive() {
-		stkXPRTMintAmount, err := k.Keeper.LiquidStake(ctx, types.LiquidStakeProxyAcc, msg.GetDelegator(), msg.LiquidAmount)
+		gTACMintAmount, err := k.Keeper.LiquidStake(ctx, types.LiquidStakeProxyAcc, msg.GetDelegator(), msg.LiquidAmount)
 		if err != nil {
 			return nil, err
 		}
 
-		stkXPRTMinted := sdk.Coin{
+		gTACMinted := sdk.Coin{
 			Denom:  liquidBondDenom,
-			Amount: stkXPRTMintAmount,
+			Amount: gTACMintAmount,
 		}
 
 		var cValue math.LegacyDec
-		if stkXPRTMintAmount.IsPositive() {
-			cValue = stkXPRTMintAmount.ToLegacyDec().Quo(msg.LiquidAmount.Amount.ToLegacyDec())
+		if gTACMintAmount.IsPositive() {
+			cValue = gTACMintAmount.ToLegacyDec().Quo(msg.LiquidAmount.Amount.ToLegacyDec())
 		}
 
 		ctx.EventManager().EmitEvents(sdk.Events{
@@ -128,12 +128,12 @@ func (k msgServer) StakeToLP(goCtx context.Context, msg *types.MsgStakeToLP) (*t
 				types.EventTypeMsgStakeToLP,
 				sdk.NewAttribute(types.AttributeKeyDelegator, msg.DelegatorAddress),
 				sdk.NewAttribute(types.AttributeKeyLiquidAmount, msg.LiquidAmount.String()),
-				sdk.NewAttribute(types.AttributeKeyStkXPRTMintedAmount, stkXPRTMinted.String()),
+				sdk.NewAttribute(types.AttributeKeyGTACMintedAmount, gTACMinted.String()),
 				sdk.NewAttribute(types.AttributeKeyCValue, cValue.String()),
 			),
 		})
 
-		_, err = k.LockOnLP(ctx, msg.GetDelegator(), stkXPRTMinted)
+		_, err = k.LockOnLP(ctx, msg.GetDelegator(), gTACMinted)
 		if err != nil {
 			return nil, err
 		}
@@ -228,7 +228,7 @@ func (k msgServer) UpdateWhitelistedValidators(goCtx context.Context, msg *types
 		fullVal, err := k.stakingKeeper.GetValidator(ctx, valAddr)
 		if err != nil {
 			return nil, normal_errors.Join(
-					errors.Wrapf(
+				errors.Wrapf(
 					types.ErrWhitelistedValidatorsList,
 					"validator not found: %s", valAddr,
 				),

@@ -92,7 +92,7 @@ $ %s query %s liquid-validators
 				return err
 			}
 
-   queryClient := types.NewQueryClient(clientCtx)
+			queryClient := types.NewQueryClient(clientCtx)
 
 			res, err := queryClient.LiquidValidators(
 				cmd.Context(),

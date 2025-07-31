@@ -1,12 +1,12 @@
 syntax = "proto3";
-package pstake.liquidstake.v1beta1;
+package tac.liquidstake.v1beta1;
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/msg/v1/msg.proto";
 import "google/protobuf/timestamp.proto";
-import "pstake/liquidstake/v1beta1/liquidstake.proto";
+import "tac/liquidstake/v1beta1/liquidstake.proto";
 import "amino/amino.proto";
 
 option go_package = "github.com/cosmos/evm/x/liquidstake/types";
@@ -22,8 +22,8 @@ service Msg {
   // staking from a delegate.
   rpc LiquidUnstake(MsgLiquidUnstake) returns (MsgLiquidUnstakeResponse);
 
-  // StakeToLP defines a method for LSM-transfer of staked XPRT
-  // into stkXPRT with locking into an LP.
+  // StakeToLP defines a method for LSM-transfer of staked TAC
+  // into gTAC with locking into an LP.
   rpc StakeToLP(MsgStakeToLP) returns (MsgStakeToLPResponse);
 
   // UpdateParams defines a method to update the module params.
@@ -57,7 +57,7 @@ message MsgLiquidStake {
 message MsgLiquidStakeResponse {}
 
 // MsgStakeToLP defines a SDK message for performing an LSM-transfer of staked
-// XPRT into stkXPRT with locking into an LP.
+// TAC into gTAC with locking into an LP.
 message MsgStakeToLP {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
