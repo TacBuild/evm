@@ -14,9 +14,6 @@ LiquidStakingI constant LIQUIDSTAKING_CONTRACT = LiquidStakingI(LIQUIDSTAKING_PR
 string constant MSG_LIQUID_STAKE = "/pstake.liquidstake.v1beta1.MsgLiquidStake";
 string constant MSG_LIQUID_UNSTAKE = "/pstake.liquidstake.v1beta1.MsgLiquidUnstake";
 string constant MSG_STAKE_TO_LP = "/pstake.liquidstake.v1beta1.MsgStakeToLP";
-string constant MSG_UPDATE_PARAMS = "/pstake.liquidstake.v1beta1.MsgUpdateParams";
-string constant MSG_UPDATE_WHITELISTED_VALIDATORS = "/pstake.liquidstake.v1beta1.MsgUpdateWhitelistedValidators";
-string constant MSG_SET_MODULE_PAUSED = "/pstake.liquidstake.v1beta1.MsgSetModulePaused";
 
 struct WhitelistedValidator {
     address     validatorAddress;
@@ -92,5 +89,22 @@ interface LiquidStakingI is authorization.AuthorizationI {
     // view functions/query definitions end
 
 
-    // events for smart-contract currently ignored
+    // events definitions start
+    event LiquidStake(
+        address         delegatorAddress,
+        uint256         amount
+    );
+
+    event StakeToLP(
+        address         delegatorAddress,
+        address         validatorAddress,
+        uint256         stakedAmount,
+        uint256         liquidAmount
+    );
+
+    event LiquidUnstake(
+        address         delegatorAddress,
+        uint256         Amount
+    );
+    // events definitions end
 }

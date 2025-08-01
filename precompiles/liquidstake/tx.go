@@ -160,7 +160,12 @@ func (p Precompile) LiquidStake(
 		p.SetBalanceChangeEntries(cmn.NewBalanceChangeEntry(delHexAddr, scaledAmt, cmn.Sub))
 	}
 
-	return method.Outputs.Pack(true)
+// Emit event after successful transaction
+if err := p.EmitLiquidStakeEvent(ctx, stateDB, msg, *delegatorHexAddr); err != nil {
+    return nil, err
+}
+
+return method.Outputs.Pack(true)
 }
 
 func (p Precompile) StakeToLP(
@@ -205,7 +210,12 @@ func (p Precompile) StakeToLP(
 		return nil, err
 	}
 
-	return method.Outputs.Pack(true)
+// Emit event after successful transaction
+if err := p.EmitStakeToLPEvent(ctx, stateDB, msg, *delegatorHexAddr); err != nil {
+    return nil, err
+}
+
+return method.Outputs.Pack(true)
 }
 
 func (p Precompile) LiquidUnstake(
@@ -284,6 +294,11 @@ func (p Precompile) LiquidUnstake(
 	}
 
 
-	return method.Outputs.Pack(responce.CompletionTime.Unix())
+// Emit event after successful transaction
+if err := p.EmitLiquidUnstakeEvent(ctx, stateDB, msg, *delegatorHexAddr); err != nil {
+    return nil, err
+}
+
+return method.Outputs.Pack(responce.CompletionTime.Unix())
 }
 
