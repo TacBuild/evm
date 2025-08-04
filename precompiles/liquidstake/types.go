@@ -122,18 +122,10 @@ func NewLiquidStakeParamsOutput(params *types.Params) LiquidStakeParams {
 	whitelistedValidators := make([]WhitelistedValidator, len(params.WhitelistedValidators))
 	for i, wv := range params.WhitelistedValidators {
 		// Convert bech32 validator address to common.Address
-		valAddr, err := sdk.ValAddressFromBech32(wv.ValidatorAddress)
-		var validatorAddr common.Address
-		if err == nil {
-			validatorAddr = common.BytesToAddress(valAddr.Bytes())
-		} else {
-			// TODO: take a close look
-			// Fallback: try as AccAddress if ValAddress fails
-			accAddr, accErr := sdk.AccAddressFromBech32(wv.ValidatorAddress)
-			if accErr == nil {
-				validatorAddr = common.BytesToAddress(accAddr.Bytes())
-			}
-		}
+		// this shouldnt ever fail
+		valAddr, _ := sdk.ValAddressFromBech32(wv.ValidatorAddress)
+		validatorAddr := common.BytesToAddress(valAddr.Bytes())
+
 		whitelistedValidators[i] = WhitelistedValidator{
 			ValidatorAddress: validatorAddr,
 			TargetWeight:     wv.TargetWeight.BigInt(),
