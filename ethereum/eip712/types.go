@@ -49,11 +49,11 @@ func createEIP712Types(messagePayload eip712MessagePayload) (apitypes.Types, err
 			},
 			{
 				Name: "verifyingContract",
-				Type: "string",
+				Type: "address",
 			},
 			{
 				Name: "salt",
-				Type: "string",
+				Type: "bytes32",
 			},
 		},
 		"Tx": {
