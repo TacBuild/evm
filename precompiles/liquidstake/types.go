@@ -58,6 +58,27 @@ type NetAmount struct {
 }
 
 
+// EventLiquidStake represents the LiquidStake event data
+type EventLiquidStake struct {
+	DelegatorAddress common.Address `json:"delegatorAddress"`
+	Amount           *big.Int       `json:"amount"`
+}
+
+// EventStakeToLP represents the StakeToLP event data
+type EventStakeToLP struct {
+	DelegatorAddress common.Address `json:"delegatorAddress"`
+	ValidatorAddress common.Address `json:"validatorAddress"`
+	StakedAmount     *big.Int       `json:"stakedAmount"`
+	LiquidAmount     *big.Int       `json:"liquidAmount"`
+}
+
+// EventLiquidUnstake represents the LiquidUnstake event data
+type EventLiquidUnstake struct {
+	DelegatorAddress common.Address `json:"delegatorAddress"`
+	Amount           *big.Int       `json:"amount"`
+}
+
+
 func NewLiquidValidatorOutput(lvs *types.LiquidValidatorState) LiquidValidatorState {
 	valAddr, err := sdk.ValAddressFromBech32(lvs.OperatorAddress)
 	var validatorAddr common.Address
@@ -101,17 +122,10 @@ func NewLiquidStakeParamsOutput(params *types.Params) LiquidStakeParams {
 	whitelistedValidators := make([]WhitelistedValidator, len(params.WhitelistedValidators))
 	for i, wv := range params.WhitelistedValidators {
 		// Convert bech32 validator address to common.Address
-		valAddr, err := sdk.ValAddressFromBech32(wv.ValidatorAddress)
-		var validatorAddr common.Address
-		if err == nil {
-			validatorAddr = common.BytesToAddress(valAddr.Bytes())
-		} else {
-			// Fallback: try as AccAddress if ValAddress fails
-			accAddr, accErr := sdk.AccAddressFromBech32(wv.ValidatorAddress)
-			if accErr == nil {
-				validatorAddr = common.BytesToAddress(accAddr.Bytes())
-			}
-		}
+		// this shouldnt ever fail
+		valAddr, _ := sdk.ValAddressFromBech32(wv.ValidatorAddress)
+		validatorAddr := common.BytesToAddress(valAddr.Bytes())
+
 		whitelistedValidators[i] = WhitelistedValidator{
 			ValidatorAddress: validatorAddr,
 			TargetWeight:     wv.TargetWeight.BigInt(),
@@ -327,3 +341,4 @@ func NewMsgSetModulePaused(args []interface{}, denom string) (*types.MsgSetModul
 
 	return &msg, nil
 }
+
