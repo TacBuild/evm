@@ -77,6 +77,12 @@ func (p Precompile) Approve(
 		}
 	}
 
+	// TODO: do we want to emit one approval for all typeUrls, or one approval for each typeUrl?
+	// NOTE: This might have gas implications as we are emitting a slice of strings
+	if err := p.EmitApprovalEvent(ctx, stateDB, grantee, origin, coin, typeURLs); err != nil {
+		return nil, err
+	}
+
 	return method.Outputs.Pack(true)
 }
 
@@ -102,6 +108,21 @@ func (p Precompile) Revoke(
 		default:
 			return nil, fmt.Errorf(cmn.ErrInvalidMsgType, "liquidstake", typeURL)
 		}
+	}
+
+	// NOTE: Using the new more generic event emitter that was created
+	if err = authorization.EmitRevocationEvent(cmn.EmitEventArgs{
+		Ctx:            ctx,
+		StateDB:        stateDB,
+		ContractAddr:   p.Address(),
+		ContractEvents: p.ABI.Events,
+		EventData: authorization.EventRevocation{
+			Granter:  origin,
+			Grantee:  grantee,
+			TypeUrls: typeURLs,
+		},
+	}); err != nil {
+		return nil, err
 	}
 
 	return method.Outputs.Pack(true)
@@ -203,6 +224,10 @@ func (p Precompile) IncreaseAllowance(
 		}
 	}
 
+	if err := p.EmitAllowanceChangeEvent(ctx, stateDB, grantee, origin, typeUrls); err != nil {
+		return nil, err
+	}
+
 	return method.Outputs.Pack(true)
 }
 
@@ -261,6 +286,10 @@ func (p Precompile) DecreaseAllowance(
 		default:
 			return nil, fmt.Errorf(cmn.ErrInvalidMsgType, "liquidstake", typeURL)
 		}
+	}
+
+	if err := p.EmitAllowanceChangeEvent(ctx, stateDB, grantee, origin, typeUrls); err != nil {
+		return nil, err
 	}
 
 	return method.Outputs.Pack(true)

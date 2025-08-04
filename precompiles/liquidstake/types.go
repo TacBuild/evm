@@ -58,6 +58,27 @@ type NetAmount struct {
 }
 
 
+// EventLiquidStake represents the LiquidStake event data
+type EventLiquidStake struct {
+	DelegatorAddress common.Address `json:"delegatorAddress"`
+	Amount           *big.Int       `json:"amount"`
+}
+
+// EventStakeToLP represents the StakeToLP event data
+type EventStakeToLP struct {
+	DelegatorAddress common.Address `json:"delegatorAddress"`
+	ValidatorAddress common.Address `json:"validatorAddress"`
+	StakedAmount     *big.Int       `json:"stakedAmount"`
+	LiquidAmount     *big.Int       `json:"liquidAmount"`
+}
+
+// EventLiquidUnstake represents the LiquidUnstake event data
+type EventLiquidUnstake struct {
+	DelegatorAddress common.Address `json:"delegatorAddress"`
+	Amount           *big.Int       `json:"amount"`
+}
+
+
 func NewLiquidValidatorOutput(lvs *types.LiquidValidatorState) LiquidValidatorState {
 	valAddr, err := sdk.ValAddressFromBech32(lvs.OperatorAddress)
 	var validatorAddr common.Address
@@ -106,6 +127,7 @@ func NewLiquidStakeParamsOutput(params *types.Params) LiquidStakeParams {
 		if err == nil {
 			validatorAddr = common.BytesToAddress(valAddr.Bytes())
 		} else {
+			// TODO: take a close look
 			// Fallback: try as AccAddress if ValAddress fails
 			accAddr, accErr := sdk.AccAddressFromBech32(wv.ValidatorAddress)
 			if accErr == nil {
@@ -327,3 +349,4 @@ func NewMsgSetModulePaused(args []interface{}, denom string) (*types.MsgSetModul
 
 	return &msg, nil
 }
+

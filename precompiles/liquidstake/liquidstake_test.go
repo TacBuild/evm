@@ -3,7 +3,6 @@ package liquidstake_test
 import (
 	"time"
 
-	"cosmossdk.io/math"
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/evm/precompiles/authorization"
 	liquidstake "github.com/cosmos/evm/precompiles/liquidstake"
@@ -320,7 +319,7 @@ func (s *LiquidStakePrecompileTestSuite) TestRun() {
 		{
 			"pass - liquidUnstake transaction",
 			func(delegator, grantee testkeyring.Key) []byte {
-				_, err := s.nw.App.LiquidStakeKeeper.LiquidStake(ctx, liquidstaketypes.LiquidStakeProxyAcc, delegator.AccAddr, sdk.NewCoin(s.bondDenom, math.NewInt(1000000000000000000)))
+				_, err := s.nw.App.LiquidStakeKeeper.LiquidStake(ctx, liquidstaketypes.LiquidStakeProxyAcc, delegator.AccAddr, sdk.NewCoin(s.bondDenom, sdkmath.NewInt(1000000000000000000)))
 				s.Require().NoError(err)
 
 				input, err := s.precompile.Pack(

@@ -120,14 +120,21 @@ func (p Precompile) EmitAllowanceChangeEvent(ctx sdk.Context, stateDB vm.StateDB
 func (p Precompile) EmitLiquidStakeEvent(ctx sdk.Context, stateDB vm.StateDB, msg *types.MsgLiquidStake, delegatorAddr common.Address) error {
 	// Prepare the event topics
 	event := p.ABI.Events[EventTypeLiquidStake]
-	topics := make([]common.Hash, 1)
+	topics := make([]common.Hash, 2)
 
 	// The first topic is always the signature of the event.
 	topics[0] = event.ID
 
+	var err error
+	topics[1], err = cmn.MakeTopic(delegatorAddr)
+	if err != nil {
+		return err
+	}
+
 	// Pack the arguments to be used as the Data field
-	arguments := abi.Arguments{event.Inputs[0], event.Inputs[1]}
-	packed, err := arguments.Pack(delegatorAddr, msg.Amount.Amount.BigInt())
+	// Only amount is not indexed, so only pack the amount
+	arguments := abi.Arguments{event.Inputs[1]} // event.Inputs[1] is the amount field
+	packed, err := arguments.Pack(msg.Amount.Amount.BigInt())
 	if err != nil {
 		return err
 	}
@@ -152,14 +159,25 @@ func (p Precompile) EmitStakeToLPEvent(ctx sdk.Context, stateDB vm.StateDB, msg 
 
 	// Prepare the event topics
 	event := p.ABI.Events[EventTypeStakeToLP]
-	topics := make([]common.Hash, 1)
+	topics := make([]common.Hash, 3)
 
 	// The first topic is always the signature of the event.
 	topics[0] = event.ID
 
+	topics[1], err = cmn.MakeTopic(delegatorAddr)
+	if err != nil {
+		return err
+	}
+
+	topics[2], err = cmn.MakeTopic(validatorAddr)
+	if err != nil {
+		return err
+	}
+
 	// Pack the arguments to be used as the Data field
-	arguments := abi.Arguments{event.Inputs[0], event.Inputs[1], event.Inputs[2], event.Inputs[3]}
-	packed, err := arguments.Pack(delegatorAddr, validatorAddr, msg.StakedAmount.Amount.BigInt(), msg.LiquidAmount.Amount.BigInt())
+	// Only stakedAmount and liquidAmount are not indexed, so only pack those
+	arguments := abi.Arguments{event.Inputs[2], event.Inputs[3]} // stakedAmount and liquidAmount fields
+	packed, err := arguments.Pack(msg.StakedAmount.Amount.BigInt(), msg.LiquidAmount.Amount.BigInt())
 	if err != nil {
 		return err
 	}
@@ -178,14 +196,21 @@ func (p Precompile) EmitStakeToLPEvent(ctx sdk.Context, stateDB vm.StateDB, msg 
 func (p Precompile) EmitLiquidUnstakeEvent(ctx sdk.Context, stateDB vm.StateDB, msg *types.MsgLiquidUnstake, delegatorAddr common.Address) error {
 	// Prepare the event topics
 	event := p.ABI.Events[EventTypeLiquidUnstake]
-	topics := make([]common.Hash, 1)
+	topics := make([]common.Hash, 2)
 
 	// The first topic is always the signature of the event.
 	topics[0] = event.ID
 
+	var err error
+	topics[1], err = cmn.MakeTopic(delegatorAddr)
+	if err != nil {
+		return err
+	}
+
 	// Pack the arguments to be used as the Data field
-	arguments := abi.Arguments{event.Inputs[0], event.Inputs[1]}
-	packed, err := arguments.Pack(delegatorAddr, msg.Amount.Amount.BigInt())
+	// Only amount is not indexed, so only pack the amount
+	arguments := abi.Arguments{event.Inputs[1]} // event.Inputs[1] is the amount field
+	packed, err := arguments.Pack(msg.Amount.Amount.BigInt())
 	if err != nil {
 		return err
 	}

@@ -69,7 +69,7 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "address",
           "name": "delegatorAddress",
           "type": "address"
@@ -88,7 +88,7 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "address",
           "name": "delegatorAddress",
           "type": "address"
@@ -96,7 +96,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "Amount",
+          "name": "amount",
           "type": "uint256"
         }
       ],
@@ -132,13 +132,13 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "address",
           "name": "delegatorAddress",
           "type": "address"
         },
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "address",
           "name": "validatorAddress",
           "type": "address"

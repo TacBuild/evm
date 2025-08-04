@@ -91,20 +91,20 @@ interface LiquidStakingI is authorization.AuthorizationI {
 
     // events definitions start
     event LiquidStake(
-        address         delegatorAddress,
-        uint256         amount
+        address indexed     delegatorAddress,
+        uint256             amount
     );
 
     event StakeToLP(
-        address         delegatorAddress,
-        address         validatorAddress,
-        uint256         stakedAmount,
-        uint256         liquidAmount
+        address indexed     delegatorAddress,
+        address indexed     validatorAddress,
+        uint256             stakedAmount,
+        uint256             liquidAmount
     );
 
     event LiquidUnstake(
-        address         delegatorAddress,
-        uint256         Amount
+        address indexed     delegatorAddress,
+        uint256             amount
     );
     // events definitions end
 }

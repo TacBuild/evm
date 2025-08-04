@@ -42,46 +42,6 @@ const (
 	StakeToLPAuthz = types.AuthorizationType_AUTHORIZATION_TYPE_STAKE_TO_LP
 )
 
-//	var (
-//		// stakeAuthz is the authorization grant for the caller and the delegator address
-//		stakeAuthz *stakingtypes.StakeAuthorization
-//		// expiration is the expiration time of the authorization grant
-//		expiration *time.Time
-//
-//		// isCallerOrigin is true when the delegator is the same as the origin and is the caller address
-//		isCallerOrigin = delegatorHexAddr == origin && contract.CallerAddress == origin
-//		// isSCDelegator is true when the contract caller is the same as the delegator
-//		// and is not origin (it is a SmartContract)
-//		isSCDelegator = contract.CallerAddress == delegatorHexAddr && origin != contract.CallerAddress
-//	)
-//
-//	// 3 possible cases:
-//	// 1. Delegator is EOA and submits tx to stake its own funds (origin == contract_caller_addr) -> no auth needed
-//	// 2. Delegator is SC and submits tx to stake its own funds -> no auth needed (should be handled at SC level)
-//	// 3. Delegator is EOA and SC makes call to stake the EOA's funds -> auth needed
-//
-//	// no need to have authorization when the delegator is the owner of the funds
-//	if !isCallerOrigin && !isSCDelegator {
-//		// Check if the authorization grant exists for the caller and the origin
-//		stakeAuthz, expiration, err = authorization.CheckAuthzAndAllowanceForGranter(ctx, p.AuthzKeeper, contract.CallerAddress, delegatorHexAddr, &msg.Amount, DelegateMsg)
-//		if err != nil {
-//			return nil, err
-//		}
-//	}
-//
-//	// Execute the transaction using the message server
-//	msgSrv := stakingkeeper.NewMsgServerImpl(&p.stakingKeeper)
-//	if _, err = msgSrv.Delegate(ctx, msg); err != nil {
-//		return nil, err
-//	}
-//
-//	// Only update the authorization if the contract caller is different from owner of the funds
-//	if !isCallerOrigin && !isSCDelegator {
-//		if err := p.UpdateStakingAuthorization(ctx, contract.CallerAddress, delegatorHexAddr, stakeAuthz, expiration, DelegateMsg, msg); err != nil {
-//			return nil, err
-//		}
-//	}
-
 func (p Precompile) LiquidStake(
 	ctx sdk.Context,
 	origin common.Address,
@@ -151,21 +111,20 @@ func (p Precompile) LiquidStake(
 		// when calling the precompile from a smart contract
 		// This prevents the stateDB from overwriting the changed balance in the bank keeper when committing the EVM state.
 
-		// Need to scale the amount to 18 decimals for the EVM balance change entry
-		scaledAmt, err := utils.Uint256FromBigInt(evmtypes.ConvertAmountTo18DecimalsBigInt(msg.Amount.Amount.BigInt()))
+		amt, err := utils.Uint256FromBigInt(msg.Amount.Amount.BigInt())
 		if err != nil {
 			return nil, err
 		}
 
-		p.SetBalanceChangeEntries(cmn.NewBalanceChangeEntry(delHexAddr, scaledAmt, cmn.Sub))
+		p.SetBalanceChangeEntries(cmn.NewBalanceChangeEntry(delHexAddr, amt, cmn.Sub))
 	}
 
-// Emit event after successful transaction
-if err := p.EmitLiquidStakeEvent(ctx, stateDB, msg, *delegatorHexAddr); err != nil {
-    return nil, err
-}
+	// Emit event after successful transaction
+	if err := p.EmitLiquidStakeEvent(ctx, stateDB, msg, *delegatorHexAddr); err != nil {
+		return nil, err
+	}
 
-return method.Outputs.Pack(true)
+	return method.Outputs.Pack(true)
 }
 
 func (p Precompile) StakeToLP(
@@ -210,12 +169,12 @@ func (p Precompile) StakeToLP(
 		return nil, err
 	}
 
-// Emit event after successful transaction
-if err := p.EmitStakeToLPEvent(ctx, stateDB, msg, *delegatorHexAddr); err != nil {
-    return nil, err
-}
+	// Emit event after successful transaction
+	if err := p.EmitStakeToLPEvent(ctx, stateDB, msg, *delegatorHexAddr); err != nil {
+		return nil, err
+	}
 
-return method.Outputs.Pack(true)
+	return method.Outputs.Pack(true)
 }
 
 func (p Precompile) LiquidUnstake(
@@ -284,21 +243,21 @@ func (p Precompile) LiquidUnstake(
 		// when calling the precompile from a smart contract
 		// This prevents the stateDB from overwriting the changed balance in the bank keeper when committing the EVM state.
 
-		// Need to scale the amount to 18 decimals for the EVM balance change entry
-		scaledAmt, err := utils.Uint256FromBigInt(evmtypes.ConvertAmountTo18DecimalsBigInt(msg.Amount.Amount.BigInt()))
+
+		amt, err := utils.Uint256FromBigInt(msg.Amount.Amount.BigInt())
 		if err != nil {
 			return nil, err
 		}
 
-		p.SetBalanceChangeEntries(cmn.NewBalanceChangeEntry(delHexAddr, scaledAmt, cmn.Sub))
+		p.SetBalanceChangeEntries(cmn.NewBalanceChangeEntry(delHexAddr, amt, cmn.Sub))
 	}
 
 
-// Emit event after successful transaction
-if err := p.EmitLiquidUnstakeEvent(ctx, stateDB, msg, *delegatorHexAddr); err != nil {
-    return nil, err
-}
+	// Emit event after successful transaction
+	if err := p.EmitLiquidUnstakeEvent(ctx, stateDB, msg, *delegatorHexAddr); err != nil {
+		return nil, err
+	}
 
-return method.Outputs.Pack(responce.CompletionTime.Unix())
+	return method.Outputs.Pack(responce.CompletionTime.Unix())
 }
 
