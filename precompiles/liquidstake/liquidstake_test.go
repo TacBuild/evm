@@ -47,16 +47,18 @@ func CheckAuthorizationWithContext(ctx sdk.Context, ak authzkeeper.Keeper, autho
 type LiquidStakePrecompileTestSuite struct {
 	suite.Suite
 
-	nw          *network.UnitTestNetwork
-	factory     factory.TxFactory
-	grpcHandler grpc.Handler
-	keyring     testkeyring.Keyring
+	nw           *network.UnitTestNetwork
+	factory      factory.TxFactory
+	grpcHandler  grpc.Handler
+	keyring      testkeyring.Keyring
 
-	bondDenom  string
-	precompile *liquidstake.Precompile
+	bondDenom    string
+	precompile   *liquidstake.Precompile
 
 	validatorAdr common.Address
 	validator    stakingtypes.Validator
+
+	admin        testkeyring.Key
 }
 
 func TestLiquidStakePrecompileTestSuite(t *testing.T) {
@@ -92,7 +94,7 @@ func (s *LiquidStakePrecompileTestSuite) SetupTest() {
 
 	params := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
 	params.ModulePaused = false
-	params.LsmDisabled = false // Enable LSM for testing
+	params.LsmDisabled = false
 	params.LiquidBondDenom = "agatom"
 
 	// Get operator address from validator and convert to common.Address
@@ -110,6 +112,11 @@ func (s *LiquidStakePrecompileTestSuite) SetupTest() {
 		ValidatorAddress: validators[0].OperatorAddress,
 		TargetWeight:     sdkmath.NewInt(10000),
 	})
+
+	params.WhitelistAdminAddress = validators[0].OperatorAddress
+
+	s.admin = keyring.GetKey(9)
+	params.WhitelistAdminAddress = s.admin.AccAddr.String()
 
 	err = s.nw.App.LiquidStakeKeeper.SetParams(ctx, params)
 	if err != nil {
@@ -561,3 +568,107 @@ func (s *LiquidStakePrecompileTestSuite) TestQueryMethods() {
 	}
 }
 
+
+// TestRun tests the precompile's Run method.
+func (s *LiquidStakePrecompileTestSuite) TestAdminMethods() {
+	var ctx sdk.Context
+	testcases := []struct {
+		name        string
+		malleate    func() ([]byte, testkeyring.Key)
+		gas         uint64
+		expPass     bool
+		errContains string
+	}{
+		{
+			"",
+			func() ([]byte, testkeyring.Key) {
+				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
+
+				paramsAfter.ModulePaused = true
+
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateParams,
+					s.admin.Addr,
+					paramsAfter,
+				)
+				s.Require().NoError(err, "failed to pack input")
+
+				return input, s.admin
+			},
+			800000,
+			true,
+			"",
+		},
+	}
+
+	for _, tc := range testcases {
+		s.Run(tc.name, func() {
+			// setup basic test suite
+			s.SetupTest()
+			ctx = s.nw.GetContext().WithBlockTime(time.Now())
+
+			baseFee := s.nw.App.EVMKeeper.GetBaseFee(ctx)
+
+			contract := vm.NewPrecompile(vm.AccountRef(s.admin.Addr), s.precompile, common.U2560, tc.gas)
+			contractAddr := contract.Address()
+
+			var sender testkeyring.Key
+			// malleate testcase
+			contract.Input, sender = tc.malleate()
+
+			// Build and sign Ethereum transaction
+			txArgs := evmtypes.EvmTxArgs{
+				ChainID:   evmtypes.GetEthChainConfig().ChainID,
+				Nonce:     0,
+				To:        &contractAddr,
+				Amount:    nil,
+				GasLimit:  tc.gas,
+				GasPrice:  chainutil.ExampleMinGasPrices.BigInt(),
+				GasFeeCap: baseFee,
+				GasTipCap: big.NewInt(1),
+				Accesses:  &ethtypes.AccessList{},
+			}
+
+			msg, err := s.factory.GenerateGethCoreMsg(sender.Priv, txArgs)
+			s.Require().NoError(err)
+
+			// Instantiate config
+			proposerAddress := ctx.BlockHeader().ProposerAddress
+			cfg, err := s.nw.App.EVMKeeper.EVMConfig(ctx, proposerAddress)
+			s.Require().NoError(err, "failed to instantiate EVM config")
+
+			// Instantiate EVM
+			headerHash := ctx.HeaderHash()
+			stDB := statedb.New(
+				ctx,
+				s.nw.App.EVMKeeper,
+				statedb.NewEmptyTxConfig(common.BytesToHash(headerHash)),
+			)
+			evm := s.nw.App.EVMKeeper.NewEVM(
+				ctx, *msg, cfg, nil, stDB,
+			)
+
+			precompiles, found, err := s.nw.App.EVMKeeper.GetPrecompileInstance(ctx, contractAddr)
+			s.Require().NoError(err, "failed to instantiate precompile")
+			s.Require().True(found, "not found precompile")
+			evm.WithPrecompiles(precompiles.Map, precompiles.Addresses)
+
+			// Run precompiled contract
+			bz, err := s.precompile.Run(evm, contract, false)
+
+			// Check results
+			if tc.expPass {
+				s.Require().NoError(err, "expected no error when running the precompile")
+				s.Require().NotNil(bz, "expected returned bytes not to be nil")
+			} else {
+				s.Require().Error(err, "expected error to be returned when running the precompile")
+				s.Require().Nil(bz, "expected returned bytes to be nil")
+				s.Require().ErrorContains(err, tc.errContains)
+				consumed := ctx.GasMeter().GasConsumed()
+				// LessThanOrEqual because the gas is consumed before the error is returned
+				s.Require().LessOrEqual(tc.gas, consumed, "expected gas consumed to be equal or less to gas limit")
+			}
+		})
+	}
+}

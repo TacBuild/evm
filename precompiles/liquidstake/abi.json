@@ -468,6 +468,30 @@
       "inputs": [
         {
           "internalType": "address",
+          "name": "authoriy",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "isPaused",
+          "type": "bool"
+        }
+      ],
+      "name": "setModulePaused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
           "name": "delegatorAddress",
           "type": "address"
         },
@@ -551,6 +575,130 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "authority",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "liquidBondDenom",
+              "type": "string"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "validatorAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "int256",
+                  "name": "targetWeight",
+                  "type": "int256"
+                }
+              ],
+              "internalType": "struct WhitelistedValidator[]",
+              "name": "whitelistedValidators",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "int256",
+              "name": "unstakeFeeRate",
+              "type": "int256"
+            },
+            {
+              "internalType": "bool",
+              "name": "lsmDisabled",
+              "type": "bool"
+            },
+            {
+              "internalType": "int256",
+              "name": "minLiquidStakeAmount",
+              "type": "int256"
+            },
+            {
+              "internalType": "address",
+              "name": "cwLockedPoolAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "feeAccountAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "int256",
+              "name": "autocompoundFeeRate",
+              "type": "int256"
+            },
+            {
+              "internalType": "address",
+              "name": "whitelistAdminAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "modulePaused",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct LiquidStakeParams",
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "updateParams",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "authoriy",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "validatorAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "int256",
+              "name": "targetWeight",
+              "type": "int256"
+            }
+          ],
+          "internalType": "struct WhitelistedValidator[]",
+          "name": "whitelistedValidators",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "updateWhitelistedValidators",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
       "type": "function"
     }
   ],

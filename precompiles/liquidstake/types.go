@@ -266,12 +266,12 @@ func NewMsgUpdateParams(args []interface{}, denom string) (*types.MsgUpdateParam
 	Params := types.Params{
 		LiquidBondDenom:       params.LiquidBondDenom,
 		WhitelistAdminAddress: sdk.AccAddress(params.WhitelistAdminAddress.Bytes()).String(),
-		UnstakeFeeRate:        math.LegacyNewDecFromBigInt(params.UnstakeFeeRate),
+		UnstakeFeeRate:        math.LegacyNewDecFromBigIntWithPrec(params.UnstakeFeeRate, math.LegacyPrecision), //TODO: something wrong here
 		LsmDisabled:           params.LsmDisabled,
 		MinLiquidStakeAmount:  math.NewIntFromBigInt(params.MinLiquidStakeAmount),
 		CwLockedPoolAddress:   sdk.AccAddress(params.CwLockedPoolAddress.Bytes()).String(),
 		FeeAccountAddress:     sdk.AccAddress(params.FeeAccountAddress.Bytes()).String(),
-		AutocompoundFeeRate:   math.LegacyNewDecFromBigInt(params.AutocompoundFeeRate),
+		AutocompoundFeeRate:   math.LegacyNewDecFromBigIntWithPrec(params.AutocompoundFeeRate, math.LegacyPrecision),  //TODO: something wrong here
 		ModulePaused:          params.ModulePaused,
 		WhitelistedValidators: make([]types.WhitelistedValidator, len(params.WhitelistedValidators)),
 	}

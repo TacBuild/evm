@@ -117,6 +117,15 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readOnly bool) (bz [
 			case authorization.DecreaseAllowanceMethod:
 				bz, err = p.DecreaseAllowance(ctx, evm.Origin, stateDB, method, args)
 
+
+			// Transactions
+			case UpdateParams:
+				bz, err = p.UpdateParams(ctx, evm.Origin, contract, stateDB, method, args)
+			case UpdateWhitelistedValidators:
+				bz, err = p.UpdateWhitelistedValidators(ctx, evm.Origin, contract, stateDB, method, args)
+			case SetModulePaused:
+				bz, err = p.SetModulePaused(ctx, evm.Origin, contract, stateDB, method, args)
+
 			// Query methods
 			case ParamsMethod:
 				bz, err = p.Params(ctx, contract, method, args)
