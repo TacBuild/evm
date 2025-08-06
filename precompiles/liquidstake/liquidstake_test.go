@@ -667,6 +667,179 @@ func (s *LiquidStakePrecompileTestSuite) TestAdminMethods() {
 			true,
 			"",
 		},
+		// Negative test cases
+		{
+			"UpdateParams_Unauthorized_Caller",
+			func() ([]byte, testkeyring.Key) {
+				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
+				paramsAfter.ModulePaused = true
+				
+				// Use non-admin key
+				nonAdmin := s.keyring.GetKey(1)
+				
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateParams,
+					nonAdmin.Addr, // Wrong authority
+					paramsAfter,
+				)
+				s.Require().NoError(err, "failed to pack input")
+				
+				return input, nonAdmin
+			},
+			800000,
+			false,
+			"unauthorized",
+		},
+		{
+			"UpdateParams_Invalid_Arguments_Count",
+			func() ([]byte, testkeyring.Key) {
+				// Pack with wrong number of arguments (only authority, missing params)
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateParams,
+					s.admin.Addr,
+					// Missing second argument
+				)
+				s.Require().NoError(err, "failed to pack input")
+				
+				return input, s.admin
+			},
+			800000,
+			false,
+			"invalid number of arguments",
+		},
+		{
+			"UpdateWhitelistedValidators_Unauthorized_Caller",
+			func() ([]byte, testkeyring.Key) {
+				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				whitelisted := liquidstake.NewLiquidStakeWhitelistedValidatorsOutput(&paramsBeforeInternal)
+				
+				// Use non-admin key
+				nonAdmin := s.keyring.GetKey(2)
+				
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateWhitelistedValidators,
+					nonAdmin.Addr, // Wrong authority
+					whitelisted,
+				)
+				s.Require().NoError(err, "failed to pack input")
+				
+				return input, nonAdmin
+			},
+			800000,
+			false,
+			"unauthorized",
+		},
+		{
+			"UpdateWhitelistedValidators_Invalid_Arguments_Count",
+			func() ([]byte, testkeyring.Key) {
+				// Pack with wrong number of arguments
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateWhitelistedValidators,
+					s.admin.Addr,
+					// Missing validators argument
+				)
+				s.Require().NoError(err, "failed to pack input")
+				
+				return input, s.admin
+			},
+			800000,
+			false,
+			"invalid number of arguments",
+		},
+		{
+			"SetModulePaused_Unauthorized_Caller",
+			func() ([]byte, testkeyring.Key) {
+				// Use non-admin key
+				nonAdmin := s.keyring.GetKey(3)
+				
+				input, err := s.precompile.Pack(
+					liquidstake.SetModulePaused,
+					nonAdmin.Addr, // Wrong authority
+					true,
+				)
+				s.Require().NoError(err, "failed to pack input")
+				
+				return input, nonAdmin
+			},
+			800000,
+			false,
+			"unauthorized",
+		},
+		{
+			"SetModulePaused_Invalid_Arguments_Count",
+			func() ([]byte, testkeyring.Key) {
+				// Pack with wrong number of arguments
+				input, err := s.precompile.Pack(
+					liquidstake.SetModulePaused,
+					s.admin.Addr,
+					// Missing boolean argument
+				)
+				s.Require().NoError(err, "failed to pack input")
+				
+				return input, s.admin
+			},
+			800000,
+			false,
+			"invalid number of arguments",
+		},
+		{
+			"UpdateParams_Invalid_Authority_Type",
+			func() ([]byte, testkeyring.Key) {
+				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
+				paramsAfter.ModulePaused = true
+				
+				// Manually create invalid input with wrong type for authority
+				methodID := s.precompile.ABI.Methods[liquidstake.UpdateParams].ID
+				// Pack with invalid authority type (string instead of address)
+				invalidInput := append(methodID, []byte("invalid_authority_type")...)
+				
+				return invalidInput, s.admin
+			},
+			800000,
+			false,
+			"invalid type",
+		},
+		{
+			"UpdateWhitelistedValidators_Empty_Validators_List",
+			func() ([]byte, testkeyring.Key) {
+				// Create empty validators list
+				emptyValidators := []liquidstake.WhitelistedValidator{}
+				
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateWhitelistedValidators,
+					s.admin.Addr,
+					emptyValidators,
+				)
+				s.Require().NoError(err, "failed to pack input")
+				
+				return input, s.admin
+			},
+			800000,
+			false,
+			"empty validators list", // This might need adjustment based on actual error message
+		},
+		{
+			"UpdateParams_Out_Of_Gas",
+			func() ([]byte, testkeyring.Key) {
+				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
+				paramsAfter.ModulePaused = true
+				
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateParams,
+					s.admin.Addr,
+					paramsAfter,
+				)
+				s.Require().NoError(err, "failed to pack input")
+				
+				return input, s.admin
+			},
+			10000, // Insufficient gas
+			false,
+			"out of gas",
+		},
 	}
 
 	for _, tc := range testcases {
