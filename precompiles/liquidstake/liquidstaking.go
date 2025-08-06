@@ -172,6 +172,11 @@ func (Precompile) IsTransaction(method *abi.Method) bool {
 		authorization.IncreaseAllowanceMethod,
 		authorization.DecreaseAllowanceMethod:
 		return true
+	case // tx admin
+		UpdateParams,
+		UpdateWhitelistedValidators,
+		SetModulePaused:
+		return true
 	default:
 		return false
 	}

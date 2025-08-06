@@ -55,8 +55,11 @@ type LiquidStakePrecompileTestSuite struct {
 	bondDenom    string
 	precompile   *liquidstake.Precompile
 
-	validatorAdr common.Address
-	validator    stakingtypes.Validator
+	liquidValidatorAddr common.Address
+	liquidValidator    stakingtypes.Validator
+
+	ValidatorAddr common.Address
+	Validator    stakingtypes.Validator
 
 	admin        testkeyring.Key
 }
@@ -86,8 +89,8 @@ func (s *LiquidStakePrecompileTestSuite) SetupTest() {
 	s.keyring = keyring
 	s.nw = nw
 
-	validators, err := s.nw.App.StakingKeeper.GetValidators(ctx, 1)
-	s.validator = validators[0]
+	validators, err := s.nw.App.StakingKeeper.GetValidators(ctx, 2)
+	s.liquidValidator = validators[0]
 	if err != nil {
 		panic(err)
 	}
@@ -97,12 +100,11 @@ func (s *LiquidStakePrecompileTestSuite) SetupTest() {
 	params.LsmDisabled = false
 	params.LiquidBondDenom = "agatom"
 
-	// Get operator address from validator and convert to common.Address
 	valAddr, err := sdk.ValAddressFromBech32(validators[0].OperatorAddress)
 	if err != nil {
 		panic(err)
 	}
-	s.validatorAdr = common.BytesToAddress(valAddr.Bytes())
+	s.liquidValidatorAddr = common.BytesToAddress(valAddr.Bytes())
 
 	s.nw.App.LiquidStakeKeeper.SetLiquidValidator(ctx, liquidstaketypes.LiquidValidator{
 		OperatorAddress: validators[0].OperatorAddress,
@@ -114,6 +116,14 @@ func (s *LiquidStakePrecompileTestSuite) SetupTest() {
 	})
 
 	params.WhitelistAdminAddress = validators[0].OperatorAddress
+
+	// extract validator that wouldnt be liquidValidator
+	s.Validator = validators[1]
+	valAddr, err = sdk.ValAddressFromBech32(s.Validator.OperatorAddress)
+	if err != nil {
+		panic(err)
+	}
+	s.ValidatorAddr = common.BytesToAddress(valAddr.Bytes())
 
 	s.admin = keyring.GetKey(9)
 	params.WhitelistAdminAddress = s.admin.AccAddr.String()
@@ -170,6 +180,21 @@ func (s *LiquidStakePrecompileTestSuite) TestIsTransaction() {
 		},
 		{
 			authorization.AllowanceMethod,
+			s.precompile.Methods[authorization.AllowanceMethod],
+			false,
+		},
+		{
+			liquidstake.UpdateParams,
+			s.precompile.Methods[liquidstake.StakeToLPMethod],
+			true,
+		},
+		{
+			liquidstake.UpdateWhitelistedValidators,
+			s.precompile.Methods[liquidstake.LiquidUnstakeMethod],
+			true,
+		},
+		{
+			liquidstake.SetModulePaused,
 			s.precompile.Methods[authorization.AllowanceMethod],
 			false,
 		},
@@ -580,7 +605,7 @@ func (s *LiquidStakePrecompileTestSuite) TestAdminMethods() {
 		errContains string
 	}{
 		{
-			"",
+			"UpdateParams_Basic_Positive",
 			func() ([]byte, testkeyring.Key) {
 				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
 				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
@@ -591,6 +616,48 @@ func (s *LiquidStakePrecompileTestSuite) TestAdminMethods() {
 					liquidstake.UpdateParams,
 					s.admin.Addr,
 					paramsAfter,
+				)
+				s.Require().NoError(err, "failed to pack input")
+
+				return input, s.admin
+			},
+			800000,
+			true,
+			"",
+		},
+		{
+			"UpdateWhitelistedValidators_Basic_Positive",
+			func() ([]byte, testkeyring.Key) {
+				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				whitelisted := liquidstake.NewLiquidStakeWhitelistedValidatorsOutput(&paramsBeforeInternal)
+
+				whitelisted[0].TargetWeight = big.NewInt(8000)
+
+				whitelisted = append(whitelisted, liquidstake.WhitelistedValidator{
+					ValidatorAddress: s.ValidatorAddr,
+					TargetWeight:     big.NewInt(2000),
+				})
+
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateWhitelistedValidators,
+					s.admin.Addr,
+					whitelisted,
+				)
+				s.Require().NoError(err, "failed to pack input")
+
+				return input, s.admin
+			},
+			800000,
+			true,
+			"",
+		},
+		{
+			"SetModulePaused_Basic_Positive",
+			func() ([]byte, testkeyring.Key) {
+				input, err := s.precompile.Pack(
+					liquidstake.SetModulePaused,
+					s.admin.Addr,
+					false,
 				)
 				s.Require().NoError(err, "failed to pack input")
 
@@ -668,6 +735,7 @@ func (s *LiquidStakePrecompileTestSuite) TestAdminMethods() {
 				consumed := ctx.GasMeter().GasConsumed()
 				// LessThanOrEqual because the gas is consumed before the error is returned
 				s.Require().LessOrEqual(tc.gas, consumed, "expected gas consumed to be equal or less to gas limit")
+
 			}
 		})
 	}
