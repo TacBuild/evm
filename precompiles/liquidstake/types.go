@@ -175,7 +175,7 @@ func NewLiquidStakeParamsOutput(params *types.Params) LiquidStakeParams {
 
 func NewMsgLiquidStake(args []interface{}, denom string) (*common.Address, *types.MsgLiquidStake, error) {
 	if len(args) != 2 {
-		return nil, nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 6, len(args))
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 2, len(args))
 	}
 
 	delegatorAddress, ok := args[0].(common.Address)
@@ -198,7 +198,7 @@ func NewMsgLiquidStake(args []interface{}, denom string) (*common.Address, *type
 
 func NewMsgStakeToLP(args []interface{}, liquidDenom string, denom string) (*common.Address, *types.MsgStakeToLP, error) {
 	if len(args) != 4 {
-		return nil, nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 6, len(args))
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 4, len(args))
 	}
 
 	delegatorAddress, ok := args[0].(common.Address)
@@ -233,7 +233,7 @@ func NewMsgStakeToLP(args []interface{}, liquidDenom string, denom string) (*com
 
 func NewMsgLiquidUnstake(args []interface{}, denom string) (*common.Address, *types.MsgLiquidUnstake, error) {
 	if len(args) != 2 {
-		return nil, nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 6, len(args))
+		return nil, nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 2, len(args))
 	}
 
 	delegatorAddress, ok := args[0].(common.Address)
@@ -254,19 +254,14 @@ func NewMsgLiquidUnstake(args []interface{}, denom string) (*common.Address, *ty
 	return &delegatorAddress, &msg, nil
 }
 
-func NewMsgUpdateParams(args []interface{}, denom string) (*types.MsgUpdateParams, error) {
-	if len(args) != 2 {
-		return nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 6, len(args))
+func NewMsgUpdateParams(args []interface{}, denom string, authorityAddress common.Address) (*types.MsgUpdateParams, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 1, len(args))
 	}
 
-	authorityAddress, ok := args[0].(common.Address)
+	params, ok := args[0].(LiquidStakeParams)
 	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidType, "common.Address", "received", args[0])
-	}
-
-	params, ok := args[1].(LiquidStakeParams)
-	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidAmount, args[1])
+		return nil, fmt.Errorf(cmn.ErrInvalidType, "LiquidStakeParams", "received", args[0])
 	}
 
 	Params := types.Params{
@@ -295,19 +290,14 @@ func NewMsgUpdateParams(args []interface{}, denom string) (*types.MsgUpdateParam
 	return &msg, nil
 }
 
-func NewMsgUpdateWhitelistedValidators(args []interface{}, denom string) (*types.MsgUpdateWhitelistedValidators, error) {
-	if len(args) != 2 {
-		return nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 6, len(args))
+func NewMsgUpdateWhitelistedValidators(args []interface{}, denom string, authorityAddress common.Address) (*types.MsgUpdateWhitelistedValidators, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 1, len(args))
 	}
 
-	authorityAddress, ok := args[0].(common.Address)
+	whitelistedValidators, ok := args[0].([]WhitelistedValidator)
 	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidType, "common.Address", "received", args[0])
-	}
-
-	whitelistedValidators, ok := args[1].([]WhitelistedValidator)
-	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidType, "[]WhitelistedValidator", "received", args[1])
+		return nil, fmt.Errorf(cmn.ErrInvalidType, "[]WhitelistedValidator", "received", args[0])
 	}
 
 	WhitelistedValidatorsEncoded := make([]types.WhitelistedValidator, len(whitelistedValidators))
@@ -325,19 +315,14 @@ func NewMsgUpdateWhitelistedValidators(args []interface{}, denom string) (*types
 	return &msg, nil
 }
 
-func NewMsgSetModulePaused(args []interface{}, denom string) (*types.MsgSetModulePaused, error) {
-	if len(args) != 2 {
-		return nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 6, len(args))
+func NewMsgSetModulePaused(args []interface{}, denom string, authorityAddress common.Address) (*types.MsgSetModulePaused, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 1, len(args))
 	}
 
-	authorityAddress, ok := args[0].(common.Address)
+	isPaused, ok := args[0].(bool)
 	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidType, "common.Address", "received", args[0])
-	}
-
-	isPaused, ok := args[1].(bool)
-	if !ok {
-		return nil, fmt.Errorf(cmn.ErrInvalidType, "bool", "received", args[1])
+		return nil, fmt.Errorf(cmn.ErrInvalidType, "bool", "received", args[0])
 	}
 
 	msg := types.MsgSetModulePaused{

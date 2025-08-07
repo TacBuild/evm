@@ -9,15 +9,15 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 
 	"github.com/cosmos/evm/precompiles/authorization"
+	"github.com/cosmos/ibc-go/v8/modules/core/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	keeper "github.com/cosmos/evm/x/liquidstake/keeper"
 	types "github.com/cosmos/evm/x/liquidstake/types"
 
-	evmtypes "github.com/cosmos/evm/x/vm/types"
 	cmn "github.com/cosmos/evm/precompiles/common"
 	"github.com/cosmos/evm/utils"
-
+	evmtypes "github.com/cosmos/evm/x/vm/types"
 )
 
 const (
@@ -275,7 +275,25 @@ func (p Precompile) UpdateParams(
 ) ([]byte, error) {
 	bondDenom := p.liquidStakeKeeper.LiquidBondDenom(ctx)
 
-	msg, err := NewMsgUpdateParams(args, bondDenom)
+	AdminAccAddr, err := sdk.AccAddressFromBech32(p.liquidStakeKeeper.GetParams(ctx).WhitelistAdminAddress)
+	var AdminBytes []byte
+	if err == nil {
+		AdminBytes = AdminAccAddr.Bytes()
+	} else {
+		AdminValAddr, err := sdk.ValAddressFromBech32(p.liquidStakeKeeper.GetParams(ctx).WhitelistAdminAddress)
+		if err != nil {
+			return nil, err
+		}
+		AdminBytes = AdminValAddr.Bytes()
+	}
+
+	adminAddr := common.BytesToAddress(AdminBytes)
+
+	if adminAddr != contract.CallerAddress {
+		return nil, errors.ErrUnauthorized
+	}
+
+	msg, err := NewMsgUpdateParams(args, bondDenom, adminAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -300,7 +318,25 @@ func (p Precompile) UpdateWhitelistedValidators(
 ) ([]byte, error) {
 	bondDenom := p.liquidStakeKeeper.LiquidBondDenom(ctx)
 
-	msg, err := NewMsgUpdateWhitelistedValidators(args, bondDenom)
+	AdminAccAddr, err := sdk.AccAddressFromBech32(p.liquidStakeKeeper.GetParams(ctx).WhitelistAdminAddress)
+	var AdminBytes []byte
+	if err == nil {
+		AdminBytes = AdminAccAddr.Bytes()
+	} else {
+		AdminValAddr, err := sdk.ValAddressFromBech32(p.liquidStakeKeeper.GetParams(ctx).WhitelistAdminAddress)
+		if err != nil {
+			return nil, err
+		}
+		AdminBytes = AdminValAddr.Bytes()
+	}
+
+	adminAddr := common.BytesToAddress(AdminBytes)
+
+	if adminAddr != contract.CallerAddress {
+		return nil, errors.ErrUnauthorized
+	}
+
+	msg, err := NewMsgUpdateWhitelistedValidators(args, bondDenom, adminAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -325,7 +361,25 @@ func (p Precompile) SetModulePaused(
 ) ([]byte, error) {
 	bondDenom := p.liquidStakeKeeper.LiquidBondDenom(ctx)
 
-	msg, err := NewMsgSetModulePaused(args, bondDenom)
+	AdminAccAddr, err := sdk.AccAddressFromBech32(p.liquidStakeKeeper.GetParams(ctx).WhitelistAdminAddress)
+	var AdminBytes []byte
+	if err == nil {
+		AdminBytes = AdminAccAddr.Bytes()
+	} else {
+		AdminValAddr, err := sdk.ValAddressFromBech32(p.liquidStakeKeeper.GetParams(ctx).WhitelistAdminAddress)
+		if err != nil {
+			return nil, err
+		}
+		AdminBytes = AdminValAddr.Bytes()
+	}
+
+	adminAddr := common.BytesToAddress(AdminBytes)
+
+	if adminAddr != contract.CallerAddress {
+		return nil, errors.ErrUnauthorized
+	}
+
+	msg, err := NewMsgSetModulePaused(args, bondDenom, adminAddr)
 	if err != nil {
 		return nil, err
 	}

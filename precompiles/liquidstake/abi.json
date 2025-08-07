@@ -467,11 +467,6 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "authoriy",
-          "type": "address"
-        },
-        {
           "internalType": "bool",
           "name": "isPaused",
           "type": "bool"
@@ -580,11 +575,6 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "authority",
-          "type": "address"
-        },
-        {
           "components": [
             {
               "internalType": "string",
@@ -667,11 +657,6 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "address",
-          "name": "authoriy",
-          "type": "address"
-        },
         {
           "components": [
             {

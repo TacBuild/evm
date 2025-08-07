@@ -84,17 +84,14 @@ interface LiquidStakingI is authorization.AuthorizationI {
 
     // admin transactions
     function updateParams(
-        address                     authority,
         LiquidStakeParams calldata  params
     ) external returns (bool success);
 
     function updateWhitelistedValidators(
-        address                         authoriy,
         WhitelistedValidator[] calldata whitelistedValidators
     ) external returns (bool success);
 
     function setModulePaused(
-        address authoriy,
         bool    isPaused
     ) external returns (bool success);
     // functions definitions end
