@@ -122,6 +122,233 @@ func (s *LiquidStakePrecompileTestSuite) TestLiquidStakeEvent() {
 	}
 }
 
+func (s *LiquidStakePrecompileTestSuite) TestUpdateParamsEvent() {
+	var (
+		stDB *statedb.StateDB
+		ctx  sdk.Context
+	)
+	method := s.precompile.Methods[liquidstake.UpdateParams]
+	testCases := []struct {
+		name        string
+		malleate    func(admin common.Address) []interface{}
+		expErr      bool
+		errContains string
+		postCheck   func(admin common.Address)
+	}{
+		{
+			"success - UpdateParams event emitted correctly",
+			func(admin common.Address) []interface{} {
+				// Create test params with all required fields
+				params := liquidstake.LiquidStakeParams{
+					LiquidBondDenom:       "stkTAC",
+					WhitelistedValidators: []liquidstake.WhitelistedValidator{},
+					UnstakeFeeRate:        big.NewInt(1000),
+					LsmDisabled:           false,
+					MinLiquidStakeAmount:  big.NewInt(1000000),
+					CwLockedPoolAddress:   common.HexToAddress("0x1"),
+					FeeAccountAddress:     common.HexToAddress("0x2"),
+					AutocompoundFeeRate:   big.NewInt(500),
+					WhitelistAdminAddress: admin,
+					ModulePaused:          false,
+				}
+				return []interface{}{params}
+			},
+			false,
+			"",
+			func(admin common.Address) {
+				log := stDB.Logs()[0]
+				s.Require().Equal(log.Address, s.precompile.Address())
+
+				// Check event signature matches the one emitted
+				event := s.precompile.ABI.Events[liquidstake.EventTypeUpdateParams]
+				s.Require().Equal(crypto.Keccak256Hash([]byte(event.Sig)), common.HexToHash(log.Topics[0].Hex()))
+				s.Require().Equal(log.BlockNumber, uint64(ctx.BlockHeight())) //nolint:gosec
+
+				var updateParamsEvent liquidstake.EventUpdateParams
+				err := cmn.UnpackLog(s.precompile.ABI, &updateParamsEvent, liquidstake.EventTypeUpdateParams, *log)
+				s.Require().NoError(err)
+				s.Require().Equal("stkTAC", updateParamsEvent.Params.LiquidBondDenom)
+				s.Require().Equal(admin, updateParamsEvent.Params.WhitelistAdminAddress)
+				s.Require().Equal(false, updateParamsEvent.Params.ModulePaused)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			s.SetupTest() // reset
+			ctx = s.nw.GetContext()
+			stDB = s.nw.GetStateDB()
+
+			contract := vm.NewContract(vm.AccountRef(s.admin.Addr), s.precompile, common.U2560, 200000)
+			contract.CallerAddress = s.admin.Addr
+
+			_, err := s.precompile.UpdateParams(ctx, s.admin.Addr, contract, stDB, &method, tc.malleate(s.admin.Addr))
+
+			if tc.expErr {
+				s.Require().Error(err)
+				s.Require().Contains(err.Error(), tc.errContains)
+			} else {
+				s.Require().NoError(err)
+				tc.postCheck(s.admin.Addr)
+			}
+		})
+	}
+}
+
+func (s *LiquidStakePrecompileTestSuite) TestUpdateWhitelistedValidatorsEvent() {
+	var (
+		stDB *statedb.StateDB
+		ctx  sdk.Context
+	)
+	method := s.precompile.Methods[liquidstake.UpdateWhitelistedValidators]
+	testCases := []struct {
+		name        string
+		malleate    func(admin common.Address) []interface{}
+		expErr      bool
+		errContains string
+		postCheck   func(admin common.Address)
+	}{
+		{
+			"success - UpdateWhitelistedValidators event emitted correctly",
+			func(admin common.Address) []interface{} {
+				// Create test whitelisted validators
+				validator1 := liquidstake.WhitelistedValidator{
+					ValidatorAddress: common.HexToAddress("0x1234567890123456789012345678901234567890"),
+					TargetWeight:     big.NewInt(50),
+				}
+				validator2 := liquidstake.WhitelistedValidator{
+					ValidatorAddress: common.HexToAddress("0x0987654321098765432109876543210987654321"),
+					TargetWeight:     big.NewInt(50),
+				}
+				whitelistedValidators := []liquidstake.WhitelistedValidator{validator1, validator2}
+				return []interface{}{whitelistedValidators}
+			},
+			false,
+			"",
+			func(admin common.Address) {
+				log := stDB.Logs()[0]
+				s.Require().Equal(log.Address, s.precompile.Address())
+
+				// Check event signature matches the one emitted
+				event := s.precompile.ABI.Events[liquidstake.EventTypeUpdateWhitelistedValidator]
+				s.Require().Equal(crypto.Keccak256Hash([]byte(event.Sig)), common.HexToHash(log.Topics[0].Hex()))
+				s.Require().Equal(log.BlockNumber, uint64(ctx.BlockHeight())) //nolint:gosec
+
+				var updateWhitelistEvent liquidstake.EventUpdateWhitelistedValidator
+				err := cmn.UnpackLog(s.precompile.ABI, &updateWhitelistEvent, liquidstake.EventTypeUpdateWhitelistedValidator, *log)
+				s.Require().NoError(err)
+				s.Require().Equal(2, len(updateWhitelistEvent.WhitelistedValidators))
+				s.Require().Equal(common.HexToAddress("0x1234567890123456789012345678901234567890"), updateWhitelistEvent.WhitelistedValidators[0].ValidatorAddress)
+				s.Require().Equal(big.NewInt(50), updateWhitelistEvent.WhitelistedValidators[0].TargetWeight)
+				s.Require().Equal(common.HexToAddress("0x0987654321098765432109876543210987654321"), updateWhitelistEvent.WhitelistedValidators[1].ValidatorAddress)
+				s.Require().Equal(big.NewInt(50), updateWhitelistEvent.WhitelistedValidators[1].TargetWeight)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			s.SetupTest() // reset
+			ctx = s.nw.GetContext()
+			stDB = s.nw.GetStateDB()
+
+			contract := vm.NewContract(vm.AccountRef(s.admin.Addr), s.precompile, common.U2560, 200000)
+			contract.CallerAddress = s.admin.Addr
+
+			_, err := s.precompile.UpdateWhitelistedValidators(ctx, s.admin.Addr, contract, stDB, &method, tc.malleate(s.admin.Addr))
+
+			if tc.expErr {
+				s.Require().Error(err)
+				s.Require().Contains(err.Error(), tc.errContains)
+			} else {
+				s.Require().NoError(err)
+				tc.postCheck(s.admin.Addr)
+			}
+		})
+	}
+}
+
+func (s *LiquidStakePrecompileTestSuite) TestSetModulePausedEvent() {
+	var (
+		stDB *statedb.StateDB
+		ctx  sdk.Context
+	)
+	method := s.precompile.Methods[liquidstake.SetModulePaused]
+	testCases := []struct {
+		name        string
+		malleate    func(admin common.Address) []interface{}
+		expErr      bool
+		errContains string
+		postCheck   func(admin common.Address)
+	}{
+		{
+			"success - SetModulePaused event emitted correctly (pause module)",
+			func(admin common.Address) []interface{} {
+				return []interface{}{true}
+			},
+			false,
+			"",
+			func(admin common.Address) {
+				log := stDB.Logs()[0]
+				s.Require().Equal(log.Address, s.precompile.Address())
+
+				// Check event signature matches the one emitted
+				event := s.precompile.ABI.Events[liquidstake.EventTypeSetModulePaused]
+				s.Require().Equal(crypto.Keccak256Hash([]byte(event.Sig)), common.HexToHash(log.Topics[0].Hex()))
+				s.Require().Equal(log.BlockNumber, uint64(ctx.BlockHeight())) //nolint:gosec
+
+				var setModulePausedEvent liquidstake.EventSetModulePaused
+				err := cmn.UnpackLog(s.precompile.ABI, &setModulePausedEvent, liquidstake.EventTypeSetModulePaused, *log)
+				s.Require().NoError(err)
+				s.Require().Equal(true, setModulePausedEvent.IsPaused)
+			},
+		},
+		{
+			"success - SetModulePaused event emitted correctly (unpause module)",
+			func(admin common.Address) []interface{} {
+				return []interface{}{false}
+			},
+			false,
+			"",
+			func(admin common.Address) {
+				log := stDB.Logs()[0]
+				s.Require().Equal(log.Address, s.precompile.Address())
+
+				// Check event signature matches the one emitted
+				event := s.precompile.ABI.Events[liquidstake.EventTypeSetModulePaused]
+				s.Require().Equal(crypto.Keccak256Hash([]byte(event.Sig)), common.HexToHash(log.Topics[0].Hex()))
+				s.Require().Equal(log.BlockNumber, uint64(ctx.BlockHeight())) //nolint:gosec
+
+				var setModulePausedEvent liquidstake.EventSetModulePaused
+				err := cmn.UnpackLog(s.precompile.ABI, &setModulePausedEvent, liquidstake.EventTypeSetModulePaused, *log)
+				s.Require().NoError(err)
+				s.Require().Equal(false, setModulePausedEvent.IsPaused)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			s.SetupTest() // reset
+			ctx = s.nw.GetContext()
+			stDB = s.nw.GetStateDB()
+
+			contract := vm.NewContract(vm.AccountRef(s.admin.Addr), s.precompile, common.U2560, 200000)
+			contract.CallerAddress = s.admin.Addr
+
+			_, err := s.precompile.SetModulePaused(ctx, s.admin.Addr, contract, stDB, &method, tc.malleate(s.admin.Addr))
+
+			if tc.expErr {
+				s.Require().Error(err)
+				s.Require().Contains(err.Error(), tc.errContains)
+			} else {
+				s.Require().NoError(err)
+				tc.postCheck(s.admin.Addr)
+			}
+		})
+	}
+}
 //func (s *LiquidStakePrecompileTestSuite) TestStakeToLPEvent() {
 //	var (
 //		stDB *statedb.StateDB

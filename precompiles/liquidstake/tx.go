@@ -305,6 +305,11 @@ func (p Precompile) UpdateParams(
 		return nil, err
 	}
 
+	// Emit event after successful transaction
+	if err := p.EmitUpdateParamsEvent(ctx, stateDB, msg); err != nil {
+		return nil, err
+	}
+
 	return method.Outputs.Pack(true)
 }
 
@@ -348,6 +353,11 @@ func (p Precompile) UpdateWhitelistedValidators(
 		return nil, err
 	}
 
+	// Emit event after successful transaction
+	if err := p.EmitUpdateWhitelistedValidatorEvent(ctx, stateDB, msg); err != nil {
+		return nil, err
+	}
+
 	return method.Outputs.Pack(true)
 }
 
@@ -388,6 +398,11 @@ func (p Precompile) SetModulePaused(
 
 	// Execute the transaction using the message server
 	if _, err = msgSrv.SetModulePaused(ctx, msg); err != nil {
+		return nil, err
+	}
+
+	// Emit event after successful transaction
+	if err := p.EmitSetModulePausedEvent(ctx, stateDB, msg); err != nil {
 		return nil, err
 	}
 

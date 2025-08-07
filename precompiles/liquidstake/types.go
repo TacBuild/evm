@@ -78,6 +78,21 @@ type EventLiquidUnstake struct {
 	Amount           *big.Int       `json:"amount"`
 }
 
+// EventUpdateParams represents the UpdateParams event data
+type EventUpdateParams struct {
+	Params LiquidStakeParams `json:"params"`
+}
+
+// EventUpdateWhitelistedValidator represents the UpdateWhitelistedValidator event data
+type EventUpdateWhitelistedValidator struct {
+	WhitelistedValidators []WhitelistedValidator `json:"whitelistedValidators"`
+}
+
+// EventSetModulePaused represents the SetModulePaused event data
+type EventSetModulePaused struct {
+	IsPaused bool `json:"isPaused"`
+}
+
 
 func NewLiquidValidatorOutput(lvs *types.LiquidValidatorState) LiquidValidatorState {
 	valAddr, err := sdk.ValAddressFromBech32(lvs.OperatorAddress)
