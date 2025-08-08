@@ -214,14 +214,10 @@ func (s *LiquidStakePrecompileTestSuite) TestUpdateWhitelistedValidatorsEvent() 
 			func(admin common.Address) []interface{} {
 				// Create test whitelisted validators
 				validator1 := liquidstake.WhitelistedValidator{
-					ValidatorAddress: common.HexToAddress("0x1234567890123456789012345678901234567890"),
-					TargetWeight:     big.NewInt(50),
+					ValidatorAddress: s.ValidatorAddr,
+					TargetWeight:     big.NewInt(10000),
 				}
-				validator2 := liquidstake.WhitelistedValidator{
-					ValidatorAddress: common.HexToAddress("0x0987654321098765432109876543210987654321"),
-					TargetWeight:     big.NewInt(50),
-				}
-				whitelistedValidators := []liquidstake.WhitelistedValidator{validator1, validator2}
+				whitelistedValidators := []liquidstake.WhitelistedValidator{validator1}
 				return []interface{}{whitelistedValidators}
 			},
 			false,
@@ -238,11 +234,9 @@ func (s *LiquidStakePrecompileTestSuite) TestUpdateWhitelistedValidatorsEvent() 
 				var updateWhitelistEvent liquidstake.EventUpdateWhitelistedValidator
 				err := cmn.UnpackLog(s.precompile.ABI, &updateWhitelistEvent, liquidstake.EventTypeUpdateWhitelistedValidator, *log)
 				s.Require().NoError(err)
-				s.Require().Equal(2, len(updateWhitelistEvent.WhitelistedValidators))
-				s.Require().Equal(common.HexToAddress("0x1234567890123456789012345678901234567890"), updateWhitelistEvent.WhitelistedValidators[0].ValidatorAddress)
-				s.Require().Equal(big.NewInt(50), updateWhitelistEvent.WhitelistedValidators[0].TargetWeight)
-				s.Require().Equal(common.HexToAddress("0x0987654321098765432109876543210987654321"), updateWhitelistEvent.WhitelistedValidators[1].ValidatorAddress)
-				s.Require().Equal(big.NewInt(50), updateWhitelistEvent.WhitelistedValidators[1].TargetWeight)
+				s.Require().Equal(1, len(updateWhitelistEvent.WhitelistedValidators))
+				s.Require().Equal(s.ValidatorAddr, updateWhitelistEvent.WhitelistedValidators[0].ValidatorAddress)
+				s.Require().Equal(big.NewInt(10000), updateWhitelistEvent.WhitelistedValidators[0].TargetWeight)
 			},
 		},
 	}
