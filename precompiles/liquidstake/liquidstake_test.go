@@ -47,16 +47,21 @@ func CheckAuthorizationWithContext(ctx sdk.Context, ak authzkeeper.Keeper, autho
 type LiquidStakePrecompileTestSuite struct {
 	suite.Suite
 
-	nw          *network.UnitTestNetwork
-	factory     factory.TxFactory
-	grpcHandler grpc.Handler
-	keyring     testkeyring.Keyring
+	nw           *network.UnitTestNetwork
+	factory      factory.TxFactory
+	grpcHandler  grpc.Handler
+	keyring      testkeyring.Keyring
 
-	bondDenom  string
-	precompile *liquidstake.Precompile
+	bondDenom    string
+	precompile   *liquidstake.Precompile
 
-	validatorAdr common.Address
-	validator    stakingtypes.Validator
+	liquidValidatorAddr common.Address
+	liquidValidator    stakingtypes.Validator
+
+	ValidatorAddr common.Address
+	Validator    stakingtypes.Validator
+
+	admin        testkeyring.Key
 }
 
 func TestLiquidStakePrecompileTestSuite(t *testing.T) {
@@ -84,23 +89,22 @@ func (s *LiquidStakePrecompileTestSuite) SetupTest() {
 	s.keyring = keyring
 	s.nw = nw
 
-	validators, err := s.nw.App.StakingKeeper.GetValidators(ctx, 1)
-	s.validator = validators[0]
+	validators, err := s.nw.App.StakingKeeper.GetValidators(ctx, 2)
+	s.liquidValidator = validators[0]
 	if err != nil {
 		panic(err)
 	}
 
 	params := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
 	params.ModulePaused = false
-	params.LsmDisabled = false // Enable LSM for testing
+	params.LsmDisabled = false
 	params.LiquidBondDenom = "agatom"
 
-	// Get operator address from validator and convert to common.Address
 	valAddr, err := sdk.ValAddressFromBech32(validators[0].OperatorAddress)
 	if err != nil {
 		panic(err)
 	}
-	s.validatorAdr = common.BytesToAddress(valAddr.Bytes())
+	s.liquidValidatorAddr = common.BytesToAddress(valAddr.Bytes())
 
 	s.nw.App.LiquidStakeKeeper.SetLiquidValidator(ctx, liquidstaketypes.LiquidValidator{
 		OperatorAddress: validators[0].OperatorAddress,
@@ -110,6 +114,19 @@ func (s *LiquidStakePrecompileTestSuite) SetupTest() {
 		ValidatorAddress: validators[0].OperatorAddress,
 		TargetWeight:     sdkmath.NewInt(10000),
 	})
+
+	params.WhitelistAdminAddress = validators[0].OperatorAddress
+
+	// extract validator that wouldnt be liquidValidator
+	s.Validator = validators[1]
+	valAddr, err = sdk.ValAddressFromBech32(s.Validator.OperatorAddress)
+	if err != nil {
+		panic(err)
+	}
+	s.ValidatorAddr = common.BytesToAddress(valAddr.Bytes())
+
+	s.admin = keyring.GetKey(9)
+	params.WhitelistAdminAddress = s.admin.AccAddr.String()
 
 	err = s.nw.App.LiquidStakeKeeper.SetParams(ctx, params)
 	if err != nil {
@@ -163,6 +180,21 @@ func (s *LiquidStakePrecompileTestSuite) TestIsTransaction() {
 		},
 		{
 			authorization.AllowanceMethod,
+			s.precompile.Methods[authorization.AllowanceMethod],
+			false,
+		},
+		{
+			liquidstake.UpdateParams,
+			s.precompile.Methods[liquidstake.StakeToLPMethod],
+			true,
+		},
+		{
+			liquidstake.UpdateWhitelistedValidators,
+			s.precompile.Methods[liquidstake.LiquidUnstakeMethod],
+			true,
+		},
+		{
+			liquidstake.SetModulePaused,
 			s.precompile.Methods[authorization.AllowanceMethod],
 			false,
 		},
@@ -561,3 +593,242 @@ func (s *LiquidStakePrecompileTestSuite) TestQueryMethods() {
 	}
 }
 
+
+// TestRun tests the precompile's Run method.
+func (s *LiquidStakePrecompileTestSuite) TestAdminMethods() {
+	var ctx sdk.Context
+	testcases := []struct {
+		name        string
+		malleate    func() ([]byte, testkeyring.Key)
+		gas         uint64
+		expPass     bool
+		errContains string
+	}{
+		{
+			"UpdateParams_Basic_Positive",
+			func() ([]byte, testkeyring.Key) {
+				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
+
+				paramsAfter.ModulePaused = true
+
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateParams,
+					paramsAfter,
+				)
+				s.Require().NoError(err, "failed to pack input")
+
+				return input, s.admin
+			},
+			800000,
+			true,
+			"",
+		},
+		{
+			"UpdateWhitelistedValidators_Basic_Positive",
+			func() ([]byte, testkeyring.Key) {
+				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				whitelisted := liquidstake.NewLiquidStakeWhitelistedValidatorsOutput(&paramsBeforeInternal)
+
+				whitelisted[0].TargetWeight = big.NewInt(8000)
+
+				whitelisted = append(whitelisted, liquidstake.WhitelistedValidator{
+					ValidatorAddress: s.ValidatorAddr,
+					TargetWeight:     big.NewInt(2000),
+				})
+
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateWhitelistedValidators,
+					whitelisted,
+				)
+				s.Require().NoError(err, "failed to pack input")
+
+				return input, s.admin
+			},
+			800000,
+			true,
+			"",
+		},
+		{
+			"SetModulePaused_Basic_Positive",
+			func() ([]byte, testkeyring.Key) {
+				input, err := s.precompile.Pack(
+					liquidstake.SetModulePaused,
+					false,
+				)
+				s.Require().NoError(err, "failed to pack input")
+
+				return input, s.admin
+			},
+			800000,
+			true,
+			"",
+		},
+		// Negative test cases
+		{
+			"UpdateParams_Unauthorized_Caller",
+			func() ([]byte, testkeyring.Key) {
+				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
+				paramsAfter.ModulePaused = true
+
+				// Use non-admin key
+				nonAdmin := s.keyring.GetKey(1)
+
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateParams,
+					paramsAfter,
+				)
+				s.Require().NoError(err, "failed to pack input")
+
+				return input, nonAdmin
+			},
+			800000,
+			false,
+			"unauthorized",
+		},
+		{
+			"UpdateWhitelistedValidators_Unauthorized_Caller",
+			func() ([]byte, testkeyring.Key) {
+				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				whitelisted := liquidstake.NewLiquidStakeWhitelistedValidatorsOutput(&paramsBeforeInternal)
+
+				// Use non-admin key
+				nonAdmin := s.keyring.GetKey(2)
+
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateWhitelistedValidators,
+					whitelisted,
+				)
+				s.Require().NoError(err, "failed to pack input")
+
+				return input, nonAdmin
+			},
+			800000,
+			false,
+			"unauthorized",
+		},
+		{
+			"SetModulePaused_Unauthorized_Caller",
+			func() ([]byte, testkeyring.Key) {
+				// Use non-admin key
+				nonAdmin := s.keyring.GetKey(3)
+
+				input, err := s.precompile.Pack(
+					liquidstake.SetModulePaused,
+					true,
+				)
+				s.Require().NoError(err, "failed to pack input")
+
+				return input, nonAdmin
+			},
+			800000,
+			false,
+			"unauthorized",
+		},
+		{
+			"UpdateWhitelistedValidators_Empty_Validators_List",
+			func() ([]byte, testkeyring.Key) {
+				// Create empty validators list
+				emptyValidators := []liquidstake.WhitelistedValidator{}
+
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateWhitelistedValidators,
+					emptyValidators,
+				)
+				s.Require().NoError(err, "failed to pack input")
+
+				return input, s.admin
+			},
+			800000,
+			false,
+			"whitelisted validators list cannot be empty", // This might need adjustment based on actual error message
+		},
+		{
+			"UpdateParams_Out_Of_Gas",
+			func() ([]byte, testkeyring.Key) {
+				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
+				paramsAfter.ModulePaused = true
+
+				input, err := s.precompile.Pack(
+					liquidstake.UpdateParams,
+					paramsAfter,
+				)
+				s.Require().NoError(err, "failed to pack input")
+
+				return input, s.admin
+			},
+			10000, // Insufficient gas
+			false,
+			"out of gas",
+		},
+	}
+
+	for _, tc := range testcases {
+		s.Run(tc.name, func() {
+			// setup basic test suite
+			s.SetupTest()
+			ctx = s.nw.GetContext().WithBlockTime(time.Now())
+
+			baseFee := s.nw.App.EVMKeeper.GetBaseFee(ctx)
+
+			input, sender := tc.malleate()
+
+			contract := vm.NewPrecompile(vm.AccountRef(sender.Addr), s.precompile, common.U2560, tc.gas)
+			contractAddr := contract.Address()
+
+			contract.Input = input
+
+			// Build and sign Ethereum transaction
+			txArgs := evmtypes.EvmTxArgs{
+				ChainID:   evmtypes.GetEthChainConfig().ChainID,
+				Nonce:     0,
+				To:        &contractAddr,
+				Amount:    nil,
+				GasLimit:  tc.gas,
+				GasPrice:  chainutil.ExampleMinGasPrices.BigInt(),
+				GasFeeCap: baseFee,
+				GasTipCap: big.NewInt(1),
+				Accesses:  &ethtypes.AccessList{},
+			}
+
+			msg, err := s.factory.GenerateGethCoreMsg(sender.Priv, txArgs)
+			s.Require().NoError(err)
+
+			// Instantiate config
+			proposerAddress := ctx.BlockHeader().ProposerAddress
+			cfg, err := s.nw.App.EVMKeeper.EVMConfig(ctx, proposerAddress)
+			s.Require().NoError(err, "failed to instantiate EVM config")
+
+			// Instantiate EVM
+			headerHash := ctx.HeaderHash()
+			stDB := statedb.New(
+				ctx,
+				s.nw.App.EVMKeeper,
+				statedb.NewEmptyTxConfig(common.BytesToHash(headerHash)),
+			)
+			evm := s.nw.App.EVMKeeper.NewEVM(
+				ctx, *msg, cfg, nil, stDB,
+			)
+
+			precompiles, found, err := s.nw.App.EVMKeeper.GetPrecompileInstance(ctx, contractAddr)
+			s.Require().NoError(err, "failed to instantiate precompile")
+			s.Require().True(found, "not found precompile")
+			evm.WithPrecompiles(precompiles.Map, precompiles.Addresses)
+
+			// Run precompiled contract
+			bz, err := s.precompile.Run(evm, contract, false)
+
+			// Check results
+			if tc.expPass {
+				s.Require().NoError(err, "expected no error when running the precompile")
+				s.Require().NotNil(bz, "expected returned bytes not to be nil")
+			} else {
+				s.Require().Error(err, "expected error to be returned when running the precompile")
+				s.Require().Nil(bz, "expected returned bytes to be nil")
+				s.Require().ErrorContains(err, tc.errContains)
+			}
+		})
+	}
+}

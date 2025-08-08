@@ -11,9 +11,9 @@ address constant LIQUIDSTAKING_PRECOMPILE_ADDRESS = 0x00000000000000000000000000
 LiquidStakingI constant LIQUIDSTAKING_CONTRACT = LiquidStakingI(LIQUIDSTAKING_PRECOMPILE_ADDRESS);
 
 /// @dev Define all the available liquidstake methods.
-string constant MSG_LIQUID_STAKE = "/pstake.liquidstake.v1beta1.MsgLiquidStake";
-string constant MSG_LIQUID_UNSTAKE = "/pstake.liquidstake.v1beta1.MsgLiquidUnstake";
-string constant MSG_STAKE_TO_LP = "/pstake.liquidstake.v1beta1.MsgStakeToLP";
+string constant MSG_LIQUID_STAKE = "/tac.liquidstake.v1beta1.MsgLiquidStake";
+string constant MSG_LIQUID_UNSTAKE = "/tac.liquidstake.v1beta1.MsgLiquidUnstake";
+string constant MSG_STAKE_TO_LP = "/tac.liquidstake.v1beta1.MsgStakeToLP";
 
 
 struct WhitelistedValidator {
@@ -75,17 +75,32 @@ interface LiquidStakingI is authorization.AuthorizationI {
         uint256         stakedAmount,
         uint256         liquidAmount
     ) external returns (bool success);
-    // dev notes: bool success corresponds to "empty" responce in message server
 
     function liquidUnstake(
         address         delegatorAddress,
         uint256         Amount
     ) external returns (int64 completionTime);
+
+
+    // admin transactions
+    function updateParams(
+        LiquidStakeParams calldata  params
+    ) external returns (bool success);
+
+    function updateWhitelistedValidators(
+        WhitelistedValidator[] calldata whitelistedValidators
+    ) external returns (bool success);
+
+    function setModulePaused(
+        bool    isPaused
+    ) external returns (bool success);
     // functions definitions end
 
     // view functions/query definitions start
     function params() external view returns(LiquidStakeParams calldata);
+
     function liquidValidators() external view returns(LiquidValidatorState[] calldata);
+
     function states() external view returns(NetAmountState calldata);
     // view functions/query definitions end
 
@@ -107,5 +122,18 @@ interface LiquidStakingI is authorization.AuthorizationI {
         address indexed     delegatorAddress,
         uint256             amount
     );
+
+    event UpdateParams(
+        LiquidStakeParams   params
+    );
+
+    event UpdateWhitelistedValidator(
+        WhitelistedValidator[] whitelistedValidators
+    );
+
+    event SetModulePaused(
+        bool                isPaused
+    );
     // events definitions end
 }
+

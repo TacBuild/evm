@@ -132,6 +132,19 @@
       "anonymous": false,
       "inputs": [
         {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "isPaused",
+          "type": "bool"
+        }
+      ],
+      "name": "SetModulePaused",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
           "indexed": true,
           "internalType": "address",
           "name": "delegatorAddress",
@@ -157,6 +170,108 @@
         }
       ],
       "name": "StakeToLP",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "liquidBondDenom",
+              "type": "string"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "validatorAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "int256",
+                  "name": "targetWeight",
+                  "type": "int256"
+                }
+              ],
+              "internalType": "struct WhitelistedValidator[]",
+              "name": "whitelistedValidators",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "int256",
+              "name": "unstakeFeeRate",
+              "type": "int256"
+            },
+            {
+              "internalType": "bool",
+              "name": "lsmDisabled",
+              "type": "bool"
+            },
+            {
+              "internalType": "int256",
+              "name": "minLiquidStakeAmount",
+              "type": "int256"
+            },
+            {
+              "internalType": "address",
+              "name": "cwLockedPoolAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "feeAccountAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "int256",
+              "name": "autocompoundFeeRate",
+              "type": "int256"
+            },
+            {
+              "internalType": "address",
+              "name": "whitelistAdminAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "modulePaused",
+              "type": "bool"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct LiquidStakeParams",
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "UpdateParams",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "validatorAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "int256",
+              "name": "targetWeight",
+              "type": "int256"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct WhitelistedValidator[]",
+          "name": "whitelistedValidators",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "UpdateWhitelistedValidator",
       "type": "event"
     },
     {
@@ -467,6 +582,25 @@
     {
       "inputs": [
         {
+          "internalType": "bool",
+          "name": "isPaused",
+          "type": "bool"
+        }
+      ],
+      "name": "setModulePaused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address",
           "name": "delegatorAddress",
           "type": "address"
@@ -551,6 +685,120 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "liquidBondDenom",
+              "type": "string"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "validatorAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "int256",
+                  "name": "targetWeight",
+                  "type": "int256"
+                }
+              ],
+              "internalType": "struct WhitelistedValidator[]",
+              "name": "whitelistedValidators",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "int256",
+              "name": "unstakeFeeRate",
+              "type": "int256"
+            },
+            {
+              "internalType": "bool",
+              "name": "lsmDisabled",
+              "type": "bool"
+            },
+            {
+              "internalType": "int256",
+              "name": "minLiquidStakeAmount",
+              "type": "int256"
+            },
+            {
+              "internalType": "address",
+              "name": "cwLockedPoolAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "feeAccountAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "int256",
+              "name": "autocompoundFeeRate",
+              "type": "int256"
+            },
+            {
+              "internalType": "address",
+              "name": "whitelistAdminAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "modulePaused",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct LiquidStakeParams",
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "updateParams",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "validatorAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "int256",
+              "name": "targetWeight",
+              "type": "int256"
+            }
+          ],
+          "internalType": "struct WhitelistedValidator[]",
+          "name": "whitelistedValidators",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "updateWhitelistedValidators",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
       "type": "function"
     }
   ],
