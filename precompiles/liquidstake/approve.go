@@ -366,7 +366,7 @@ func (p Precompile) Allowance(
 	}
 
 	// Check if the authorization exists for the given spender
-	existingAuthz, expiration, err := authorization.CheckAuthzExists(ctx, p.AuthzKeeper, grantee, granter, typeURL)
+	existingAuthz, _, err := authorization.CheckAuthzExists(ctx, p.AuthzKeeper, grantee, granter, typeURL)
 	if err != nil {
 		return nil, err
 	}
@@ -379,8 +379,8 @@ func (p Precompile) Allowance(
 
 	// If the authorization has no limit, return max uint256
 	if liquidAuthz.MaxTokens == nil {
-		return method.Outputs.Pack(abi.MaxUint256, expiration.Unix())
+		return method.Outputs.Pack(abi.MaxUint256)
 	}
 
-	return method.Outputs.Pack(liquidAuthz.MaxTokens.Amount.BigInt(), expiration.Unix())
+	return method.Outputs.Pack(liquidAuthz.MaxTokens.Amount.BigInt())
 }
