@@ -368,7 +368,7 @@ func (p Precompile) Allowance(
 	// Check if the authorization exists for the given spender
 	existingAuthz, _, err := authorization.CheckAuthzExists(ctx, p.AuthzKeeper, grantee, granter, typeURL)
 	if err != nil {
-		return nil, err
+		return method.Outputs.Pack(0)
 	}
 
 	// Cast the authorization to a liquidstake authorization
