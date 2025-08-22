@@ -251,7 +251,7 @@ func (p Precompile) DecreaseAllowance(
 
 	for _, typeURL := range typeUrls {
 		switch typeURL {
-		case LiquidStakeMsg, LiquidUnstakeMsg:
+		case LiquidStakeMsg:
 			authzGrant, expiration, err := authorization.CheckAuthzExists(ctx, p.AuthzKeeper, grantee, caller, typeURL)
 			if err != nil {
 				return nil, err
