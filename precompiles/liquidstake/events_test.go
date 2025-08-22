@@ -139,9 +139,7 @@ func (s *LiquidStakePrecompileTestSuite) TestUpdateParamsEvent() {
 			"success - UpdateParams event emitted correctly",
 			func(admin common.Address) []interface{} {
 				// Create test params with all required fields
-				params := liquidstake.LiquidStakeParams{
-					LiquidBondDenom:       "stkTAC",
-					WhitelistedValidators: []liquidstake.WhitelistedValidator{},
+				params := liquidstake.LiquidStakeUpdatableParams{
 					UnstakeFeeRate:        big.NewInt(1000),
 					LsmDisabled:           false,
 					MinLiquidStakeAmount:  big.NewInt(1000000),
@@ -149,7 +147,6 @@ func (s *LiquidStakePrecompileTestSuite) TestUpdateParamsEvent() {
 					FeeAccountAddress:     common.HexToAddress("0x2"),
 					AutocompoundFeeRate:   big.NewInt(500),
 					WhitelistAdminAddress: admin,
-					ModulePaused:          false,
 				}
 				return []interface{}{params}
 			},
@@ -167,9 +164,7 @@ func (s *LiquidStakePrecompileTestSuite) TestUpdateParamsEvent() {
 				var updateParamsEvent liquidstake.EventUpdateParams
 				err := cmn.UnpackLog(s.precompile.ABI, &updateParamsEvent, liquidstake.EventTypeUpdateParams, *log)
 				s.Require().NoError(err)
-				s.Require().Equal("stkTAC", updateParamsEvent.Params.LiquidBondDenom)
 				s.Require().Equal(admin, updateParamsEvent.Params.WhitelistAdminAddress)
-				s.Require().Equal(false, updateParamsEvent.Params.ModulePaused)
 			},
 		},
 	}

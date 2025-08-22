@@ -38,6 +38,16 @@ type LiquidStakeParams = struct {
 	ModulePaused               bool                   `json:"modulePaused"`
 }
 
+type LiquidStakeUpdatableParams = struct {
+	UnstakeFeeRate             *big.Int               `json:"unstakeFeeRate"`
+	LsmDisabled                bool                   `json:"lsmDisabled"`
+	MinLiquidStakeAmount       *big.Int               `json:"minLiquidStakeAmount"`
+	CwLockedPoolAddress        common.Address         `json:"cwLockedPoolAddress"`
+	FeeAccountAddress          common.Address         `json:"feeAccountAddress"`
+	AutocompoundFeeRate        *big.Int               `json:"autocompoundFeeRate"`
+	WhitelistAdminAddress      common.Address         `json:"whitelistAdminAddress"`
+}
+
 type LiquidValidatorState struct {
 	OperatorAddress  common.Address   `json:"operatorAddress"`
 	Weight           *big.Int         `json:"weight"`
@@ -80,7 +90,7 @@ type EventLiquidUnstake struct {
 
 // EventUpdateParams represents the UpdateParams event data
 type EventUpdateParams struct {
-	Params LiquidStakeParams `json:"params"`
+	Params LiquidStakeUpdatableParams `json:"params"`
 }
 
 // EventUpdateWhitelistedValidator represents the UpdateWhitelistedValidator event data
@@ -188,6 +198,39 @@ func NewLiquidStakeParamsOutput(params *types.Params) LiquidStakeParams {
 	}
 }
 
+func NewLiquidStakeUpdatableParamsOutput(params *types.UpdatableParams) LiquidStakeUpdatableParams {
+	// Convert bech32 address strings to common.Address for ABI compatibility
+	var cwLockedPoolAddr, feeAccountAddr, whitelistAdminAddr common.Address
+	
+	if params.CwLockedPoolAddress != "" {
+		if accAddr, err := sdk.AccAddressFromBech32(params.CwLockedPoolAddress); err == nil {
+			cwLockedPoolAddr = common.BytesToAddress(accAddr.Bytes())
+		}
+	}
+	
+	if params.FeeAccountAddress != "" {
+		if accAddr, err := sdk.AccAddressFromBech32(params.FeeAccountAddress); err == nil {
+			feeAccountAddr = common.BytesToAddress(accAddr.Bytes())
+		}
+	}
+	
+	if params.WhitelistAdminAddress != "" {
+		if accAddr, err := sdk.AccAddressFromBech32(params.WhitelistAdminAddress); err == nil {
+			whitelistAdminAddr = common.BytesToAddress(accAddr.Bytes())
+		}
+	}
+
+	return LiquidStakeUpdatableParams{
+		UnstakeFeeRate:        params.UnstakeFeeRate.BigInt(),
+		LsmDisabled:           params.LsmDisabled,
+		MinLiquidStakeAmount:  params.MinLiquidStakeAmount.BigInt(),
+		CwLockedPoolAddress:   cwLockedPoolAddr,
+		FeeAccountAddress:     feeAccountAddr,
+		AutocompoundFeeRate:   params.AutocompoundFeeRate.BigInt(),
+		WhitelistAdminAddress: whitelistAdminAddr,
+	}
+}
+
 func NewMsgLiquidStake(args []interface{}, denom string) (*common.Address, *types.MsgLiquidStake, error) {
 	if len(args) != 2 {
 		return nil, nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 2, len(args))
@@ -274,13 +317,12 @@ func NewMsgUpdateParams(args []interface{}, denom string, authorityAddress commo
 		return nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 1, len(args))
 	}
 
-	params, ok := args[0].(LiquidStakeParams)
+	params, ok := args[0].(LiquidStakeUpdatableParams)
 	if !ok {
 		return nil, fmt.Errorf(cmn.ErrInvalidType, "LiquidStakeParams", "received", args[0])
 	}
 
-	Params := types.Params{
-		LiquidBondDenom:       params.LiquidBondDenom,
+	Params := types.UpdatableParams{
 		WhitelistAdminAddress: sdk.AccAddress(params.WhitelistAdminAddress.Bytes()).String(),
 		UnstakeFeeRate:        math.LegacyNewDecFromBigIntWithPrec(params.UnstakeFeeRate, math.LegacyPrecision),
 		LsmDisabled:           params.LsmDisabled,
@@ -288,13 +330,6 @@ func NewMsgUpdateParams(args []interface{}, denom string, authorityAddress commo
 		CwLockedPoolAddress:   sdk.AccAddress(params.CwLockedPoolAddress.Bytes()).String(),
 		FeeAccountAddress:     sdk.AccAddress(params.FeeAccountAddress.Bytes()).String(),
 		AutocompoundFeeRate:   math.LegacyNewDecFromBigIntWithPrec(params.AutocompoundFeeRate, math.LegacyPrecision),
-		ModulePaused:          params.ModulePaused,
-		WhitelistedValidators: make([]types.WhitelistedValidator, len(params.WhitelistedValidators)),
-	}
-
-	for i, whitelisted := range params.WhitelistedValidators {
-		Params.WhitelistedValidators[i].ValidatorAddress = sdk.ValAddress(whitelisted.ValidatorAddress.Bytes()).String()
-		Params.WhitelistedValidators[i].TargetWeight = math.NewIntFromBigInt(whitelisted.TargetWeight)
 	}
 
 	msg := types.MsgUpdateParams{
