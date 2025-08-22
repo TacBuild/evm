@@ -8,7 +8,7 @@ import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	
+
 	"github.com/cosmos/evm/x/liquidstake/types"
 )
 
@@ -221,13 +221,12 @@ func (k Keeper) AutocompoundStakingRewards(ctx sdk.Context, whitelistedValsMap t
 
 	totalSupply := k.bankKeeper.GetSupply(ctx, bondDenom).Amount
 	bondedTokens := k.bankKeeper.GetBalance(ctx, k.stakingKeeper.GetBondedPool(ctx).GetAddress(), bondDenom).Amount
-	//inflation := k.mintKeeper.GetMinter(ctx).Inflation
+	// inflation := k.mintKeeper.GetMinter(ctx).Inflation
 	minter, err := k.mintKeeper.Minter.Get(ctx)
 	if err != nil {
 		return err
 	}
 	inflation := minter.Inflation
-
 
 	// calculate the hourly APY
 	bondRatio := math.LegacyDec(bondedTokens).Quo(math.LegacyDec(totalSupply))
@@ -273,13 +272,7 @@ func (k Keeper) AutocompoundStakingRewards(ctx sdk.Context, whitelistedValsMap t
 	delegableAmount := autoCompoundableAmount.Sub(autocompoundFee.Amount)
 	err = k.LiquidDelegate(cachedCtx, types.LiquidStakeProxyAcc, activeVals, delegableAmount, whitelistedValsMap)
 	if err != nil {
-		k.Logger(ctx).Error(
-			"failed to re-stake the accumulated rewards",
-			types.ErrorKeyVal,
-			err,
-		)
-		return nil
-		// skip errors as they might occur due to reaching global liquid cap
+		return fmt.Errorf("failted to re-stake the accumulated rewards: %w", err)
 	}
 	writeCache()
 
@@ -287,12 +280,7 @@ func (k Keeper) AutocompoundStakingRewards(ctx sdk.Context, whitelistedValsMap t
 	feeAccountAddr := sdk.MustAccAddressFromBech32(params.FeeAccountAddress)
 	err = k.bankKeeper.SendCoins(ctx, types.LiquidStakeProxyAcc, feeAccountAddr, sdk.NewCoins(autocompoundFee))
 	if err != nil {
-		k.Logger(ctx).Error(
-			"failed to send autocompound fee to fee account",
-			types.ErrorKeyVal,
-			err,
-		)
-		return nil
+		return fmt.Errorf("failed to send autocompound fee to fee account: %w", err)
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{

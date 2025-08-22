@@ -1,8 +1,10 @@
 package keeper
 
 import (
-	epochstypes "github.com/cosmos/evm/x/epochs/types"
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	epochstypes "github.com/cosmos/evm/x/epochs/types"
 
 	liquidstake "github.com/cosmos/evm/x/liquidstake/types"
 )
@@ -29,13 +31,15 @@ func (h EpochHooks) AfterEpochEnd(_ sdk.Context, _ string, _ int64) error {
 func (k Keeper) BeforeEpochStart(ctx sdk.Context, epochIdentifier string, _ int64) error {
 	if !k.GetParams(ctx).ModulePaused {
 		// Update the liquid validator set at the start of each epoch
-		if epochIdentifier == liquidstake.AutocompoundEpoch {
-			k.AutocompoundStakingRewards(ctx, liquidstake.GetWhitelistedValsMap(k.GetParams(ctx).WhitelistedValidators))
-		}
-
-		if epochIdentifier == liquidstake.RebalanceEpoch {
+		switch epochIdentifier {
+		case liquidstake.AutocompoundEpoch:
+			return k.AutocompoundStakingRewards(ctx, liquidstake.GetWhitelistedValsMap(k.GetParams(ctx).WhitelistedValidators))
+		case liquidstake.RebalanceEpoch:
 			// return value of UpdateLiquidValidatorSet is useful only in testing
 			_ = k.UpdateLiquidValidatorSet(ctx, true)
+		case "week":
+		default:
+			return fmt.Errorf("unknown epoch identifier: %s", epochIdentifier)
 		}
 	}
 

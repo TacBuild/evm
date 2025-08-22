@@ -5,6 +5,7 @@ import (
 	"sort"
 	"time"
 
+	"cosmossdk.io/errors"
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
@@ -23,7 +24,7 @@ func (k Keeper) LiquidBondDenom(ctx sdk.Context) string {
 }
 
 func (k Keeper) BondDenom(ctx sdk.Context) (string, error) {
-	 return k.stakingKeeper.BondDenom(ctx)
+	return k.stakingKeeper.BondDenom(ctx)
 }
 
 // GetNetAmountState calculates the sum of bondedDenom balance, total delegation tokens(slash applied LiquidTokens), total remaining reward of types.LiquidStakeProxyAcc
@@ -48,7 +49,6 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas *types.NetAmountState, e
 	}
 
 	balance, err := k.GetProxyAccBalance(ctx, types.LiquidStakeProxyAcc)
-
 	if err != nil {
 		return nil, err
 	}
@@ -773,7 +773,6 @@ func (k Keeper) LiquidUnstake(
 	bondDenom, err := k.stakingKeeper.BondDenom(ctx)
 	if err != nil {
 		return time.Time{}, math.ZeroInt(), []stakingtypes.UnbondingDelegation{}, math.ZeroInt(), err
-
 	}
 	if params.ModulePaused {
 		return time.Time{}, math.ZeroInt(), []stakingtypes.UnbondingDelegation{}, math.ZeroInt(), types.ErrModulePaused
@@ -1021,26 +1020,31 @@ func (k Keeper) CheckDelegationStates(ctx sdk.Context, proxyAcc sdk.AccAddress) 
 
 	// Cache ctx for calculate rewards
 	cachedCtx, _ := ctx.CacheContext()
-	k.stakingKeeper.IterateDelegations(
+	var iterationErr error
+	err = k.stakingKeeper.IterateDelegations(
 		cachedCtx, proxyAcc,
 		func(_ int64, del stakingtypes.DelegationI) (stop bool) {
 			valAddr := del.GetValidatorAddr()
 			valAddrObj, parseErr := sdk.ValAddressFromBech32(valAddr)
 			if parseErr != nil {
-				return false
+				iterationErr = errors.Wrapf(err, "failed to convert val address from bech32")
+				return true
 			}
 
 			val, err := k.stakingKeeper.Validator(cachedCtx, valAddrObj)
 			if err != nil {
-				return false
+				iterationErr = errors.Wrapf(err, "failed to get validator")
+				return true
 			}
 			endingPeriod, err := k.distrKeeper.IncrementValidatorPeriod(cachedCtx, val)
 			if err != nil {
-				return false
+				iterationErr = errors.Wrapf(err, "failed to increment validator period")
+				return true
 			}
 			delReward, err := k.distrKeeper.CalculateDelegationRewards(cachedCtx, val, del, endingPeriod)
 			if err != nil {
-				return false
+				iterationErr = errors.Wrapf(err, "failed to calcualte delegation rewards")
+				return true
 			}
 			delShares := del.GetShares()
 			if delShares.IsPositive() {
@@ -1052,6 +1056,11 @@ func (k Keeper) CheckDelegationStates(ctx sdk.Context, proxyAcc sdk.AccAddress) 
 			return false
 		},
 	)
+	if err != nil {
+		return math.LegacyZeroDec(), math.LegacyZeroDec(), math.ZeroInt(), errors.Wrapf(err, "failed to iterate delegations")
+	} else if iterationErr != nil {
+		return math.LegacyZeroDec(), math.LegacyZeroDec(), math.ZeroInt(), iterationErr
+	}
 
 	return totalRewards, totalDelShares, totalLiquidTokens, nil
 }
