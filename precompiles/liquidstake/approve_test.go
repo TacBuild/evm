@@ -2,9 +2,9 @@ package liquidstake_test
 
 import (
 	"fmt"
+	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
 	"math/big"
 	"time"
-	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
 
 	"cosmossdk.io/math"
 
@@ -140,8 +140,6 @@ func (s *LiquidStakePrecompileTestSuite) TestDecreaseAllowance() {
 		})
 	}
 }
-
-
 
 // ApproveAndCheckAuthz is a helper function to approve a given authorization method and check if the authorization was created.
 func (s *LiquidStakePrecompileTestSuite) ApproveAndCheckAuthz(method abi.Method, granter, grantee testkeyring.Key, msgType string, amount *big.Int) {
@@ -459,7 +457,6 @@ func (s *LiquidStakePrecompileTestSuite) TestIncreaseAllowance() {
 	}
 }
 
-
 func (s *LiquidStakePrecompileTestSuite) TestApprove() {
 	var (
 		ctx  sdk.Context
@@ -707,5 +704,3 @@ func (s *LiquidStakePrecompileTestSuite) TestApprove() {
 		})
 	}
 }
-
-

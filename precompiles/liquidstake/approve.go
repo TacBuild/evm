@@ -24,7 +24,7 @@ var (
 	// LiquidUnstakeMsg defines the authorization type for MsgLiquidUnstake
 	LiquidUnstakeMsg = sdk.MsgTypeURL(&liquidtypes.MsgLiquidUnstake{})
 
-	// We do not allow StakeToLp delegation through smart-contract, 
+	// We do not allow StakeToLp delegation through smart-contract,
 	// because current authorization interface doesnt provide opportunity to pass more arguments required for this delegation
 	// It is still possible to delegate through native cosmos transaction, or call StakeToLP from smart-contract directly
 )
@@ -217,7 +217,6 @@ func (p Precompile) IncreaseAllowance(
 			if err = p.increaseAllowance(ctx, grantee, caller, LiquidCoin, typeURL); err != nil {
 				return nil, err
 			}
-
 
 		default:
 			return nil, fmt.Errorf(cmn.ErrInvalidMsgType, "liquidstake", typeURL)

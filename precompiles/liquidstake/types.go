@@ -26,34 +26,34 @@ type WhitelistedValidator = struct {
 }
 
 type LiquidStakeParams = struct {
-	LiquidBondDenom            string                 `json:"liquidBondDenom"`
-	WhitelistedValidators      []WhitelistedValidator `json:"whitelistedValidators"`
-	UnstakeFeeRate             *big.Int               `json:"unstakeFeeRate"`
-	LsmDisabled                bool                   `json:"lsmDisabled"`
-	MinLiquidStakeAmount       *big.Int               `json:"minLiquidStakeAmount"`
-	CwLockedPoolAddress        common.Address         `json:"cwLockedPoolAddress"`
-	FeeAccountAddress          common.Address         `json:"feeAccountAddress"`
-	AutocompoundFeeRate        *big.Int               `json:"autocompoundFeeRate"`
-	WhitelistAdminAddress      common.Address         `json:"whitelistAdminAddress"`
-	ModulePaused               bool                   `json:"modulePaused"`
+	LiquidBondDenom       string                 `json:"liquidBondDenom"`
+	WhitelistedValidators []WhitelistedValidator `json:"whitelistedValidators"`
+	UnstakeFeeRate        *big.Int               `json:"unstakeFeeRate"`
+	LsmDisabled           bool                   `json:"lsmDisabled"`
+	MinLiquidStakeAmount  *big.Int               `json:"minLiquidStakeAmount"`
+	CwLockedPoolAddress   common.Address         `json:"cwLockedPoolAddress"`
+	FeeAccountAddress     common.Address         `json:"feeAccountAddress"`
+	AutocompoundFeeRate   *big.Int               `json:"autocompoundFeeRate"`
+	WhitelistAdminAddress common.Address         `json:"whitelistAdminAddress"`
+	ModulePaused          bool                   `json:"modulePaused"`
 }
 
 type LiquidStakeUpdatableParams = struct {
-	UnstakeFeeRate             *big.Int               `json:"unstakeFeeRate"`
-	LsmDisabled                bool                   `json:"lsmDisabled"`
-	MinLiquidStakeAmount       *big.Int               `json:"minLiquidStakeAmount"`
-	CwLockedPoolAddress        common.Address         `json:"cwLockedPoolAddress"`
-	FeeAccountAddress          common.Address         `json:"feeAccountAddress"`
-	AutocompoundFeeRate        *big.Int               `json:"autocompoundFeeRate"`
-	WhitelistAdminAddress      common.Address         `json:"whitelistAdminAddress"`
+	UnstakeFeeRate        *big.Int       `json:"unstakeFeeRate"`
+	LsmDisabled           bool           `json:"lsmDisabled"`
+	MinLiquidStakeAmount  *big.Int       `json:"minLiquidStakeAmount"`
+	CwLockedPoolAddress   common.Address `json:"cwLockedPoolAddress"`
+	FeeAccountAddress     common.Address `json:"feeAccountAddress"`
+	AutocompoundFeeRate   *big.Int       `json:"autocompoundFeeRate"`
+	WhitelistAdminAddress common.Address `json:"whitelistAdminAddress"`
 }
 
 type LiquidValidatorState struct {
-	OperatorAddress  common.Address   `json:"operatorAddress"`
-	Weight           *big.Int         `json:"weight"`
-	Status           uint8            `json:"status"`
-	DelShares        *big.Int         `json:"delShares"`
-	LiquidTokens     *big.Int         `json:"liquidTokens"`
+	OperatorAddress common.Address `json:"operatorAddress"`
+	Weight          *big.Int       `json:"weight"`
+	Status          uint8          `json:"status"`
+	DelShares       *big.Int       `json:"delShares"`
+	LiquidTokens    *big.Int       `json:"liquidTokens"`
 }
 
 type NetAmount struct {
@@ -66,7 +66,6 @@ type NetAmount struct {
 	TotalUnbondingBalance *big.Int `json:"totalUnbondingBalance"`
 	ProxyAccBalance       *big.Int `json:"proxyAccBalance"`
 }
-
 
 // EventLiquidStake represents the LiquidStake event data
 type EventLiquidStake struct {
@@ -103,7 +102,6 @@ type EventSetModulePaused struct {
 	IsPaused bool `json:"isPaused"`
 }
 
-
 func NewLiquidValidatorOutput(lvs *types.LiquidValidatorState) LiquidValidatorState {
 	valAddr, err := sdk.ValAddressFromBech32(lvs.OperatorAddress)
 	var validatorAddr common.Address
@@ -113,10 +111,10 @@ func NewLiquidValidatorOutput(lvs *types.LiquidValidatorState) LiquidValidatorSt
 
 	return LiquidValidatorState{
 		OperatorAddress: validatorAddr,
-		Weight:           lvs.Weight.BigInt(),
-		Status:           uint8(lvs.Status),
-		DelShares:        lvs.DelShares.BigInt(),
-		LiquidTokens:     lvs.LiquidTokens.BigInt(),
+		Weight:          lvs.Weight.BigInt(),
+		Status:          uint8(lvs.Status),
+		DelShares:       lvs.DelShares.BigInt(),
+		LiquidTokens:    lvs.LiquidTokens.BigInt(),
 	}
 }
 
@@ -127,7 +125,6 @@ func PackLiquidValidatorOutputs(lvs []types.LiquidValidatorState, args abi.Argum
 	}
 	return args.Pack(outputs)
 }
-
 
 func NewNetAmount(nas *types.NetAmountState) NetAmount {
 	return NetAmount{
@@ -159,23 +156,22 @@ func NewLiquidStakeWhitelistedValidatorsOutput(params *types.Params) []Whitelist
 	return whitelistedValidators
 }
 
-
 func NewLiquidStakeParamsOutput(params *types.Params) LiquidStakeParams {
 	// Convert bech32 address strings to common.Address for ABI compatibility
 	var cwLockedPoolAddr, feeAccountAddr, whitelistAdminAddr common.Address
-	
+
 	if params.CwLockedPoolAddress != "" {
 		if accAddr, err := sdk.AccAddressFromBech32(params.CwLockedPoolAddress); err == nil {
 			cwLockedPoolAddr = common.BytesToAddress(accAddr.Bytes())
 		}
 	}
-	
+
 	if params.FeeAccountAddress != "" {
 		if accAddr, err := sdk.AccAddressFromBech32(params.FeeAccountAddress); err == nil {
 			feeAccountAddr = common.BytesToAddress(accAddr.Bytes())
 		}
 	}
-	
+
 	if params.WhitelistAdminAddress != "" {
 		if accAddr, err := sdk.AccAddressFromBech32(params.WhitelistAdminAddress); err == nil {
 			whitelistAdminAddr = common.BytesToAddress(accAddr.Bytes())
@@ -201,19 +197,19 @@ func NewLiquidStakeParamsOutput(params *types.Params) LiquidStakeParams {
 func NewLiquidStakeUpdatableParamsOutput(params *types.UpdatableParams) LiquidStakeUpdatableParams {
 	// Convert bech32 address strings to common.Address for ABI compatibility
 	var cwLockedPoolAddr, feeAccountAddr, whitelistAdminAddr common.Address
-	
+
 	if params.CwLockedPoolAddress != "" {
 		if accAddr, err := sdk.AccAddressFromBech32(params.CwLockedPoolAddress); err == nil {
 			cwLockedPoolAddr = common.BytesToAddress(accAddr.Bytes())
 		}
 	}
-	
+
 	if params.FeeAccountAddress != "" {
 		if accAddr, err := sdk.AccAddressFromBech32(params.FeeAccountAddress); err == nil {
 			feeAccountAddr = common.BytesToAddress(accAddr.Bytes())
 		}
 	}
-	
+
 	if params.WhitelistAdminAddress != "" {
 		if accAddr, err := sdk.AccAddressFromBech32(params.WhitelistAdminAddress); err == nil {
 			whitelistAdminAddr = common.BytesToAddress(accAddr.Bytes())
@@ -382,4 +378,3 @@ func NewMsgSetModulePaused(args []interface{}, denom string, authorityAddress co
 
 	return &msg, nil
 }
-
