@@ -44,7 +44,7 @@ func coinToLiquidCoin(coin *sdk.Coin, liquidDenom string) *sdk.Coin {
 // Returns a boolean value indicating whether the operation succeeded.
 func (p Precompile) Approve(
 	ctx sdk.Context,
-	origin common.Address,
+	caller common.Address,
 	stateDB vm.StateDB,
 	method *abi.Method,
 	args []interface{},
@@ -62,13 +62,13 @@ func (p Precompile) Approve(
 	for _, typeURL := range typeURLs {
 		switch typeURL {
 		case LiquidStakeMsg:
-			if err = p.grantOrDeleteLiquidStakeAuthz(ctx, grantee, origin, coin, typeURL); err != nil {
+			if err = p.grantOrDeleteLiquidStakeAuthz(ctx, grantee, caller, coin, typeURL); err != nil {
 				return nil, err
 			}
 		case LiquidUnstakeMsg:
 			LiquidCoin := coinToLiquidCoin(coin, p.liquidStakeKeeper.LiquidBondDenom(ctx))
 
-			if err = p.grantOrDeleteLiquidStakeAuthz(ctx, grantee, origin, LiquidCoin, typeURL); err != nil {
+			if err = p.grantOrDeleteLiquidStakeAuthz(ctx, grantee, caller, LiquidCoin, typeURL); err != nil {
 				return nil, err
 			}
 
@@ -79,7 +79,7 @@ func (p Precompile) Approve(
 
 	// TODO: do we want to emit one approval for all typeUrls, or one approval for each typeUrl?
 	// NOTE: This might have gas implications as we are emitting a slice of strings
-	if err := p.EmitApprovalEvent(ctx, stateDB, grantee, origin, coin, typeURLs); err != nil {
+	if err := p.EmitApprovalEvent(ctx, stateDB, grantee, caller, coin, typeURLs); err != nil {
 		return nil, err
 	}
 
@@ -89,7 +89,7 @@ func (p Precompile) Approve(
 // Revoke removes the authorization grants given in the typeUrls for a given granter to a given grantee.
 func (p Precompile) Revoke(
 	ctx sdk.Context,
-	origin common.Address,
+	caller common.Address,
 	stateDB vm.StateDB,
 	method *abi.Method,
 	args []interface{},
@@ -102,7 +102,7 @@ func (p Precompile) Revoke(
 	for _, typeURL := range typeURLs {
 		switch typeURL {
 		case LiquidStakeMsg, LiquidUnstakeMsg:
-			if err = p.AuthzKeeper.DeleteGrant(ctx, grantee.Bytes(), origin.Bytes(), typeURL); err != nil {
+			if err = p.AuthzKeeper.DeleteGrant(ctx, grantee.Bytes(), caller.Bytes(), typeURL); err != nil {
 				return nil, err
 			}
 		default:
@@ -117,7 +117,7 @@ func (p Precompile) Revoke(
 		ContractAddr:   p.Address(),
 		ContractEvents: p.ABI.Events,
 		EventData: authorization.EventRevocation{
-			Granter:  origin,
+			Granter:  caller,
 			Grantee:  grantee,
 			TypeUrls: typeURLs,
 		},
@@ -190,7 +190,7 @@ func (p Precompile) UpdateLiquidStakeAuthorization(
 // IncreaseAllowance increases the allowance of grantee over the caller's tokens by the amount.
 func (p Precompile) IncreaseAllowance(
 	ctx sdk.Context,
-	origin common.Address,
+	caller common.Address,
 	stateDB vm.StateDB,
 	method *abi.Method,
 	args []interface{},
@@ -208,13 +208,13 @@ func (p Precompile) IncreaseAllowance(
 	for _, typeURL := range typeUrls {
 		switch typeURL {
 		case LiquidStakeMsg:
-			if err = p.increaseAllowance(ctx, grantee, origin, coin, typeURL); err != nil {
+			if err = p.increaseAllowance(ctx, grantee, caller, coin, typeURL); err != nil {
 				return nil, err
 			}
 		case LiquidUnstakeMsg:
 			LiquidCoin := coinToLiquidCoin(coin, p.liquidStakeKeeper.LiquidBondDenom(ctx))
 
-			if err = p.increaseAllowance(ctx, grantee, origin, LiquidCoin, typeURL); err != nil {
+			if err = p.increaseAllowance(ctx, grantee, caller, LiquidCoin, typeURL); err != nil {
 				return nil, err
 			}
 
@@ -224,7 +224,7 @@ func (p Precompile) IncreaseAllowance(
 		}
 	}
 
-	if err := p.EmitAllowanceChangeEvent(ctx, stateDB, grantee, origin, typeUrls); err != nil {
+	if err := p.EmitAllowanceChangeEvent(ctx, stateDB, grantee, caller, typeUrls); err != nil {
 		return nil, err
 	}
 
@@ -234,7 +234,7 @@ func (p Precompile) IncreaseAllowance(
 // DecreaseAllowance decreases the allowance of grantee over the caller's tokens by the amount.
 func (p Precompile) DecreaseAllowance(
 	ctx sdk.Context,
-	origin common.Address,
+	caller common.Address,
 	stateDB vm.StateDB,
 	method *abi.Method,
 	args []interface{},
@@ -252,7 +252,7 @@ func (p Precompile) DecreaseAllowance(
 	for _, typeURL := range typeUrls {
 		switch typeURL {
 		case LiquidStakeMsg, LiquidUnstakeMsg:
-			authzGrant, expiration, err := authorization.CheckAuthzExists(ctx, p.AuthzKeeper, grantee, origin, typeURL)
+			authzGrant, expiration, err := authorization.CheckAuthzExists(ctx, p.AuthzKeeper, grantee, caller, typeURL)
 			if err != nil {
 				return nil, err
 			}
@@ -262,14 +262,14 @@ func (p Precompile) DecreaseAllowance(
 				return nil, errorsmod.Wrapf(authz.ErrUnknownAuthorizationType, "expected: *types.LiquidStakeAuthorization, received: %T", authzGrant)
 			}
 
-			if err = p.decreaseAllowance(ctx, grantee, origin, coin, liquidAuthz, expiration); err != nil {
+			if err = p.decreaseAllowance(ctx, grantee, caller, coin, liquidAuthz, expiration); err != nil {
 				return nil, err
 			}
 
 		case LiquidUnstakeMsg:
 			LiquidCoin := coinToLiquidCoin(coin, p.liquidStakeKeeper.LiquidBondDenom(ctx))
 
-			authzGrant, expiration, err := authorization.CheckAuthzExists(ctx, p.AuthzKeeper, grantee, origin, typeURL)
+			authzGrant, expiration, err := authorization.CheckAuthzExists(ctx, p.AuthzKeeper, grantee, caller, typeURL)
 			if err != nil {
 				return nil, err
 			}
@@ -279,7 +279,7 @@ func (p Precompile) DecreaseAllowance(
 				return nil, errorsmod.Wrapf(authz.ErrUnknownAuthorizationType, "expected: *types.LiquidStakeAuthorization, received: %T", authzGrant)
 			}
 
-			if err = p.decreaseAllowance(ctx, grantee, origin, LiquidCoin, liquidAuthz, expiration); err != nil {
+			if err = p.decreaseAllowance(ctx, grantee, caller, LiquidCoin, liquidAuthz, expiration); err != nil {
 				return nil, err
 			}
 
@@ -288,7 +288,7 @@ func (p Precompile) DecreaseAllowance(
 		}
 	}
 
-	if err := p.EmitAllowanceChangeEvent(ctx, stateDB, grantee, origin, typeUrls); err != nil {
+	if err := p.EmitAllowanceChangeEvent(ctx, stateDB, grantee, caller, typeUrls); err != nil {
 		return nil, err
 	}
 
