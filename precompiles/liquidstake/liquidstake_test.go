@@ -4,10 +4,11 @@ import (
 	"time"
 
 	sdkmath "cosmossdk.io/math"
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	"github.com/cosmos/evm/precompiles/authorization"
 	liquidstake "github.com/cosmos/evm/precompiles/liquidstake"
+	"github.com/cosmos/evm/x/liquidstake/types"
 	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
-	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 
 	"math/big"
 
@@ -607,10 +608,18 @@ func (s *LiquidStakePrecompileTestSuite) TestAdminMethods() {
 		{
 			"UpdateParams_Basic_Positive",
 			func() ([]byte, testkeyring.Key) {
-				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
-				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
+				params := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				updatableParams := types.UpdatableParams {
+					UnstakeFeeRate : params.UnstakeFeeRate,
+					LsmDisabled : true,
+					MinLiquidStakeAmount : params.MinLiquidStakeAmount,
+					CwLockedPoolAddress : params.CwLockedPoolAddress,
+					FeeAccountAddress : params.FeeAccountAddress,
+					AutocompoundFeeRate : params.AutocompoundFeeRate,
+					WhitelistAdminAddress : params.WhitelistAdminAddress,
+				}
 
-				paramsAfter.ModulePaused = true
+				paramsAfter := liquidstake.NewLiquidStakeUpdatableParamsOutput(&updatableParams)
 
 				input, err := s.precompile.Pack(
 					liquidstake.UpdateParams,
@@ -668,9 +677,18 @@ func (s *LiquidStakePrecompileTestSuite) TestAdminMethods() {
 		{
 			"UpdateParams_Unauthorized_Caller",
 			func() ([]byte, testkeyring.Key) {
-				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
-				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
-				paramsAfter.ModulePaused = true
+				params := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				updatableParams := types.UpdatableParams {
+					UnstakeFeeRate : params.UnstakeFeeRate,
+					LsmDisabled : true,
+					MinLiquidStakeAmount : params.MinLiquidStakeAmount,
+					CwLockedPoolAddress : params.CwLockedPoolAddress,
+					FeeAccountAddress : params.FeeAccountAddress,
+					AutocompoundFeeRate : params.AutocompoundFeeRate,
+					WhitelistAdminAddress : params.WhitelistAdminAddress,
+				}
+
+				paramsAfter := liquidstake.NewLiquidStakeUpdatableParamsOutput(&updatableParams)
 
 				// Use non-admin key
 				nonAdmin := s.keyring.GetKey(1)
@@ -747,9 +765,18 @@ func (s *LiquidStakePrecompileTestSuite) TestAdminMethods() {
 		{
 			"UpdateParams_Out_Of_Gas",
 			func() ([]byte, testkeyring.Key) {
-				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
-				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
-				paramsAfter.ModulePaused = true
+				params := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				updatableParams := types.UpdatableParams {
+					UnstakeFeeRate : params.UnstakeFeeRate,
+					LsmDisabled : true,
+					MinLiquidStakeAmount : params.MinLiquidStakeAmount,
+					CwLockedPoolAddress : params.CwLockedPoolAddress,
+					FeeAccountAddress : params.FeeAccountAddress,
+					AutocompoundFeeRate : params.AutocompoundFeeRate,
+					WhitelistAdminAddress : params.WhitelistAdminAddress,
+				}
+
+				paramsAfter := liquidstake.NewLiquidStakeUpdatableParamsOutput(&updatableParams)
 
 				input, err := s.precompile.Pack(
 					liquidstake.UpdateParams,
