@@ -178,28 +178,6 @@
         {
           "components": [
             {
-              "internalType": "string",
-              "name": "liquidBondDenom",
-              "type": "string"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "address",
-                  "name": "validatorAddress",
-                  "type": "address"
-                },
-                {
-                  "internalType": "int256",
-                  "name": "targetWeight",
-                  "type": "int256"
-                }
-              ],
-              "internalType": "struct WhitelistedValidator[]",
-              "name": "whitelistedValidators",
-              "type": "tuple[]"
-            },
-            {
               "internalType": "int256",
               "name": "unstakeFeeRate",
               "type": "int256"
@@ -233,15 +211,10 @@
               "internalType": "address",
               "name": "whitelistAdminAddress",
               "type": "address"
-            },
-            {
-              "internalType": "bool",
-              "name": "modulePaused",
-              "type": "bool"
             }
           ],
           "indexed": false,
-          "internalType": "struct LiquidStakeParams",
+          "internalType": "struct LiquidStakeUpdatableParams",
           "name": "params",
           "type": "tuple"
         }
@@ -692,28 +665,6 @@
         {
           "components": [
             {
-              "internalType": "string",
-              "name": "liquidBondDenom",
-              "type": "string"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "address",
-                  "name": "validatorAddress",
-                  "type": "address"
-                },
-                {
-                  "internalType": "int256",
-                  "name": "targetWeight",
-                  "type": "int256"
-                }
-              ],
-              "internalType": "struct WhitelistedValidator[]",
-              "name": "whitelistedValidators",
-              "type": "tuple[]"
-            },
-            {
               "internalType": "int256",
               "name": "unstakeFeeRate",
               "type": "int256"
@@ -747,14 +698,9 @@
               "internalType": "address",
               "name": "whitelistAdminAddress",
               "type": "address"
-            },
-            {
-              "internalType": "bool",
-              "name": "modulePaused",
-              "type": "bool"
             }
           ],
-          "internalType": "struct LiquidStakeParams",
+          "internalType": "struct LiquidStakeUpdatableParams",
           "name": "params",
           "type": "tuple"
         }

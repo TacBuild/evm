@@ -193,10 +193,10 @@ func (m *MsgLiquidUnstake) GetDelegator() sdk.AccAddress {
 }
 
 // NewMsgUpdateParams creates a new MsgUpdateParams.
-func NewMsgUpdateParams(authority sdk.AccAddress, amount Params) *MsgUpdateParams {
+func NewMsgUpdateParams(authority sdk.AccAddress, params UpdatableParams) *MsgUpdateParams {
 	return &MsgUpdateParams{
 		Authority: authority.String(),
-		Params:    amount,
+		Params:    params,
 	}
 }
 

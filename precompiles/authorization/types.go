@@ -71,17 +71,10 @@ func CheckApprovalArgs(args []interface{}, denom string) (common.Address, *sdk.C
 		}
 	}
 
-	typeURLs, ok := args[2].([]string)
-	if !ok {
-		return common.Address{}, nil, nil, fmt.Errorf(ErrInvalidMethods, args[2])
+	typeURLs, err := validateMsgTypes(args[2])
+	if err != nil {
+		return common.Address{}, nil, nil, err
 	}
-	if len(typeURLs) == 0 {
-		return common.Address{}, nil, nil, errors.New(ErrEmptyMethods)
-	}
-	if slices.Contains(typeURLs, "") {
-		return common.Address{}, nil, nil, fmt.Errorf(ErrEmptyStringInMethods, typeURLs)
-	}
-	// TODO: check if the typeURLs are valid? e.g. with a regex pattern?
 
 	return grantee, coin, typeURLs, nil
 }
@@ -104,8 +97,6 @@ func CheckRevokeArgs(args []interface{}) (common.Address, []string, error) {
 	if err != nil {
 		return common.Address{}, nil, err
 	}
-	// TODO: check if the typeURLs are valid? e.g. with a regex pattern?
-	// Check - ENG-1632 on Linear
 
 	return granteeAddr, typeURLs, nil
 }
@@ -231,6 +222,15 @@ func validateMsgTypes(arg interface{}) ([]string, error) {
 
 	if slices.Contains(typeURLs, "") {
 		return nil, fmt.Errorf(ErrEmptyStringInMethods, typeURLs)
+	}
+
+	urls := make(map[string]struct{})
+    for _, url := range typeURLs {
+		_, exists := urls[url]
+		if(exists) {
+			return nil, fmt.Errorf(ErrAuthzDublicationOfMethods, url)
+		}
+		urls[url] = struct{}{}
 	}
 
 	return typeURLs, nil

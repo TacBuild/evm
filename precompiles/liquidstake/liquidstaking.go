@@ -109,14 +109,13 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readOnly bool) (bz [
 
 			// Authorization transactions
 			case authorization.ApproveMethod:
-				bz, err = p.Approve(ctx, evm.Origin, stateDB, method, args)
+				bz, err = p.Approve(ctx, contract.CallerAddress, stateDB, method, args)
 			case authorization.RevokeMethod:
-				bz, err = p.Revoke(ctx, evm.Origin, stateDB, method, args)
+				bz, err = p.Revoke(ctx, contract.CallerAddress, stateDB, method, args)
 			case authorization.IncreaseAllowanceMethod:
-				bz, err = p.IncreaseAllowance(ctx, evm.Origin, stateDB, method, args)
+				bz, err = p.IncreaseAllowance(ctx, contract.CallerAddress, stateDB, method, args)
 			case authorization.DecreaseAllowanceMethod:
-				bz, err = p.DecreaseAllowance(ctx, evm.Origin, stateDB, method, args)
-
+				bz, err = p.DecreaseAllowance(ctx, contract.CallerAddress, stateDB, method, args)
 
 			// Transactions
 			case UpdateParams:
@@ -186,4 +185,3 @@ func (Precompile) IsTransaction(method *abi.Method) bool {
 func (p Precompile) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("evm extension", "staking")
 }
-

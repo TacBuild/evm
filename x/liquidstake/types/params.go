@@ -78,6 +78,32 @@ func (p Params) WhitelistedValsMap() WhitelistedValsMap {
 	return GetWhitelistedValsMap(p.WhitelistedValidators)
 }
 
+// String returns a human-readable string representation of the parameters.
+func (p UpdatableParams) String() string {
+	out, _ := json.MarshalIndent(p, "", "")
+	return string(out)
+}
+
+// Validate validates parameters.
+func (p UpdatableParams) Validate() error {
+	for _, v := range []struct {
+		value     interface{}
+		validator func(interface{}) error
+	}{
+		{p.UnstakeFeeRate, validateUnstakeFeeRate},
+		{p.MinLiquidStakeAmount, validateMinLiquidStakeAmount},
+		{p.AutocompoundFeeRate, validateAutocompoundFeeRate},
+		{p.FeeAccountAddress, validateFeeAccountAddress},
+		{p.CwLockedPoolAddress, validateCwLockedPoolAddress},
+		{p.WhitelistAdminAddress, validateWhitelistAdminAddress},
+	} {
+		if err := v.validator(v.value); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Validate validates parameters.
 func (p Params) Validate() error {
 	for _, v := range []struct {

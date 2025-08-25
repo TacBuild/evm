@@ -241,7 +241,7 @@ func (p Precompile) EmitUpdateParamsEvent(ctx sdk.Context, stateDB vm.StateDB, m
 	topics[0] = event.ID
 
 	// Convert the params to the format expected by the event
-	paramsOutput := NewLiquidStakeParamsOutput(&msg.Params)
+	paramsOutput := NewLiquidStakeUpdatableParamsOutput(&msg.Params)
 
 	// Pack the arguments to be used as the Data field
 	// params field is not indexed, so pack it as data

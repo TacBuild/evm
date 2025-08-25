@@ -1,15 +1,15 @@
 package liquidstake_test
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"math/big"
 	"time"
-	sdkmath "cosmossdk.io/math"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
+	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
-	ethtypes "github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/cosmos/evm/precompiles/authorization"
 	cmn "github.com/cosmos/evm/precompiles/common"
@@ -39,7 +39,7 @@ func (s *LiquidStakePrecompileTestSuite) CreateAuthorization(ctx sdk.Context, gr
 // CheckAllowanceChangeEvent checks the AllowanceChange event matches the expected values
 func (s *LiquidStakePrecompileTestSuite) CheckAllowanceChangeEvent(log *ethtypes.Log, methods []string, amounts []*big.Int, granter, grantee common.Address) {
 	s.Require().Equal(log.Address, s.precompile.Address())
-	
+
 	// Check event signature matches the one emitted
 	event := s.precompile.ABI.Events[authorization.EventTypeAllowanceChange]
 	s.Require().Equal(crypto.Keccak256Hash([]byte(event.Sig)), common.HexToHash(log.Topics[0].Hex()))
@@ -51,7 +51,7 @@ func (s *LiquidStakePrecompileTestSuite) CheckAllowanceChangeEvent(log *ethtypes
 	s.Require().Equal(granter, allowanceEvent.Granter)
 	s.Require().Equal(len(methods), len(allowanceEvent.Methods))
 	s.Require().Equal(len(amounts), len(allowanceEvent.Values))
-	
+
 	for i, method := range methods {
 		s.Require().Equal(method, allowanceEvent.Methods[i])
 		s.Require().Equal(amounts[i], allowanceEvent.Values[i])
@@ -139,9 +139,7 @@ func (s *LiquidStakePrecompileTestSuite) TestUpdateParamsEvent() {
 			"success - UpdateParams event emitted correctly",
 			func(admin common.Address) []interface{} {
 				// Create test params with all required fields
-				params := liquidstake.LiquidStakeParams{
-					LiquidBondDenom:       "stkTAC",
-					WhitelistedValidators: []liquidstake.WhitelistedValidator{},
+				params := liquidstake.LiquidStakeUpdatableParams{
 					UnstakeFeeRate:        big.NewInt(1000),
 					LsmDisabled:           false,
 					MinLiquidStakeAmount:  big.NewInt(1000000),
@@ -149,7 +147,6 @@ func (s *LiquidStakePrecompileTestSuite) TestUpdateParamsEvent() {
 					FeeAccountAddress:     common.HexToAddress("0x2"),
 					AutocompoundFeeRate:   big.NewInt(500),
 					WhitelistAdminAddress: admin,
-					ModulePaused:          false,
 				}
 				return []interface{}{params}
 			},
@@ -167,9 +164,7 @@ func (s *LiquidStakePrecompileTestSuite) TestUpdateParamsEvent() {
 				var updateParamsEvent liquidstake.EventUpdateParams
 				err := cmn.UnpackLog(s.precompile.ABI, &updateParamsEvent, liquidstake.EventTypeUpdateParams, *log)
 				s.Require().NoError(err)
-				s.Require().Equal("stkTAC", updateParamsEvent.Params.LiquidBondDenom)
 				s.Require().Equal(admin, updateParamsEvent.Params.WhitelistAdminAddress)
-				s.Require().Equal(false, updateParamsEvent.Params.ModulePaused)
 			},
 		},
 	}
@@ -343,6 +338,7 @@ func (s *LiquidStakePrecompileTestSuite) TestSetModulePausedEvent() {
 		})
 	}
 }
+
 //func (s *LiquidStakePrecompileTestSuite) TestStakeToLPEvent() {
 //	var (
 //		stDB *statedb.StateDB
@@ -370,7 +366,7 @@ func (s *LiquidStakePrecompileTestSuite) TestSetModulePausedEvent() {
 //			false,
 //			"",
 //			func(delegator common.Address) {
-//				s.SetupTest() 
+//				s.SetupTest()
 //				log := stDB.Logs()[0]
 //				s.Require().Equal(log.Address, s.precompile.Address())
 //
@@ -709,4 +705,3 @@ func (s *LiquidStakePrecompileTestSuite) TestDecreaseAllowanceEvent() {
 		})
 	}
 }
-

@@ -4,10 +4,11 @@ import (
 	"time"
 
 	sdkmath "cosmossdk.io/math"
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	"github.com/cosmos/evm/precompiles/authorization"
 	liquidstake "github.com/cosmos/evm/precompiles/liquidstake"
+	"github.com/cosmos/evm/x/liquidstake/types"
 	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
-	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 
 	"math/big"
 
@@ -47,21 +48,21 @@ func CheckAuthorizationWithContext(ctx sdk.Context, ak authzkeeper.Keeper, autho
 type LiquidStakePrecompileTestSuite struct {
 	suite.Suite
 
-	nw           *network.UnitTestNetwork
-	factory      factory.TxFactory
-	grpcHandler  grpc.Handler
-	keyring      testkeyring.Keyring
+	nw          *network.UnitTestNetwork
+	factory     factory.TxFactory
+	grpcHandler grpc.Handler
+	keyring     testkeyring.Keyring
 
-	bondDenom    string
-	precompile   *liquidstake.Precompile
+	bondDenom  string
+	precompile *liquidstake.Precompile
 
 	liquidValidatorAddr common.Address
-	liquidValidator    stakingtypes.Validator
+	liquidValidator     stakingtypes.Validator
 
 	ValidatorAddr common.Address
-	Validator    stakingtypes.Validator
+	Validator     stakingtypes.Validator
 
-	admin        testkeyring.Key
+	admin testkeyring.Key
 }
 
 func TestLiquidStakePrecompileTestSuite(t *testing.T) {
@@ -140,7 +141,6 @@ func (s *LiquidStakePrecompileTestSuite) SetupTest() {
 		panic(err)
 	}
 }
-
 
 func (s *LiquidStakePrecompileTestSuite) TestIsTransaction() {
 	testCases := []struct {
@@ -317,37 +317,37 @@ func (s *LiquidStakePrecompileTestSuite) TestRun() {
 			true,
 			"",
 		},
-//		{
-//			"pass - stakeToLP transaction",
-//			func(delegator, grantee testkeyring.Key) []byte {
-//				delAmount := math.NewInt(1000000000000000000)
-//				_, err := s.nw.App.StakingKeeper.Delegate(ctx, sdk.AccAddress(delegator.Addr.Bytes()), delAmount, stakingtypes.Bonded, s.validator, false)
-//				if err != nil {
-//					panic(err)
-//				}
-//
-//				_, err = s.nw.App.StakingKeeper.GetDelegation(ctx, delegator.AccAddr, sdk.ValAddress(s.validatorAdr.Bytes()))
-//				if err != nil {
-//					panic(err)
-//				}
-//
-//				// Use a smaller amount that definitely exists in the delegation
-//				tokenizeAmount := big.NewInt(1000000000000000000)
-//				input, err := s.precompile.Pack(
-//					liquidstake.StakeToLPMethod,
-//					delegator.Addr,
-//					s.validatorAdr,
-//					tokenizeAmount,
-//					tokenizeAmount,
-//				)
-//				s.Require().NoError(err, "failed to pack input")
-//				return input
-//			},
-//			1000000000000000000,
-//			false,
-//			true,
-//			"",
-//		},
+		//		{
+		//			"pass - stakeToLP transaction",
+		//			func(delegator, grantee testkeyring.Key) []byte {
+		//				delAmount := math.NewInt(1000000000000000000)
+		//				_, err := s.nw.App.StakingKeeper.Delegate(ctx, sdk.AccAddress(delegator.Addr.Bytes()), delAmount, stakingtypes.Bonded, s.validator, false)
+		//				if err != nil {
+		//					panic(err)
+		//				}
+		//
+		//				_, err = s.nw.App.StakingKeeper.GetDelegation(ctx, delegator.AccAddr, sdk.ValAddress(s.validatorAdr.Bytes()))
+		//				if err != nil {
+		//					panic(err)
+		//				}
+		//
+		//				// Use a smaller amount that definitely exists in the delegation
+		//				tokenizeAmount := big.NewInt(1000000000000000000)
+		//				input, err := s.precompile.Pack(
+		//					liquidstake.StakeToLPMethod,
+		//					delegator.Addr,
+		//					s.validatorAdr,
+		//					tokenizeAmount,
+		//					tokenizeAmount,
+		//				)
+		//				s.Require().NoError(err, "failed to pack input")
+		//				return input
+		//			},
+		//			1000000000000000000,
+		//			false,
+		//			true,
+		//			"",
+		//		},
 		{
 			"pass - liquidUnstake transaction",
 			func(delegator, grantee testkeyring.Key) []byte {
@@ -593,7 +593,6 @@ func (s *LiquidStakePrecompileTestSuite) TestQueryMethods() {
 	}
 }
 
-
 // TestRun tests the precompile's Run method.
 func (s *LiquidStakePrecompileTestSuite) TestAdminMethods() {
 	var ctx sdk.Context
@@ -607,10 +606,18 @@ func (s *LiquidStakePrecompileTestSuite) TestAdminMethods() {
 		{
 			"UpdateParams_Basic_Positive",
 			func() ([]byte, testkeyring.Key) {
-				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
-				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
+				params := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				updatableParams := types.UpdatableParams{
+					UnstakeFeeRate:        params.UnstakeFeeRate,
+					LsmDisabled:           true,
+					MinLiquidStakeAmount:  params.MinLiquidStakeAmount,
+					CwLockedPoolAddress:   params.CwLockedPoolAddress,
+					FeeAccountAddress:     params.FeeAccountAddress,
+					AutocompoundFeeRate:   params.AutocompoundFeeRate,
+					WhitelistAdminAddress: params.WhitelistAdminAddress,
+				}
 
-				paramsAfter.ModulePaused = true
+				paramsAfter := liquidstake.NewLiquidStakeUpdatableParamsOutput(&updatableParams)
 
 				input, err := s.precompile.Pack(
 					liquidstake.UpdateParams,
@@ -668,9 +675,18 @@ func (s *LiquidStakePrecompileTestSuite) TestAdminMethods() {
 		{
 			"UpdateParams_Unauthorized_Caller",
 			func() ([]byte, testkeyring.Key) {
-				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
-				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
-				paramsAfter.ModulePaused = true
+				params := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				updatableParams := types.UpdatableParams{
+					UnstakeFeeRate:        params.UnstakeFeeRate,
+					LsmDisabled:           true,
+					MinLiquidStakeAmount:  params.MinLiquidStakeAmount,
+					CwLockedPoolAddress:   params.CwLockedPoolAddress,
+					FeeAccountAddress:     params.FeeAccountAddress,
+					AutocompoundFeeRate:   params.AutocompoundFeeRate,
+					WhitelistAdminAddress: params.WhitelistAdminAddress,
+				}
+
+				paramsAfter := liquidstake.NewLiquidStakeUpdatableParamsOutput(&updatableParams)
 
 				// Use non-admin key
 				nonAdmin := s.keyring.GetKey(1)
@@ -747,9 +763,18 @@ func (s *LiquidStakePrecompileTestSuite) TestAdminMethods() {
 		{
 			"UpdateParams_Out_Of_Gas",
 			func() ([]byte, testkeyring.Key) {
-				paramsBeforeInternal := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
-				paramsAfter := liquidstake.NewLiquidStakeParamsOutput(&paramsBeforeInternal)
-				paramsAfter.ModulePaused = true
+				params := s.nw.App.LiquidStakeKeeper.GetParams(ctx)
+				updatableParams := types.UpdatableParams{
+					UnstakeFeeRate:        params.UnstakeFeeRate,
+					LsmDisabled:           true,
+					MinLiquidStakeAmount:  params.MinLiquidStakeAmount,
+					CwLockedPoolAddress:   params.CwLockedPoolAddress,
+					FeeAccountAddress:     params.FeeAccountAddress,
+					AutocompoundFeeRate:   params.AutocompoundFeeRate,
+					WhitelistAdminAddress: params.WhitelistAdminAddress,
+				}
+
+				paramsAfter := liquidstake.NewLiquidStakeUpdatableParamsOutput(&updatableParams)
 
 				input, err := s.precompile.Pack(
 					liquidstake.UpdateParams,

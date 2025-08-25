@@ -213,7 +213,7 @@ Example params.json
 				return err
 			}
 
-			var params types.Params
+			var params types.UpdatableParams
 
 			paramsInFile, err := os.ReadFile(args[0])
 			if err != nil {
