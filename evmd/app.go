@@ -513,7 +513,7 @@ func NewExampleApp(
 
 	invCheckPeriod, ok := appOpts.Get(server.FlagInvCheckPeriod).(uint)
 	if !ok {
-		panic("can not convert invCheckPeriod to uint")
+		invCheckPeriod = 0
 	}
 
 	app.CrisisKeeper = crisiskeeper.NewKeeper(
