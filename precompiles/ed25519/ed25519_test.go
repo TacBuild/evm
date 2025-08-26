@@ -14,6 +14,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	edprecompile "github.com/cosmos/evm/precompiles/ed25519"
+	"github.com/cosmos/evm/testutil/integration/os/network"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 )
 
@@ -278,4 +279,18 @@ func (s *PrecompileTestSuite) TestNewPrecompile() {
 	s.Require().NotNil(precompile)
 	s.Require().NotNil(precompile.ABI)
 	s.Require().Contains(precompile.ABI.Methods, edprecompile.ED25519VerifyMethod)
+
+	nw := network.NewUnitTestNetwork()
+	s.Require().NotNil(nw)
+
+	ctx := nw.GetContext()
+
+	instance, found, err := nw.App.EVMKeeper.GetPrecompileInstance(
+		ctx,
+		precompile.Address(),
+	)
+
+	s.Require().NoError(err)
+	s.Require().True(found)
+	s.Require().NotNil(instance)
 }

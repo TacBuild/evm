@@ -3,7 +3,7 @@ package types
 const (
 	P256PrecompileAddress    = "0x0000000000000000000000000000000000000100"
 	Bech32PrecompileAddress  = "0x0000000000000000000000000000000000000400"
-	Ed25519PrecompileAddress = "0x00000000000000000000000000000000000000f3"
+	Ed25519PrecompileAddress = "0x00000000000000000000000000000000000008f3"
 )
 
 const (
@@ -24,6 +24,7 @@ const (
 var AvailableStaticPrecompiles = []string{
 	P256PrecompileAddress,
 	Bech32PrecompileAddress,
+	Ed25519PrecompileAddress,
 	StakingPrecompileAddress,
 	DistributionPrecompileAddress,
 	ICS20PrecompileAddress,
