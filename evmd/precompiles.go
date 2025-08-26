@@ -10,12 +10,14 @@ import (
 	bankprecompile "github.com/cosmos/evm/precompiles/bank"
 	"github.com/cosmos/evm/precompiles/bech32"
 	distprecompile "github.com/cosmos/evm/precompiles/distribution"
+	ed25519precompile "github.com/cosmos/evm/precompiles/ed25519"
 	evidenceprecompile "github.com/cosmos/evm/precompiles/evidence"
 	govprecompile "github.com/cosmos/evm/precompiles/gov"
 	ics20precompile "github.com/cosmos/evm/precompiles/ics20"
 	"github.com/cosmos/evm/precompiles/p256"
 	slashingprecompile "github.com/cosmos/evm/precompiles/slashing"
 	stakingprecompile "github.com/cosmos/evm/precompiles/staking"
+
 	erc20Keeper "github.com/cosmos/evm/x/erc20/keeper"
 	transferkeeper "github.com/cosmos/evm/x/ibc/transfer/keeper"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
@@ -106,9 +108,15 @@ func NewAvailableStaticPrecompiles(
 		panic(fmt.Errorf("failed to instantiate evidence precompile: %w", err))
 	}
 
+	ed25519Precompile, err := ed25519precompile.NewPrecompile()
+	if err != nil {
+		panic(fmt.Errorf("failed to instantiate ed25519 precompile: %w", err))
+	}
+
 	// Stateless precompiles
 	precompiles[bech32Precompile.Address()] = bech32Precompile
 	precompiles[p256Precompile.Address()] = p256Precompile
+	precompiles[ed25519Precompile.Address()] = ed25519Precompile
 
 	// Stateful precompiles
 	precompiles[stakingPrecompile.Address()] = stakingPrecompile
