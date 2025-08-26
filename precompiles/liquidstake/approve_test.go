@@ -206,6 +206,30 @@ func (s *LiquidStakePrecompileTestSuite) TestRevoke() {
 			fmt.Sprintf(cmn.ErrInvalidMsgType, "liquidstake", "invalid"),
 		},
 		{
+			"fail - revoke contains duplicated methods",
+			func(granter, grantee testkeyring.Key) []interface{} {
+				approveMethod := s.precompile.Methods[authorization.ApproveMethod]
+				_, err := s.precompile.Approve(ctx, granter.Addr, stDB, &approveMethod, []interface{}{
+					grantee.Addr, big.NewInt(1), []string{liquidstake.LiquidStakeMsg},
+				})
+				s.Require().NoError(err)
+
+				// Check that the authorization exists
+				authz, expirationTime := CheckAuthorizationWithContext(ctx, s.nw.App.AuthzKeeper, liquidstaketypes.AuthorizationType_AUTHORIZATION_TYPE_STAKE, grantee.Addr, granter.Addr)
+				s.Require().NotNil(authz)
+				s.Require().NotNil(expirationTime)
+
+				return []interface{}{
+					grantee.Addr,
+					[]string{liquidstake.LiquidStakeMsg, liquidstake.LiquidStakeMsg},
+				}
+			},
+			func(granter, grantee testkeyring.Key, data []byte) {},
+			200000,
+			true,
+			"authorization contains dublicated methods",
+		},
+		{
 			"success - revoke liquid stake authorization",
 			func(granter, grantee testkeyring.Key) []interface{} {
 				approveMethod := s.precompile.Methods[authorization.ApproveMethod]
@@ -502,7 +526,7 @@ func (s *LiquidStakePrecompileTestSuite) TestApprove() {
 				return []interface{}{
 					grantee.Addr,
 					abi.MaxUint256,
-					[]string{liquidstake.LiquidStakeMsg},
+					[]string{liquidstake.LiquidStakeMsg, },
 				}
 			},
 			func(granter, grantee testkeyring.Key, data []byte, _ []interface{}) {
@@ -675,6 +699,23 @@ func (s *LiquidStakePrecompileTestSuite) TestApprove() {
 			20000,
 			false,
 			"",
+		},
+		{
+			"fail - Approve has duplicated methods allowance",
+			func(_ *vm.Contract, _, grantee testkeyring.Key) []interface{} {
+				return []interface{}{
+					grantee.Addr,
+					big.NewInt(1e18),
+					[]string{
+						liquidstake.LiquidStakeMsg,
+						liquidstake.LiquidStakeMsg,
+					},
+				}
+			},
+			func(granter, grantee testkeyring.Key, data []byte, _ []interface{}) {},
+			20000,
+			true,
+			"authorization contains dublicated methods",
 		},
 	}
 
