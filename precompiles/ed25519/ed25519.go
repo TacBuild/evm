@@ -44,8 +44,8 @@ func (Precompile) Address() common.Address {
 }
 
 func (p Precompile) RequiredGas(input []byte) uint64 {
-	// Challenge for ed22519 uses sha512 of sig.R, pubkey, msg
-	// So exclude 32 bytes of Z from signature
+	// Challenge for ed25519 uses sha512 of sig.R, pubkey, msg
+	// So exclude 32 bytes of sig.Z from the length
 	msgLen := max(len(input)-32, 0)
 	return ED25519_VERIFY_BASE_GAS + SHA512_BASE_GAS + SHA512_PER_WORD_GAS*((uint64(msgLen)+31)/32)
 }
