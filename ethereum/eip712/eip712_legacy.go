@@ -48,8 +48,8 @@ func LegacyWrapTxToTypedData(
 		Name:              "Cosmos Web3",
 		Version:           "1.0.0",
 		ChainId:           math.NewHexOrDecimal256(int64(chainID)), //#nosec G115 -- int overflow is not a concern here
-		VerifyingContract: "0x0000000000000000000000000000000000000000",
-		Salt:              "0x0000000000000000000000000000000000000000000000000000000000000000",
+		VerifyingContract: "cosmos",
+		Salt:              "0",
 	}
 
 	msgTypes, err := extractMsgTypes(cdc, "MsgValue", msg)
@@ -100,11 +100,11 @@ func extractMsgTypes(cdc codectypes.AnyUnpacker, msgTypeName string, msg sdk.Msg
 			},
 			{
 				Name: "verifyingContract",
-				Type: "address",
+				Type: "string",
 			},
 			{
 				Name: "salt",
-				Type: "bytes32",
+				Type: "string",
 			},
 		},
 		"Tx": {
