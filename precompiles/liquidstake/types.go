@@ -250,7 +250,7 @@ func NewMsgLiquidStake(args []interface{}, denom string) (*common.Address, *type
 	return &delegatorAddress, &msg, nil
 }
 
-func NewMsgStakeToLP(args []interface{}, liquidDenom string, denom string) (*common.Address, *types.MsgStakeToLP, error) {
+func NewMsgStakeToLP(args []interface{}, denom string) (*common.Address, *types.MsgStakeToLP, error) {
 	if len(args) != 4 {
 		return nil, nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 4, len(args))
 	}
@@ -279,7 +279,7 @@ func NewMsgStakeToLP(args []interface{}, liquidDenom string, denom string) (*com
 		DelegatorAddress: sdk.AccAddress(delegatorAddress.Bytes()).String(),
 		ValidatorAddress: sdk.ValAddress(validatorAddress.Bytes()).String(),
 		StakedAmount:     sdk.NewCoin(denom, math.NewIntFromBigInt(stakedAmount)),
-		LiquidAmount:     sdk.NewCoin(liquidDenom, math.NewIntFromBigInt(liquidAmount)),
+		LiquidAmount:     sdk.NewCoin(denom, math.NewIntFromBigInt(liquidAmount)),
 	}
 
 	return &delegatorAddress, &msg, nil

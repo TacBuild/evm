@@ -132,11 +132,6 @@ func (k msgServer) StakeToLP(goCtx context.Context, msg *types.MsgStakeToLP) (*t
 				sdk.NewAttribute(types.AttributeKeyCValue, cValue.String()),
 			),
 		})
-
-		_, err = k.LockOnLP(ctx, msg.GetDelegator(), gTACMinted)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	return &types.MsgStakeToLPResponse{}, nil

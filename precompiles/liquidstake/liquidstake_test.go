@@ -317,37 +317,37 @@ func (s *LiquidStakePrecompileTestSuite) TestRun() {
 			true,
 			"",
 		},
-		//		{
-		//			"pass - stakeToLP transaction",
-		//			func(delegator, grantee testkeyring.Key) []byte {
-		//				delAmount := math.NewInt(1000000000000000000)
-		//				_, err := s.nw.App.StakingKeeper.Delegate(ctx, sdk.AccAddress(delegator.Addr.Bytes()), delAmount, stakingtypes.Bonded, s.validator, false)
-		//				if err != nil {
-		//					panic(err)
-		//				}
-		//
-		//				_, err = s.nw.App.StakingKeeper.GetDelegation(ctx, delegator.AccAddr, sdk.ValAddress(s.validatorAdr.Bytes()))
-		//				if err != nil {
-		//					panic(err)
-		//				}
-		//
-		//				// Use a smaller amount that definitely exists in the delegation
-		//				tokenizeAmount := big.NewInt(1000000000000000000)
-		//				input, err := s.precompile.Pack(
-		//					liquidstake.StakeToLPMethod,
-		//					delegator.Addr,
-		//					s.validatorAdr,
-		//					tokenizeAmount,
-		//					tokenizeAmount,
-		//				)
-		//				s.Require().NoError(err, "failed to pack input")
-		//				return input
-		//			},
-		//			1000000000000000000,
-		//			false,
-		//			true,
-		//			"",
-		//		},
+		{
+			"pass - stakeToLP transaction",
+			func(delegator, grantee testkeyring.Key) []byte {
+				delAmount := sdkmath.NewInt(1000000000000000000)
+				_, err := s.nw.App.StakingKeeper.Delegate(ctx, sdk.AccAddress(delegator.Addr.Bytes()), delAmount, stakingtypes.Bonded, s.liquidValidator, false)
+				if err != nil {
+					panic(err)
+				}
+
+				_, err = s.nw.App.StakingKeeper.GetDelegation(ctx, delegator.AccAddr, sdk.ValAddress(s.liquidValidatorAddr.Bytes()))
+				if err != nil {
+					panic(err)
+				}
+
+				// Use a smaller amount that definitely exists in the delegation
+				tokenizeAmount := big.NewInt(1000000000000000000)
+				input, err := s.precompile.Pack(
+					liquidstake.StakeToLPMethod,
+					delegator.Addr,
+					s.liquidValidatorAddr,
+					tokenizeAmount,
+					tokenizeAmount,
+				)
+				s.Require().NoError(err, "failed to pack input")
+				return input
+			},
+			1000000000000000000,
+			false,
+			true,
+			"",
+		},
 		{
 			"pass - liquidUnstake transaction",
 			func(delegator, grantee testkeyring.Key) []byte {

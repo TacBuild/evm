@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"encoding/json"
 	"sort"
 	"time"
 
@@ -9,8 +8,6 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
@@ -174,69 +171,6 @@ func (k Keeper) LiquidStake(
 
 	err = k.LiquidDelegate(ctx, proxyAcc, activeVals, stakingCoin.Amount, whitelistedValsMap)
 	return gTACMintAmount, err
-}
-
-// LockOnLP sends tokens to a CW contract (Superfluid LP) with time locking.
-// It performs a CosmWasm execution through global message handler and may fail.
-// Emits events on a successful call.
-func (k Keeper) LockOnLP(ctx sdk.Context, delegator sdk.AccAddress, amount sdk.Coin) ([]*codectypes.Any, error) {
-	params := k.GetParams(ctx)
-
-	if len(params.CwLockedPoolAddress) == 0 {
-		return nil, types.ErrNoLPContractAddress
-	} else if amount.Denom != params.LiquidBondDenom {
-		return nil, types.ErrInvalidDenom.Wrapf("cannot lock any denom on LP except liquid bond denom: %s", params.LiquidBondDenom)
-	}
-
-	msg := &LockLstAssetMsg{
-		Asset: Asset{
-			Amount: amount.Amount.String(),
-			Info: AssetInfo{
-				NativeToken: NativeTokenInfo{
-					Denom: amount.Denom,
-				},
-			},
-		},
-	}
-
-	callData, err := json.Marshal(&ExecMsg{
-		LockLstAsset: msg,
-	})
-	if err != nil {
-		panic("failed to marshal CW contract call LockLstAsset")
-	}
-
-	cwMsg := &wasmtypes.MsgExecuteContract{
-		Sender:   delegator.String(),
-		Contract: k.GetParams(ctx).CwLockedPoolAddress,
-		Msg:      wasmtypes.RawContractMessage(callData),
-		Funds:    sdk.NewCoins(amount),
-	}
-
-	handler := k.router.Handler(cwMsg)
-	if handler == nil {
-		k.Logger(ctx).Error("failed to find CW contract handler")
-
-		return nil, sdkerrors.ErrUnknownRequest.Wrapf("unrecognized message route: %s", sdk.MsgTypeURL(cwMsg))
-	}
-
-	msgResp, err := handler(ctx, cwMsg)
-	if err != nil {
-		k.Logger(ctx).Error(
-			"failed to execute CW contract message",
-			types.ErrorKeyVal,
-			err,
-			types.MsgKeyVal,
-			cwMsg.String(),
-		)
-
-		return nil, types.ErrLPContract.Wrapf("error: %s, message %v", err.Error(), cwMsg)
-	}
-
-	// emit the events from the dispatched actions
-	ctx.EventManager().EmitEvents(msgResp.GetEvents())
-
-	return msgResp.MsgResponses, nil
 }
 
 type ExecMsg struct {
@@ -721,12 +655,6 @@ func (k Keeper) LSMDelegate(
 
 	// send gTAC to delegator acc
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, delegator, mintCoin)
-	if err != nil {
-		return gTACMintAmount, err
-	}
-
-	// but immediately lock new gTAC into LP on behalf of the delegator
-	_, err = k.LockOnLP(ctx, delegator, sdk.NewCoin(liquidBondDenom, gTACMintAmount))
 	if err != nil {
 		return gTACMintAmount, err
 	}
