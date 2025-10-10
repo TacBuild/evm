@@ -16,6 +16,8 @@ const (
 	EvidencePrecompileAddress     = "0x0000000000000000000000000000000000000807"
 )
 
+const LiquidStakePrecompileAddress     = "0x0000000000000000000000000000000000001600"
+
 // AvailableStaticPrecompiles defines the full list of all available EVM extension addresses.
 //
 // NOTE: To be explicit, this list does not include the dynamically registered EVM extensions
@@ -31,4 +33,5 @@ var AvailableStaticPrecompiles = []string{
 	GovPrecompileAddress,
 	SlashingPrecompileAddress,
 	EvidencePrecompileAddress,
+	LiquidStakePrecompileAddress,
 }

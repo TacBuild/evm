@@ -29,6 +29,8 @@ import (
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	liquidstakekeeper "github.com/cosmos/evm/x/liquidstake/keeper"
+	liquidStakePrecompile "github.com/cosmos/evm/precompiles/liquidstake"
 )
 
 const bech32PrecompileBaseGas = 6_000
@@ -48,6 +50,7 @@ func NewAvailableStaticPrecompiles(
 	govKeeper govkeeper.Keeper,
 	slashingKeeper slashingkeeper.Keeper,
 	evidenceKeeper evidencekeeper.Keeper,
+	liquidstakeKeeper liquidstakekeeper.Keeper,
 ) map[common.Address]vm.PrecompiledContract {
 	// Clone the mapping from the latest EVM fork.
 	precompiles := maps.Clone(vm.PrecompiledContractsBerlin)
@@ -106,6 +109,11 @@ func NewAvailableStaticPrecompiles(
 		panic(fmt.Errorf("failed to instantiate evidence precompile: %w", err))
 	}
 
+	liquidstakePrecompile, err := liquidStakePrecompile.NewPrecompile(liquidstakeKeeper, authzKeeper)
+	if err != nil {
+		panic(fmt.Errorf("failed to instantiate evidence precompile: %w", err))
+	}
+
 	// Stateless precompiles
 	precompiles[bech32Precompile.Address()] = bech32Precompile
 	precompiles[p256Precompile.Address()] = p256Precompile
@@ -118,6 +126,7 @@ func NewAvailableStaticPrecompiles(
 	precompiles[govPrecompile.Address()] = govPrecompile
 	precompiles[slashingPrecompile.Address()] = slashingPrecompile
 	precompiles[evidencePrecompile.Address()] = evidencePrecompile
+	precompiles[liquidstakePrecompile.Address()] = liquidstakePrecompile
 
 	return precompiles
 }

@@ -18,6 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	liquidtypes "github.com/cosmos/evm/x/liquidstake/types"
 )
 
 const (
@@ -70,17 +71,10 @@ func CheckApprovalArgs(args []interface{}, denom string) (common.Address, *sdk.C
 		}
 	}
 
-	typeURLs, ok := args[2].([]string)
-	if !ok {
-		return common.Address{}, nil, nil, fmt.Errorf(ErrInvalidMethods, args[2])
+	typeURLs, err := validateMsgTypes(args[2])
+	if err != nil {
+		return common.Address{}, nil, nil, err
 	}
-	if len(typeURLs) == 0 {
-		return common.Address{}, nil, nil, errors.New(ErrEmptyMethods)
-	}
-	if slices.Contains(typeURLs, "") {
-		return common.Address{}, nil, nil, fmt.Errorf(ErrEmptyStringInMethods, typeURLs)
-	}
-	// TODO: check if the typeURLs are valid? e.g. with a regex pattern?
 
 	return grantee, coin, typeURLs, nil
 }
@@ -103,8 +97,6 @@ func CheckRevokeArgs(args []interface{}) (common.Address, []string, error) {
 	if err != nil {
 		return common.Address{}, nil, err
 	}
-	// TODO: check if the typeURLs are valid? e.g. with a regex pattern?
-	// Check - ENG-1632 on Linear
 
 	return granteeAddr, typeURLs, nil
 }
@@ -184,6 +176,39 @@ func CheckAuthzAndAllowanceForGranter(
 	return stakeAuthz, expiration, nil
 }
 
+// CheckAuthzAndAllowanceForLiquidStake checks if the authorization exists and is not expired for the
+// given spender and the allowance is not exceeded.
+// If the authorization has a limit, checks that the provided amount does not exceed the current limit.
+// Returns an error if the authorization does not exist
+// is expired or the allowance is exceeded.
+func CheckAuthzAndAllowanceForLiquidStake(
+	ctx sdk.Context,
+	authzKeeper authzkeeper.Keeper,
+	grantee, granter common.Address,
+	amount *sdk.Coin,
+	msgURL string,
+) (*liquidtypes.LiquidStakeAuthorization, *time.Time, error) {
+	msgAuthz, expiration := authzKeeper.GetAuthorization(ctx, grantee.Bytes(), granter.Bytes(), msgURL)
+	if msgAuthz == nil {
+		return nil, nil, fmt.Errorf(ErrAuthzDoesNotExistOrExpired, msgURL, grantee)
+	}
+
+	liquidAuthz, ok := msgAuthz.(*liquidtypes.LiquidStakeAuthorization)
+	if !ok {
+		return nil, nil, authz.ErrUnknownAuthorizationType
+	}
+
+	// For liquid stake operations, we need to handle LiquidStakeAuthorization
+	// We return the generic authz.Authorization interface so the caller can cast it appropriately
+	if msgAuthz.MsgTypeURL() != msgURL {
+		return nil, nil, fmt.Errorf("authorization message type mismatch: expected %s, got %s", msgURL, msgAuthz.MsgTypeURL())
+	}
+
+	// Note: Amount validation will be done by the specific authorization's Accept method
+	// This allows for different authorization types to have different validation logic
+	return liquidAuthz, expiration, nil
+}
+
 // validateMsgTypes checks if the typeURLs are of the correct type,
 // performs basic validation on the length and checks for any empty strings
 func validateMsgTypes(arg interface{}) ([]string, error) {
@@ -197,6 +222,15 @@ func validateMsgTypes(arg interface{}) ([]string, error) {
 
 	if slices.Contains(typeURLs, "") {
 		return nil, fmt.Errorf(ErrEmptyStringInMethods, typeURLs)
+	}
+
+	urls := make(map[string]struct{})
+    for _, url := range typeURLs {
+		_, exists := urls[url]
+		if(exists) {
+			return nil, fmt.Errorf(ErrAuthzDublicationOfMethods, url)
+		}
+		urls[url] = struct{}{}
 	}
 
 	return typeURLs, nil

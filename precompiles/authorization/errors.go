@@ -19,4 +19,6 @@ const (
 	ErrInvalidMethod = "invalid method defined; expected a string; got: %v"
 	// ErrAuthzNotAccepted is raised when the authorization is not accepted.
 	ErrAuthzNotAccepted = "authorization to %s for address %s is not accepted"
+	// ErrAuthzDublicationOfMethods is raised when there is dublication of methods
+	ErrAuthzDublicationOfMethods = "authorization contains dublicated methods: %s"
 )

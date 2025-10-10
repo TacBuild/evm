@@ -135,6 +135,8 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
+	github.com/gobwas/httphead v0.1.0 // indirect
+	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gogo/googleapis v1.4.1 // indirect
@@ -268,7 +270,7 @@ replace (
 	// Pin this pebble version to avoid breaking compilation of geth
 	github.com/cockroachdb/pebble => github.com/cockroachdb/pebble v0.0.0-20230928194634-aa077af62593
 	// use Cosmos-SDK fork to enable Ledger functionality
-	github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.50.13-0.20250319183239-53dea340efc7
+	github.com/cosmos/cosmos-sdk => github.com/TacBuild/cosmos-sdk v0.0.0-20251010131633-e43d8d10a9a9
 	// use Cosmos geth fork
 	github.com/ethereum/go-ethereum => github.com/TacBuild/go-ethereum v0.0.0-20250428082551-b4f5a8f8420a
 	// Security Advisory https://github.com/advisories/GHSA-h395-qcrw-5vmq
