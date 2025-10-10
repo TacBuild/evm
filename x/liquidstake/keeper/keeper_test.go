@@ -7,7 +7,6 @@ import (
 	"cosmossdk.io/math"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/crisis"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -63,11 +62,6 @@ func (s *KeeperTestSuite) SetupTest() {
 	s.Require().NoError(err)
 }
 
-func (s *KeeperTestSuite) TearDownTest() {
-	// invariant check
-	crisis.EndBlocker(s.ctx, *s.app.CrisisKeeper)
-}
-
 func (s *KeeperTestSuite) CreateValidators(powers []int64) ([]sdk.AccAddress, []sdk.ValAddress, []cryptotypes.PubKey) {
 	s.app.BeginBlocker(s.ctx)
 	num := len(powers)
@@ -108,4 +102,35 @@ func (s *KeeperTestSuite) advanceHeight(height int, _ bool) {
 		s.app.BeginBlocker(s.ctx)
 		s.app.EndBlocker(s.ctx)
 	}
+}
+
+func (s *KeeperTestSuite) liquidStaking(liquidStaker sdk.AccAddress, stakingAmt math.Int) error {
+	ctx, writeCache := s.ctx.CacheContext()
+	params := s.keeper.GetParams(ctx)
+
+	stkxprtBalanceBefore := s.app.BankKeeper.GetBalance(
+		ctx, liquidStaker, params.LiquidBondDenom,
+	).Amount
+
+	stkXPRTMintAmt, err := s.keeper.LiquidStake(
+		ctx,
+		types.LiquidStakeProxyAcc,
+		liquidStaker,
+		sdk.NewCoin(sdk.DefaultBondDenom, stakingAmt),
+	)
+	if err != nil {
+		return err
+	}
+
+	stkxprtBalanceAfter := s.app.BankKeeper.GetBalance(
+		ctx, liquidStaker, params.LiquidBondDenom,
+	).Amount
+
+	s.Require().NoError(err)
+	s.Require().EqualValues(
+		stkXPRTMintAmt, stkxprtBalanceAfter.Sub(stkxprtBalanceBefore),
+	)
+	writeCache()
+
+	return nil
 }
