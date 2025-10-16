@@ -7,7 +7,7 @@ pragma solidity >=0.8.17;
 interface AuthorizationI {
     /// @dev Approves a list of Cosmos or IBC transactions with a specific amount of tokens.
     /// @param grantee The contract address which will have an authorization to spend the origin funds.
-    /// @param amount The amount of tokens to be spent.
+    /// @param amount The amount of tokens to be spent
     /// @param methods The message type URLs of the methods to approve.
     /// @return approved Boolean value to indicate if the approval was successful.
     function approve(
