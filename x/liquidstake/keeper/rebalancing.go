@@ -230,6 +230,8 @@ func (k Keeper) AutocompoundStakingRewards(ctx sdk.Context, whitelistedValsMap t
 
 	// calculate the hourly APY
 	bondRatio := math.LegacyDec(bondedTokens).Quo(math.LegacyDec(totalSupply))
+	bondRatio = bondRatio.Add(math.LegacySmallestDec())
+
 	hourlyApy := inflation.Quo(bondRatio).
 		Quo(types.DefaultLimitAutocompoundPeriodDays).
 		Quo(types.DefaultLimitAutocompoundPeriodHours)
