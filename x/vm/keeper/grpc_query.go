@@ -256,6 +256,10 @@ func (k Keeper) EthCall(c context.Context, req *types.EthCallRequest) (*types.Ms
 	return res, nil
 }
 
+func (k Keeper) TacSimulate(c context.Context, req *types.TacSimulateRequest) (*types.MsgEthereumTxResponse, error) {
+
+}
+
 // EstimateGas implements eth_estimateGas rpc api.
 func (k Keeper) EstimateGas(c context.Context, req *types.EthCallRequest) (*types.EstimateGasResponse, error) {
 	return k.EstimateGasInternal(c, req, types.RPC)

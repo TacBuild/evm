@@ -2,6 +2,7 @@ package eth
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -66,7 +67,13 @@ type EthereumAPI interface {
 	//
 	// Allows developers to read data from the blockchain which includes executing
 	// smart contracts. However, no data is published to the Ethereum network.
-	Call(args evmtypes.TransactionArgs, blockNrOrHash rpctypes.BlockNumberOrHash, _ *rpctypes.StateOverride) (hexutil.Bytes, error)
+	Call(args evmtypes.TransactionArgs, blockNrOrHash rpctypes.BlockNumberOrHash, _ *evmtypes.StateOverride) (hexutil.Bytes, error)
+
+	// eth_tacSimulate implements the custom `eth_tacSimulate` rpc api which supports state override and event logs as result
+	TacSimulate(args evmtypes.TransactionArgs,
+		blockNrOrHash rpctypes.BlockNumberOrHash,
+		stateOverride *evmtypes.StateOverride,
+	) (hexutil.Bytes, error)
 
 	// Chain Information
 	//
@@ -268,7 +275,7 @@ func (e *PublicAPI) GetProof(address common.Address,
 // Call performs a raw contract call.
 func (e *PublicAPI) Call(args evmtypes.TransactionArgs,
 	blockNrOrHash rpctypes.BlockNumberOrHash,
-	_ *rpctypes.StateOverride,
+	_ *evmtypes.StateOverride,
 ) (hexutil.Bytes, error) {
 	e.logger.Debug("eth_call", "args", args.String(), "block number or hash", blockNrOrHash)
 
@@ -282,6 +289,36 @@ func (e *PublicAPI) Call(args evmtypes.TransactionArgs,
 	}
 
 	return (hexutil.Bytes)(data.Ret), nil
+}
+
+func (e *PublicAPI) TacSimulate(args evmtypes.TransactionArgs,
+	blockNrOrHash rpctypes.BlockNumberOrHash,
+	stateOverride *evmtypes.StateOverride,
+) (hexutil.Bytes, error) {
+	e.logger.Debug("eth_tacSimulate", "args", args.String(), "block number or hash", blockNrOrHash, "state override", stateOverride)
+
+	blockNum, err := e.backend.BlockNumberFromTendermint(blockNrOrHash)
+	if err != nil {
+		return nil, err
+	}
+	data, err := e.backend.DoTacSimulate(args, blockNum, stateOverride)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	tacSimulateResult := rpctypes.TacSimulateResult{
+		Output:  hexutil.Bytes(data.Ret),
+		VmError: data.VmError,
+		Logs:    data.Logs,
+		GasUsed: hexutil.Uint64(data.GasUsed),
+	}
+
+	ret, err := json.Marshal(tacSimulateResult)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return ret, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
