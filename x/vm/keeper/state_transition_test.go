@@ -6,6 +6,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core"
 	gethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
@@ -747,6 +748,7 @@ func (suite *KeeperTestSuite) TestApplyMessageWithConfig() {
 				true,
 				config,
 				txConfig,
+				nil,
 			)
 
 			if tc.expErr {
@@ -771,6 +773,243 @@ func (suite *KeeperTestSuite) TestApplyMessageWithConfig() {
 			suite.Require().NoError(err)
 		})
 	}
+}
+
+func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
+	suite.SetupTest()
+
+	sender := suite.keyring.GetKey(0)
+	recipient := suite.keyring.GetAddr(1)
+
+	// Get proposer address and EVM config
+	proposerAddress := suite.network.GetContext().BlockHeader().ProposerAddress
+	config, err := suite.network.App.EVMKeeper.EVMConfig(
+		suite.network.GetContext(),
+		proposerAddress,
+	)
+	suite.Require().NoError(err)
+
+	testCases := []struct {
+		name          string
+		stateOverride *types.StateOverride
+		commit        bool
+		expErr        bool
+		expErrMsg     string
+	}{
+		{
+			name:          "success - nil state override",
+			stateOverride: nil,
+			commit:        false,
+			expErr:        false,
+		},
+		{
+			name: "success - override balance",
+			stateOverride: &types.StateOverride{
+				recipient: types.OverrideAccount{
+					Balance: (*hexutil.Big)(big.NewInt(1e18)),
+				},
+			},
+			commit: false,
+			expErr: false,
+		},
+		{
+			name: "success - override nonce",
+			stateOverride: &types.StateOverride{
+				recipient: types.OverrideAccount{
+					Nonce: func() *hexutil.Uint64 { n := hexutil.Uint64(100); return &n }(),
+				},
+			},
+			commit: false,
+			expErr: false,
+		},
+		{
+			name: "success - override code (empty code does not affect simple transfer)",
+			stateOverride: &types.StateOverride{
+				recipient: types.OverrideAccount{
+					// Setting empty code on recipient - simple transfer should still work
+					Code: func() *hexutil.Bytes { b := hexutil.Bytes([]byte{}); return &b }(),
+				},
+			},
+			commit: false,
+			expErr: false,
+		},
+		{
+			name: "success - override state diff",
+			stateOverride: &types.StateOverride{
+				recipient: types.OverrideAccount{
+					StateDiff: map[common.Hash]common.Hash{
+						common.HexToHash("0x01"): common.HexToHash("0x02"),
+					},
+				},
+			},
+			commit: false,
+			expErr: false,
+		},
+		{
+			name: "fail - state override with commit=true",
+			stateOverride: &types.StateOverride{
+				recipient: types.OverrideAccount{
+					Balance: (*hexutil.Big)(big.NewInt(1e18)),
+				},
+			},
+			commit:    true,
+			expErr:    true,
+			expErrMsg: "state override is not nil",
+		},
+		{
+			name: "fail - both state and stateDiff provided",
+			stateOverride: &types.StateOverride{
+				recipient: types.OverrideAccount{
+					State: map[common.Hash]common.Hash{
+						common.HexToHash("0x01"): common.HexToHash("0x02"),
+					},
+					StateDiff: map[common.Hash]common.Hash{
+						common.HexToHash("0x03"): common.HexToHash("0x04"),
+					},
+				},
+			},
+			commit:    false,
+			expErr:    true,
+			expErrMsg: "has both 'state' and 'stateDiff'",
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			// Generate a transfer message
+			msg, err := suite.factory.GenerateGethCoreMsg(sender.Priv, types.EvmTxArgs{
+				To:     &recipient,
+				Amount: big.NewInt(100),
+			})
+			suite.Require().NoError(err)
+
+			txConfig := suite.network.App.EVMKeeper.TxConfig(
+				suite.network.GetContext(),
+				common.Hash{},
+			)
+
+			// Function being tested
+			res, err := suite.network.App.EVMKeeper.ApplyMessageWithConfig(
+				suite.network.GetContext(),
+				*msg,
+				nil,
+				tc.commit,
+				config,
+				txConfig,
+				tc.stateOverride,
+			)
+
+			if tc.expErr {
+				suite.Require().Error(err)
+				suite.Require().Contains(err.Error(), tc.expErrMsg)
+			} else {
+				suite.Require().NoError(err)
+				suite.Require().NotNil(res)
+				suite.Require().False(res.Failed())
+			}
+		})
+	}
+}
+
+// TestStateOverrideBalanceCheck tests that StateOverride actually changes the balance
+// by calling a contract that checks the balance of an address
+func (suite *KeeperTestSuite) TestStateOverrideBalanceCheck() {
+	suite.SetupTest()
+
+	sender := suite.keyring.GetKey(0)
+	senderAddr := suite.keyring.GetAddr(0)
+
+	// Address to check balance
+	targetAddr := common.HexToAddress("0x1234567890123456789012345678901234567890")
+
+	// Contract bytecode that returns balance of msg.sender:
+	// SELFBALANCE opcode returns the balance of the current contract
+	// We'll use BALANCE opcode to get balance of a specific address
+	//
+	// Bytecode explanation:
+	// PUSH20 <address> - push target address
+	// BALANCE - get balance of that address
+	// PUSH1 0x00 - push memory offset
+	// MSTORE - store balance in memory
+	// PUSH1 0x20 - push return size (32 bytes)
+	// PUSH1 0x00 - push return offset
+	// RETURN - return the balance
+	//
+	// 73 <20 bytes address> 31 60 00 52 60 20 60 00 f3
+	balanceCheckerCode := append(
+		[]byte{0x73}, // PUSH20
+		append(
+			targetAddr.Bytes(),
+			[]byte{
+				0x31,       // BALANCE
+				0x60, 0x00, // PUSH1 0x00
+				0x52,       // MSTORE
+				0x60, 0x20, // PUSH1 0x20
+				0x60, 0x00, // PUSH1 0x00
+				0xf3, // RETURN
+			}...,
+		)...,
+	)
+
+	// Deploy a simple contract that will check balance
+	contractAddr := common.HexToAddress("0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+
+	// Get proposer address and EVM config
+	proposerAddress := suite.network.GetContext().BlockHeader().ProposerAddress
+	config, err := suite.network.App.EVMKeeper.EVMConfig(
+		suite.network.GetContext(),
+		proposerAddress,
+	)
+	suite.Require().NoError(err)
+
+	// Test 1: Without state override - balance should be 0
+	txConfig := suite.network.App.EVMKeeper.TxConfig(
+		suite.network.GetContext(),
+		common.Hash{},
+	)
+
+	msg, err := suite.factory.GenerateGethCoreMsg(sender.Priv, types.EvmTxArgs{
+		To:       &contractAddr,
+		Input:    []byte{}, // just call the contract
+		GasLimit: 100000,   // enough gas for the call
+	})
+	suite.Require().NoError(err)
+
+	// State override: set code for contractAddr and balance for targetAddr
+	overriddenBalance := big.NewInt(123456789)
+	stateOverride := &types.StateOverride{
+		contractAddr: types.OverrideAccount{
+			Code: func() *hexutil.Bytes { b := hexutil.Bytes(balanceCheckerCode); return &b }(),
+		},
+		targetAddr: types.OverrideAccount{
+			Balance: (*hexutil.Big)(overriddenBalance),
+		},
+	}
+
+	res, err := suite.network.App.EVMKeeper.ApplyMessageWithConfig(
+		suite.network.GetContext(),
+		*msg,
+		nil,
+		false, // don't commit
+		config,
+		txConfig,
+		stateOverride,
+	)
+	suite.Require().NoError(err)
+	suite.Require().NotNil(res)
+	suite.Require().False(res.Failed(), "VM error: %s", res.VmError)
+
+	// The result should contain the overridden balance
+	returnedBalance := new(big.Int).SetBytes(res.Ret)
+	suite.Require().Equal(overriddenBalance.String(), returnedBalance.String(),
+		"StateOverride should have changed the balance visible to the contract")
+
+	// Test 2: Verify original state is unchanged (targetAddr should have 0 balance)
+	originalBalance := suite.network.App.EVMKeeper.GetBalance(suite.network.GetContext(), targetAddr)
+	suite.Require().Equal(big.NewInt(0).String(), originalBalance.String(),
+		"Original state should not be modified")
+
+	_ = senderAddr // suppress unused variable warning
 }
 
 func (suite *KeeperTestSuite) TestGetProposerAddress() {

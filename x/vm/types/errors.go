@@ -30,6 +30,7 @@ const (
 	codeErrInactivePrecompile
 	codeErrABIPack
 	codeErrABIUnpack
+	codeErrUnexpectedStateOverride
 )
 
 var (
@@ -86,6 +87,9 @@ var (
 
 	// ErrABIUnpack returns an error if the contract ABI unpacking fails
 	ErrABIUnpack = errorsmod.Register(ModuleName, codeErrABIUnpack, "contract ABI unpack failed")
+
+	// ErrUnexpectedStateOverride returns an error if the state override is not nil when commit is true
+	ErrUnexpectedStateOverride = errorsmod.Register(ModuleName, codeErrUnexpectedStateOverride, "state override is not allowed when commit is true")
 )
 
 // NewExecErrorWithReason unpacks the revert return bytes and returns a wrapped error

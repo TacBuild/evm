@@ -3,6 +3,7 @@ package statedb
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"sort"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -610,6 +611,71 @@ func (s *StateDB) commitWithCtx(ctx sdk.Context) error {
 				} else {
 					s.keeper.SetState(ctx, obj.Address(), key, valueBytes)
 				}
+			}
+		}
+	}
+	return nil
+}
+
+func (s *StateDB) SetBalance(addr common.Address, amount *uint256.Int) {
+	stateObject := s.getOrNewStateObject(addr)
+	if stateObject != nil {
+		stateObject.SetBalance(amount)
+	}
+}
+
+// SetStorage replaces the entire storage for the specified account with given
+// storage. This function should only be used for debugging and the mutations
+// must be discarded afterwards.
+func (s *StateDB) SetStorage(addr common.Address, storage map[common.Hash]common.Hash) {
+	newObj, prev := s.createObject(addr)
+	for k, v := range storage {
+		newObj.SetState(k, v)
+	}
+	// Inherit the metadata of original object if it was existent
+	if prev != nil {
+		newObj.SetCode(common.BytesToHash(prev.CodeHash()), prev.code)
+		newObj.SetNonce(prev.Nonce())
+		newObj.SetBalance(prev.Balance())
+	}
+}
+
+// Apply overrides the fields of specified accounts into the given state.
+func (statedb *StateDB) ApplyStateOverride(diff *types.StateOverride) error {
+	if diff == nil {
+		return nil
+	}
+	// Tracks destinations of precompiles that were moved.
+	dirtyAddrs := make(map[common.Address]struct{})
+	for addr, account := range *diff {
+		// If a precompile was moved to this address already, it can't be overridden.
+		if _, ok := dirtyAddrs[addr]; ok {
+			return fmt.Errorf("account %s has already been overridden by a precompile", addr.Hex())
+		}
+		// Override account nonce.
+		if account.Nonce != nil {
+			statedb.SetNonce(addr, uint64(*account.Nonce))
+		}
+		// Override account(contract) code.
+		if account.Code != nil {
+			statedb.SetCode(addr, *account.Code)
+		}
+		// Override account balance.
+		if account.Balance != nil {
+			u256Balance, _ := uint256.FromBig((*big.Int)(account.Balance))
+			statedb.SetBalance(addr, u256Balance)
+		}
+		if account.State != nil && account.StateDiff != nil {
+			return fmt.Errorf("account %s has both 'state' and 'stateDiff'", addr.Hex())
+		}
+		// Replace entire state if caller requires.
+		if account.State != nil {
+			statedb.SetStorage(addr, account.State)
+		}
+		// Apply state diff into specified accounts.
+		if account.StateDiff != nil {
+			for key, value := range account.StateDiff {
+				statedb.SetState(addr, key, value)
 			}
 		}
 	}
