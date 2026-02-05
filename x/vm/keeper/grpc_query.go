@@ -217,7 +217,7 @@ func (k Keeper) Params(c context.Context, _ *types.QueryParamsRequest) (*types.Q
 	}, nil
 }
 
-func (k Keeper) call(ctx sdk.Context, args types.TransactionArgs, proposerAddress sdk.ConsAddress, gasCap uint64, stateOverridePtr *types.StateOverride) (*types.MsgEthereumTxResponse, error) {
+func (k Keeper) call(ctx sdk.Context, args types.TransactionArgs, proposerAddress sdk.ConsAddress, gasCap uint64, stateOverride *types.StateOverride) (*types.MsgEthereumTxResponse, error) {
 	cfg, err := k.EVMConfig(ctx, GetProposerAddress(ctx, proposerAddress))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -235,7 +235,7 @@ func (k Keeper) call(ctx sdk.Context, args types.TransactionArgs, proposerAddres
 	txConfig := statedb.NewEmptyTxConfig(common.BytesToHash(ctx.HeaderHash()))
 
 	// pass false to not commit StateDB
-	res, err := k.ApplyMessageWithConfig(ctx, msg, nil, false, cfg, txConfig, stateOverridePtr)
+	res, err := k.ApplyMessageWithConfig(ctx, msg, nil, false, cfg, txConfig, stateOverride)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

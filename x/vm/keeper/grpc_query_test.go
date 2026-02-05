@@ -1667,6 +1667,277 @@ func (suite *KeeperTestSuite) TestEthCall() {
 	}
 }
 
+func (suite *KeeperTestSuite) TestTacSimulate() {
+	suite.enableFeemarket = true
+	defer func() { suite.enableFeemarket = false }()
+	suite.SetupTest()
+
+	erc20Contract, err := testdata.LoadERC20Contract()
+	suite.Require().NoError(err)
+
+	// Generate common data for requests
+	sender := suite.keyring.GetAddr(0)
+	supply := sdkmath.NewIntWithDecimal(1000, 18).BigInt()
+	ctorArgs, err := erc20Contract.ABI.Pack("", sender, supply)
+	suite.Require().NoError(err)
+	deployData := erc20Contract.Bin
+	deployData = append(deployData, ctorArgs...)
+
+	// Deploy ERC20 contract for transfer tests
+	senderKey := suite.keyring.GetKey(0)
+	contractAddr, err := deployErc20Contract(senderKey, suite.factory)
+	suite.Require().NoError(err)
+
+	err = suite.network.NextBlock()
+	suite.Require().NoError(err)
+
+	// Prepare transfer call data
+	recipient := common.HexToAddress("0xC6Fe5D33615a1C52c08018c47E8Bc53646A0E101")
+	transferData, err := erc20Contract.ABI.Pack("transfer", recipient, big.NewInt(1000))
+	suite.Require().NoError(err)
+
+	testCases := []struct {
+		name       string
+		getReq     func() *types.TacSimulateRequest
+		expPass    bool
+		expVMError bool
+		validate   func(res *types.MsgEthereumTxResponse)
+	}{
+		{
+			name: "fail - nil request",
+			getReq: func() *types.TacSimulateRequest {
+				return nil
+			},
+			expPass: false,
+		},
+		{
+			name: "fail - invalid args",
+			getReq: func() *types.TacSimulateRequest {
+				return &types.TacSimulateRequest{
+					Args:   []byte("invalid args"),
+					GasCap: config.DefaultGasCap,
+				}
+			},
+			expPass: false,
+		},
+		{
+			name: "fail - invalid state override json",
+			getReq: func() *types.TacSimulateRequest {
+				args, err := json.Marshal(&types.TransactionArgs{
+					From: &sender,
+					To:   &contractAddr,
+					Data: (*hexutil.Bytes)(&transferData),
+				})
+				suite.Require().NoError(err)
+
+				return &types.TacSimulateRequest{
+					Args:            args,
+					StateOverride:   []byte("invalid json"),
+					GasCap:          config.DefaultGasCap,
+					ProposerAddress: suite.network.GetContext().BlockHeader().ProposerAddress,
+				}
+			},
+			expPass: false,
+		},
+		{
+			name: "success - simple transfer call",
+			getReq: func() *types.TacSimulateRequest {
+				args, err := json.Marshal(&types.TransactionArgs{
+					From: &sender,
+					To:   &contractAddr,
+					Data: (*hexutil.Bytes)(&transferData),
+				})
+				suite.Require().NoError(err)
+
+				return &types.TacSimulateRequest{
+					Args:            args,
+					GasCap:          config.DefaultGasCap,
+					ProposerAddress: suite.network.GetContext().BlockHeader().ProposerAddress,
+				}
+			},
+			expPass: true,
+			validate: func(res *types.MsgEthereumTxResponse) {
+				suite.Require().False(res.Failed(), "VM error: %s", res.VmError)
+				suite.Require().NotEmpty(res.Ret)
+			},
+		},
+		{
+			name: "success - call with state override (override balance)",
+			getReq: func() *types.TacSimulateRequest {
+				// Create a new address with zero balance
+				newAddr := common.HexToAddress("0x1234567890123456789012345678901234567890")
+
+				args, err := json.Marshal(&types.TransactionArgs{
+					From:  &newAddr,
+					To:    &contractAddr,
+					Data:  (*hexutil.Bytes)(&transferData),
+					Value: (*hexutil.Big)(big.NewInt(0)),
+				})
+				suite.Require().NoError(err)
+
+				// Override balance for newAddr so it can pay for gas
+				stateOverride := types.StateOverride{
+					newAddr: types.OverrideAccount{
+						Balance: (*hexutil.Big)(big.NewInt(1e18)),
+					},
+				}
+				stateOverrideBytes, err := json.Marshal(stateOverride)
+				suite.Require().NoError(err)
+
+				return &types.TacSimulateRequest{
+					Args:            args,
+					StateOverride:   stateOverrideBytes,
+					GasCap:          config.DefaultGasCap,
+					ProposerAddress: suite.network.GetContext().BlockHeader().ProposerAddress,
+				}
+			},
+			expPass:    true,
+			expVMError: true, // Will fail because newAddr doesn't have ERC20 tokens, but balance override worked
+		},
+		{
+			name: "success - call with empty state override",
+			getReq: func() *types.TacSimulateRequest {
+				args, err := json.Marshal(&types.TransactionArgs{
+					From: &sender,
+					To:   &contractAddr,
+					Data: (*hexutil.Bytes)(&transferData),
+				})
+				suite.Require().NoError(err)
+
+				// Empty state override
+				stateOverride := types.StateOverride{}
+				stateOverrideBytes, err := json.Marshal(stateOverride)
+				suite.Require().NoError(err)
+
+				return &types.TacSimulateRequest{
+					Args:            args,
+					StateOverride:   stateOverrideBytes,
+					GasCap:          config.DefaultGasCap,
+					ProposerAddress: suite.network.GetContext().BlockHeader().ProposerAddress,
+				}
+			},
+			expPass: true,
+			validate: func(res *types.MsgEthereumTxResponse) {
+				suite.Require().False(res.Failed(), "VM error: %s", res.VmError)
+			},
+		},
+		{
+			name: "success - contract deployment",
+			getReq: func() *types.TacSimulateRequest {
+				args, err := json.Marshal(&types.TransactionArgs{
+					From: &sender,
+					Data: (*hexutil.Bytes)(&deployData),
+				})
+				suite.Require().NoError(err)
+
+				return &types.TacSimulateRequest{
+					Args:            args,
+					GasCap:          config.DefaultGasCap,
+					ProposerAddress: suite.network.GetContext().BlockHeader().ProposerAddress,
+				}
+			},
+			expPass: true,
+			validate: func(res *types.MsgEthereumTxResponse) {
+				suite.Require().False(res.Failed(), "VM error: %s", res.VmError)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			req := tc.getReq()
+
+			res, err := suite.network.App.EVMKeeper.TacSimulate(suite.network.GetContext(), req)
+
+			if tc.expPass {
+				suite.Require().NoError(err)
+				suite.Require().NotNil(res)
+
+				if tc.expVMError {
+					suite.Require().True(res.Failed(), "expected VM error but got success")
+				}
+
+				if tc.validate != nil {
+					tc.validate(res)
+				}
+			} else {
+				suite.Require().Error(err)
+			}
+		})
+	}
+}
+
+func (suite *KeeperTestSuite) TestTacSimulateWithStateOverride() {
+	suite.SetupTest()
+
+	sender := suite.keyring.GetAddr(0)
+
+	// Target address to check balance
+	targetAddr := common.HexToAddress("0x1234567890123456789012345678901234567890")
+
+	// Contract bytecode that returns balance of a specific address
+	// PUSH20 <address> BALANCE PUSH1 0x00 MSTORE PUSH1 0x20 PUSH1 0x00 RETURN
+	balanceCheckerCode := append(
+		[]byte{0x73}, // PUSH20
+		append(
+			targetAddr.Bytes(),
+			[]byte{
+				0x31,       // BALANCE
+				0x60, 0x00, // PUSH1 0x00
+				0x52,       // MSTORE
+				0x60, 0x20, // PUSH1 0x20
+				0x60, 0x00, // PUSH1 0x00
+				0xf3, // RETURN
+			}...,
+		)...,
+	)
+
+	contractAddr := common.HexToAddress("0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+
+	// Test: Use state override to inject code and check balance
+	overriddenBalance := big.NewInt(123456789)
+
+	args, err := json.Marshal(&types.TransactionArgs{
+		From: &sender,
+		To:   &contractAddr,
+		Gas:  func() *hexutil.Uint64 { g := hexutil.Uint64(100000); return &g }(),
+	})
+	suite.Require().NoError(err)
+
+	stateOverride := types.StateOverride{
+		contractAddr: types.OverrideAccount{
+			Code: func() *hexutil.Bytes { b := hexutil.Bytes(balanceCheckerCode); return &b }(),
+		},
+		targetAddr: types.OverrideAccount{
+			Balance: (*hexutil.Big)(overriddenBalance),
+		},
+	}
+	stateOverrideBytes, err := json.Marshal(stateOverride)
+	suite.Require().NoError(err)
+
+	req := &types.TacSimulateRequest{
+		Args:            args,
+		StateOverride:   stateOverrideBytes,
+		GasCap:          config.DefaultGasCap,
+		ProposerAddress: suite.network.GetContext().BlockHeader().ProposerAddress,
+	}
+
+	res, err := suite.network.App.EVMKeeper.TacSimulate(suite.network.GetContext(), req)
+	suite.Require().NoError(err)
+	suite.Require().NotNil(res)
+	suite.Require().False(res.Failed(), "VM error: %s", res.VmError)
+
+	// The result should contain the overridden balance
+	returnedBalance := new(big.Int).SetBytes(res.Ret)
+	suite.Require().Equal(overriddenBalance.String(), returnedBalance.String(),
+		"StateOverride should have changed the balance visible to the contract")
+
+	// Verify original state is unchanged
+	originalBalance := suite.network.App.EVMKeeper.GetBalance(suite.network.GetContext(), targetAddr)
+	suite.Require().Equal(big.NewInt(0).String(), originalBalance.String(),
+		"Original state should not be modified")
+}
+
 func (suite *KeeperTestSuite) TestEmptyRequest() {
 	suite.SetupTest()
 	k := suite.network.App.EVMKeeper
