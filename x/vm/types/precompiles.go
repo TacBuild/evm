@@ -23,10 +23,11 @@ const LiquidStakePrecompileAddress     = "0x000000000000000000000000000000000000
 //
 // NOTE: To be explicit, this list does not include the dynamically registered EVM extensions
 // like the ERC-20 extensions.
+// NOTE: This list MUST be sorted lexicographically by address to match the expected order
+// after params are set (SetParams sorts the precompiles).
 var AvailableStaticPrecompiles = []string{
 	P256PrecompileAddress,
 	Bech32PrecompileAddress,
-	Ed25519PrecompileAddress,
 	StakingPrecompileAddress,
 	DistributionPrecompileAddress,
 	ICS20PrecompileAddress,
@@ -35,5 +36,6 @@ var AvailableStaticPrecompiles = []string{
 	GovPrecompileAddress,
 	SlashingPrecompileAddress,
 	EvidencePrecompileAddress,
+	Ed25519PrecompileAddress,
 	LiquidStakePrecompileAddress,
 }
