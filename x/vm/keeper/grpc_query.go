@@ -217,6 +217,32 @@ func (k Keeper) Params(c context.Context, _ *types.QueryParamsRequest) (*types.Q
 	}, nil
 }
 
+func (k Keeper) call(ctx sdk.Context, args types.TransactionArgs, proposerAddress sdk.ConsAddress, gasCap uint64, stateOverridePtr *types.StateOverride) (*types.MsgEthereumTxResponse, error) {
+	cfg, err := k.EVMConfig(ctx, GetProposerAddress(ctx, proposerAddress))
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	// ApplyMessageWithConfig expect correct nonce set in msg
+	nonce := k.GetNonce(ctx, args.GetFrom())
+	args.Nonce = (*hexutil.Uint64)(&nonce)
+
+	msg, err := args.ToMessage(gasCap, cfg.BaseFee)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	txConfig := statedb.NewEmptyTxConfig(common.BytesToHash(ctx.HeaderHash()))
+
+	// pass false to not commit StateDB
+	res, err := k.ApplyMessageWithConfig(ctx, msg, nil, false, cfg, txConfig, stateOverridePtr)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return res, nil
+}
+
 // EthCall implements eth_call rpc api.
 func (k Keeper) EthCall(c context.Context, req *types.EthCallRequest) (*types.MsgEthereumTxResponse, error) {
 	if req == nil {
@@ -231,29 +257,7 @@ func (k Keeper) EthCall(c context.Context, req *types.EthCallRequest) (*types.Ms
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	cfg, err := k.EVMConfig(ctx, GetProposerAddress(ctx, req.ProposerAddress))
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	// ApplyMessageWithConfig expect correct nonce set in msg
-	nonce := k.GetNonce(ctx, args.GetFrom())
-	args.Nonce = (*hexutil.Uint64)(&nonce)
-
-	msg, err := args.ToMessage(req.GasCap, cfg.BaseFee)
-	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	txConfig := statedb.NewEmptyTxConfig(common.BytesToHash(ctx.HeaderHash()))
-
-	// pass false to not commit StateDB
-	res, err := k.ApplyMessageWithConfig(ctx, msg, nil, false, cfg, txConfig, nil)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return res, nil
+	return k.call(ctx, args, req.ProposerAddress, req.GasCap, nil)
 }
 
 func (k Keeper) TacSimulate(c context.Context, req *types.TacSimulateRequest) (*types.MsgEthereumTxResponse, error) {
@@ -279,24 +283,7 @@ func (k Keeper) TacSimulate(c context.Context, req *types.TacSimulateRequest) (*
 		stateOverridePtr = &stateOverride
 	}
 
-	cfg, err := k.EVMConfig(ctx, GetProposerAddress(ctx, req.ProposerAddress))
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	// ApplyMessageWithConfig expect correct nonce set in msg
-	nonce := k.GetNonce(ctx, args.GetFrom())
-	args.Nonce = (*hexutil.Uint64)(&nonce)
-
-	msg, err := args.ToMessage(req.GasCap, cfg.BaseFee)
-	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	txConfig := statedb.NewEmptyTxConfig(common.BytesToHash(ctx.HeaderHash()))
-
-	// pass false to not commit StateDB
-	return k.ApplyMessageWithConfig(ctx, msg, nil, false, cfg, txConfig, stateOverridePtr)
+	return k.call(ctx, args, req.ProposerAddress, req.GasCap, stateOverridePtr)
 
 }
 
