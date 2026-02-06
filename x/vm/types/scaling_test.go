@@ -83,7 +83,7 @@ func TestConvertEvmCoinFrom18Decimals(t *testing.T) {
 
 			if !tc.expErr {
 				require.NoError(t, err)
-				require.Equal(t, tc.expCoin, coinConverted, "expected a different coin")
+				require.True(t, tc.expCoin.IsEqual(coinConverted), "expected a different coin: got %s, want %s", coinConverted, tc.expCoin)
 			} else {
 				require.Error(t, err)
 			}
