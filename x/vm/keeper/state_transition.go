@@ -317,7 +317,7 @@ func (k *Keeper) ApplyMessageWithConfig(
 		if commit {
 			return nil, errorsmod.Wrap(types.ErrUnexpectedStateOverride, "state override is not nil")
 		}
-		if err := stateDB.ApplyStateOverride(stateOverride); err != nil {
+		if err := stateDB.ApplyStateOverride(stateOverride, evm.ActivePrecompiles(rules)); err != nil {
 			return nil, errorsmod.Wrap(err, "failed to apply state override")
 		}
 	}
