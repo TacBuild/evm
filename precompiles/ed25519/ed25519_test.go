@@ -50,6 +50,9 @@ func (s *PrecompileTestSuite) TestAddress() {
 }
 
 func (s *PrecompileTestSuite) TestRequiredGas() {
+	// Formula: msgLen = max(len(input) - 36, 0)
+	// gas = ED25519_VERIFY_BASE_GAS + SHA512_BASE_GAS + SHA512_PER_WORD_GAS * ((msgLen + 31) / 32)
+	// 36 = 4 (method selector) + 32 (sig.Z excluded from sha512 calculation)
 	testCases := []struct {
 		name     string
 		input    []byte
@@ -58,27 +61,32 @@ func (s *PrecompileTestSuite) TestRequiredGas() {
 		{
 			"empty input",
 			[]byte{},
+			// msgLen = 0, words = 0
 			edprecompile.ED25519_VERIFY_BASE_GAS + edprecompile.SHA512_BASE_GAS,
 		},
 		{
 			"minimal input (96 bytes)",
 			make([]byte, 96),
-			edprecompile.ED25519_VERIFY_BASE_GAS + edprecompile.SHA512_BASE_GAS,
-		},
-		{
-			"input with 32 byte message",
-			make([]byte, 96+32),
-			edprecompile.ED25519_VERIFY_BASE_GAS + edprecompile.SHA512_BASE_GAS + edprecompile.SHA512_PER_WORD_GAS,
-		},
-		{
-			"input with 64 byte message",
-			make([]byte, 96+64),
+			// msgLen = 96-36 = 60, words = (60+31)/32 = 2
 			edprecompile.ED25519_VERIFY_BASE_GAS + edprecompile.SHA512_BASE_GAS + edprecompile.SHA512_PER_WORD_GAS*2,
 		},
 		{
-			"input with 100 byte message",
-			make([]byte, 96+100),
+			"input with 32 byte message (128 bytes total)",
+			make([]byte, 128),
+			// msgLen = 128-36 = 92, words = (92+31)/32 = 3
+			edprecompile.ED25519_VERIFY_BASE_GAS + edprecompile.SHA512_BASE_GAS + edprecompile.SHA512_PER_WORD_GAS*3,
+		},
+		{
+			"input with 64 byte message (160 bytes total)",
+			make([]byte, 160),
+			// msgLen = 160-36 = 124, words = (124+31)/32 = 4
 			edprecompile.ED25519_VERIFY_BASE_GAS + edprecompile.SHA512_BASE_GAS + edprecompile.SHA512_PER_WORD_GAS*4,
+		},
+		{
+			"input with 100 byte message (196 bytes total)",
+			make([]byte, 196),
+			// msgLen = 196-36 = 160, words = (160+31)/32 = 5
+			edprecompile.ED25519_VERIFY_BASE_GAS + edprecompile.SHA512_BASE_GAS + edprecompile.SHA512_PER_WORD_GAS*5,
 		},
 	}
 
