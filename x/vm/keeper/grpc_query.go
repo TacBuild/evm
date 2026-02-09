@@ -217,7 +217,7 @@ func (k Keeper) Params(c context.Context, _ *types.QueryParamsRequest) (*types.Q
 	}, nil
 }
 
-func (k Keeper) call(ctx sdk.Context, args types.TransactionArgs, proposerAddress sdk.ConsAddress, gasCap uint64, stateOverride *types.StateOverride) (*types.MsgEthereumTxResponse, error) {
+func (k Keeper) callWithOverride(ctx sdk.Context, args types.TransactionArgs, proposerAddress sdk.ConsAddress, gasCap uint64, stateOverride *types.StateOverride) (*types.MsgEthereumTxResponse, error) {
 	cfg, err := k.EVMConfig(ctx, GetProposerAddress(ctx, proposerAddress))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -257,7 +257,7 @@ func (k Keeper) EthCall(c context.Context, req *types.EthCallRequest) (*types.Ms
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	return k.call(ctx, args, req.ProposerAddress, req.GasCap, nil)
+	return k.callWithOverride(ctx, args, req.ProposerAddress, req.GasCap, nil)
 }
 
 func (k Keeper) TacSimulate(c context.Context, req *types.TacSimulateRequest) (*types.MsgEthereumTxResponse, error) {
@@ -283,7 +283,7 @@ func (k Keeper) TacSimulate(c context.Context, req *types.TacSimulateRequest) (*
 		stateOverridePtr = &stateOverride
 	}
 
-	return k.call(ctx, args, req.ProposerAddress, req.GasCap, stateOverridePtr)
+	return k.callWithOverride(ctx, args, req.ProposerAddress, req.GasCap, stateOverridePtr)
 
 }
 
