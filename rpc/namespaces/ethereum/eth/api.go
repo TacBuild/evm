@@ -306,10 +306,13 @@ func (e *PublicAPI) TacSimulate(args evmtypes.TransactionArgs,
 		return []byte{}, err
 	}
 
+	// convert evmtypes.Log to ethtypes.Log
+	rpcLogs := rpctypes.ToRPCTypeLogs(data.Logs)
+
 	tacSimulateResult := rpctypes.TacSimulateResult{
 		Output:  hexutil.Bytes(data.Ret),
 		VmError: data.VmError,
-		Logs:    data.Logs,
+		Logs:    rpcLogs,
 		GasUsed: hexutil.Uint64(data.GasUsed),
 	}
 
