@@ -110,7 +110,7 @@ type EVMBackend interface {
 	SetTxDefaults(args evmtypes.TransactionArgs) (evmtypes.TransactionArgs, error)
 	EstimateGas(args evmtypes.TransactionArgs, blockNrOptional *rpctypes.BlockNumber) (hexutil.Uint64, error)
 	DoCall(args evmtypes.TransactionArgs, blockNr rpctypes.BlockNumber) (*evmtypes.MsgEthereumTxResponse, error)
-	DoTacSimulate(args evmtypes.TransactionArgs, blockNr rpctypes.BlockNumber, stateOverride *evmtypes.StateOverride) (*evmtypes.MsgEthereumTxResponse, error)
+	DoTacSimulate(args evmtypes.TransactionArgs, blockNr rpctypes.BlockNumber, stateOverride evmtypes.StateOverride) (*evmtypes.MsgEthereumTxResponse, error)
 	GasPrice() (*hexutil.Big, error)
 
 	// Filter API

@@ -217,7 +217,7 @@ func (k Keeper) Params(c context.Context, _ *types.QueryParamsRequest) (*types.Q
 	}, nil
 }
 
-func (k Keeper) callWithOverride(ctx sdk.Context, args types.TransactionArgs, proposerAddress sdk.ConsAddress, gasCap uint64, stateOverride *types.StateOverride) (*types.MsgEthereumTxResponse, error) {
+func (k Keeper) callWithOverride(ctx sdk.Context, args types.TransactionArgs, proposerAddress sdk.ConsAddress, gasCap uint64, stateOverride types.StateOverride) (*types.MsgEthereumTxResponse, error) {
 	cfg, err := k.EVMConfig(ctx, GetProposerAddress(ctx, proposerAddress))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -273,17 +273,15 @@ func (k Keeper) TacSimulate(c context.Context, req *types.TacSimulateRequest) (*
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	var stateOverridePtr *types.StateOverride
+	var stateOverride types.StateOverride
 	if req.StateOverride != nil {
-		var stateOverride types.StateOverride
 		err = json.Unmarshal(req.StateOverride, &stateOverride)
 		if err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
-		stateOverridePtr = &stateOverride
 	}
 
-	return k.callWithOverride(ctx, args, req.ProposerAddress, req.GasCap, stateOverridePtr)
+	return k.callWithOverride(ctx, args, req.ProposerAddress, req.GasCap, stateOverride)
 
 }
 

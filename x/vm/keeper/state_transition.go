@@ -270,7 +270,7 @@ func (k *Keeper) ApplyMessageWithConfig(
 	commit bool,
 	cfg *statedb.EVMConfig,
 	txConfig statedb.TxConfig,
-	stateOverride *types.StateOverride,
+	stateOverride types.StateOverride,
 ) (*types.MsgEthereumTxResponse, error) {
 	var (
 		ret   []byte // return bytes from evm execution

@@ -72,7 +72,7 @@ type EthereumAPI interface {
 	// eth_tacSimulate implements the custom `eth_tacSimulate` rpc api which supports state override and event logs as result
 	TacSimulate(args evmtypes.TransactionArgs,
 		blockNrOrHash rpctypes.BlockNumberOrHash,
-		stateOverride *evmtypes.StateOverride,
+		stateOverride evmtypes.StateOverride,
 	) (hexutil.Bytes, error)
 
 	// Chain Information
@@ -293,7 +293,7 @@ func (e *PublicAPI) Call(args evmtypes.TransactionArgs,
 
 func (e *PublicAPI) TacSimulate(args evmtypes.TransactionArgs,
 	blockNrOrHash rpctypes.BlockNumberOrHash,
-	stateOverride *evmtypes.StateOverride,
+	stateOverride evmtypes.StateOverride,
 ) (hexutil.Bytes, error) {
 	e.logger.Debug("eth_tacSimulate", "args", args.String(), "block number or hash", blockNrOrHash, "state override", stateOverride)
 

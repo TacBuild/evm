@@ -642,11 +642,11 @@ func (s *StateDB) SetStorage(addr common.Address, storage map[common.Hash]common
 }
 
 // Apply overrides the fields of specified accounts into the given state.
-func (statedb *StateDB) ApplyStateOverride(diff *types.StateOverride, activePrecompiles []common.Address) error {
+func (statedb *StateDB) ApplyStateOverride(diff types.StateOverride, activePrecompiles []common.Address) error {
 	if diff == nil {
 		return nil
 	}
-	for addr, account := range *diff {
+	for addr, account := range diff {
 		// check if the account is a precompile, if so, return error since state override is not allowed for precompiles
 		if slices.Index(activePrecompiles, addr) != -1 {
 			return fmt.Errorf("account %s is a precompile, state override is not allowed", addr.Hex())

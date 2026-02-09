@@ -375,7 +375,7 @@ func (b *Backend) DoCall(
 func (b *Backend) DoTacSimulate(
 	args evmtypes.TransactionArgs,
 	blockNr rpctypes.BlockNumber,
-	stateOverride *evmtypes.StateOverride,
+	stateOverride evmtypes.StateOverride,
 ) (*evmtypes.MsgEthereumTxResponse, error) {
 	bz, err := json.Marshal(&args)
 	if err != nil {
