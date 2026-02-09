@@ -18,9 +18,9 @@ import (
 //go:embed abi.json
 var f embed.FS
 
-const ED25519_VERIFY_BASE_GAS = 1500
+const ED25519_VERIFY_BASE_GAS = 2000
 const SHA512_BASE_GAS = 60
-const SHA512_PER_WORD_GAS = 8
+const SHA512_PER_WORD_GAS = 12
 
 const ED25519VerifyMethod = "ed25519Verify"
 
@@ -46,7 +46,8 @@ func (Precompile) Address() common.Address {
 func (p Precompile) RequiredGas(input []byte) uint64 {
 	// Challenge for ed25519 uses sha512 of sig.R, pubkey, msg
 	// So exclude 32 bytes of sig.Z from the length
-	msgLen := max(len(input)-32, 0)
+	// Also exclute 4 bytes of method selector
+	msgLen := max(len(input)-36, 0)
 	return ED25519_VERIFY_BASE_GAS + SHA512_BASE_GAS + SHA512_PER_WORD_GAS*((uint64(msgLen)+31)/32)
 }
 
