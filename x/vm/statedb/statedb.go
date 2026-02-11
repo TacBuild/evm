@@ -630,6 +630,7 @@ func (s *StateDB) SetBalance(addr common.Address, amount *uint256.Int) {
 // must be discarded afterwards.
 func (s *StateDB) SetStorage(addr common.Address, storage map[common.Hash]common.Hash) {
 	newObj, prev := s.createObject(addr)
+	newObj.SetStateOverriden()
 	for k, v := range storage {
 		newObj.SetState(k, v)
 	}
