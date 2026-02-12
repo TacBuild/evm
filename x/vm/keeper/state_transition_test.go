@@ -791,7 +791,7 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 
 	testCases := []struct {
 		name          string
-		stateOverride *types.StateOverride
+		stateOverride types.StateOverride
 		commit        bool
 		expErr        bool
 		expErrMsg     string
@@ -804,7 +804,7 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 		},
 		{
 			name: "success - override balance",
-			stateOverride: &types.StateOverride{
+			stateOverride: types.StateOverride{
 				recipient: types.OverrideAccount{
 					Balance: (*hexutil.Big)(big.NewInt(1e18)),
 				},
@@ -814,7 +814,7 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 		},
 		{
 			name: "success - override nonce",
-			stateOverride: &types.StateOverride{
+			stateOverride: types.StateOverride{
 				recipient: types.OverrideAccount{
 					Nonce: func() *hexutil.Uint64 { n := hexutil.Uint64(100); return &n }(),
 				},
@@ -824,7 +824,7 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 		},
 		{
 			name: "success - override code (empty code does not affect simple transfer)",
-			stateOverride: &types.StateOverride{
+			stateOverride: types.StateOverride{
 				recipient: types.OverrideAccount{
 					// Setting empty code on recipient - simple transfer should still work
 					Code: func() *hexutil.Bytes { b := hexutil.Bytes([]byte{}); return &b }(),
@@ -835,7 +835,7 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 		},
 		{
 			name: "success - override state diff",
-			stateOverride: &types.StateOverride{
+			stateOverride: types.StateOverride{
 				recipient: types.OverrideAccount{
 					StateDiff: map[common.Hash]common.Hash{
 						common.HexToHash("0x01"): common.HexToHash("0x02"),
@@ -847,7 +847,7 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 		},
 		{
 			name: "fail - state override with commit=true",
-			stateOverride: &types.StateOverride{
+			stateOverride: types.StateOverride{
 				recipient: types.OverrideAccount{
 					Balance: (*hexutil.Big)(big.NewInt(1e18)),
 				},
@@ -858,7 +858,7 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 		},
 		{
 			name: "fail - both state and stateDiff provided",
-			stateOverride: &types.StateOverride{
+			stateOverride: types.StateOverride{
 				recipient: types.OverrideAccount{
 					State: map[common.Hash]common.Hash{
 						common.HexToHash("0x01"): common.HexToHash("0x02"),
@@ -977,7 +977,7 @@ func (suite *KeeperTestSuite) TestStateOverrideBalanceCheck() {
 
 	// State override: set code for contractAddr and balance for targetAddr
 	overriddenBalance := big.NewInt(123456789)
-	stateOverride := &types.StateOverride{
+	stateOverride := types.StateOverride{
 		contractAddr: types.OverrideAccount{
 			Code: func() *hexutil.Bytes { b := hexutil.Bytes(balanceCheckerCode); return &b }(),
 		},
@@ -1010,6 +1010,264 @@ func (suite *KeeperTestSuite) TestStateOverrideBalanceCheck() {
 		"Original state should not be modified")
 
 	_ = senderAddr // suppress unused variable warning
+}
+
+// TestStateOverrideStateMapResetsNonOverriddenKeys verifies that when State map (full state replacement)
+// is used in state override, storage keys NOT present in the override return zero values,
+// even if they exist in the actual on-chain storage. This mimics geth behavior.
+// In contrast, StateDiff (partial override) should preserve non-overridden keys.
+func (suite *KeeperTestSuite) TestStateOverrideStateMapResetsNonOverriddenKeys() {
+	suite.SetupTest()
+
+	sender := suite.keyring.GetKey(0)
+
+	// Contract address where we'll set real storage and override it
+	contractAddr := common.HexToAddress("0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+
+	// Storage slots and values
+	slot0 := common.HexToHash("0x00")
+	slot1 := common.HexToHash("0x01")
+	realValue0 := common.HexToHash("0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+	realValue1 := common.HexToHash("0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+	overrideValue0 := common.HexToHash("0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
+
+	// Write real storage values into the keeper (on-chain state)
+	suite.network.App.EVMKeeper.SetState(suite.network.GetContext(), contractAddr, slot0, realValue0.Bytes())
+	suite.network.App.EVMKeeper.SetState(suite.network.GetContext(), contractAddr, slot1, realValue1.Bytes())
+
+	// Verify real storage was written correctly
+	readValue0 := suite.network.App.EVMKeeper.GetState(suite.network.GetContext(), contractAddr, slot0)
+	readValue1 := suite.network.App.EVMKeeper.GetState(suite.network.GetContext(), contractAddr, slot1)
+	suite.Require().Equal(realValue0, readValue0, "slot0 should be written to keeper")
+	suite.Require().Equal(realValue1, readValue1, "slot1 should be written to keeper")
+
+	// Bytecode: reads slot 0 and slot 1, returns both as 64 bytes
+	//
+	// PUSH1 0x00  SLOAD  PUSH1 0x00  MSTORE   -> memory[0..31] = storage[0]
+	// PUSH1 0x01  SLOAD  PUSH1 0x20  MSTORE   -> memory[32..63] = storage[1]
+	// PUSH1 0x40  PUSH1 0x00  RETURN           -> return 64 bytes from memory
+	storageReaderCode := []byte{
+		0x60, 0x00, // PUSH1 0x00
+		0x54,       // SLOAD
+		0x60, 0x00, // PUSH1 0x00
+		0x52,       // MSTORE
+		0x60, 0x01, // PUSH1 0x01
+		0x54,       // SLOAD
+		0x60, 0x20, // PUSH1 0x20
+		0x52,       // MSTORE
+		0x60, 0x40, // PUSH1 0x40
+		0x60, 0x00, // PUSH1 0x00
+		0xf3, // RETURN
+	}
+
+	// Get proposer address and EVM config
+	proposerAddress := suite.network.GetContext().BlockHeader().ProposerAddress
+	config, err := suite.network.App.EVMKeeper.EVMConfig(
+		suite.network.GetContext(),
+		proposerAddress,
+	)
+	suite.Require().NoError(err)
+
+	txConfig := suite.network.App.EVMKeeper.TxConfig(
+		suite.network.GetContext(),
+		common.Hash{},
+	)
+
+	msg, err := suite.factory.GenerateGethCoreMsg(sender.Priv, types.EvmTxArgs{
+		To:       &contractAddr,
+		Input:    []byte{},
+		GasLimit: 100000,
+	})
+	suite.Require().NoError(err)
+
+	// ---------------------------------------------------------------
+	// Test 1: State override with State map (full replacement)
+	// Override only slot0 -> non-overridden slot1 MUST return zero
+	// ---------------------------------------------------------------
+	stateOverrideFullReplace := types.StateOverride{
+		contractAddr: types.OverrideAccount{
+			Code: func() *hexutil.Bytes { b := hexutil.Bytes(storageReaderCode); return &b }(),
+			State: map[common.Hash]common.Hash{
+				slot0: overrideValue0,
+				// slot1 is intentionally NOT in the State map
+			},
+		},
+	}
+
+	res, err := suite.network.App.EVMKeeper.ApplyMessageWithConfig(
+		suite.network.GetContext(),
+		*msg,
+		nil,
+		false,
+		config,
+		txConfig,
+		stateOverrideFullReplace,
+	)
+	suite.Require().NoError(err)
+	suite.Require().NotNil(res)
+	suite.Require().False(res.Failed(), "VM error: %s", res.VmError)
+	suite.Require().Len(res.Ret, 64, "expected 64 bytes return (two 32-byte slots)")
+
+	returnedSlot0 := common.BytesToHash(res.Ret[:32])
+	returnedSlot1 := common.BytesToHash(res.Ret[32:64])
+
+	suite.Require().Equal(overrideValue0, returnedSlot0,
+		"State override: slot0 should return the overridden value")
+	suite.Require().Equal(common.Hash{}, returnedSlot1,
+		"State override: slot1 (not in override State map) should return zero, not the real on-chain value")
+
+	// ---------------------------------------------------------------
+	// Test 2: State override with StateDiff (partial override)
+	// Override only slot0 -> non-overridden slot1 MUST return real value
+	// ---------------------------------------------------------------
+	msg2, err := suite.factory.GenerateGethCoreMsg(sender.Priv, types.EvmTxArgs{
+		To:       &contractAddr,
+		Input:    []byte{},
+		GasLimit: 100000,
+	})
+	suite.Require().NoError(err)
+
+	stateOverridePartial := types.StateOverride{
+		contractAddr: types.OverrideAccount{
+			Code: func() *hexutil.Bytes { b := hexutil.Bytes(storageReaderCode); return &b }(),
+			StateDiff: map[common.Hash]common.Hash{
+				slot0: overrideValue0,
+				// slot1 is intentionally NOT in the StateDiff map
+			},
+		},
+	}
+
+	txConfig2 := suite.network.App.EVMKeeper.TxConfig(
+		suite.network.GetContext(),
+		common.Hash{},
+	)
+
+	res2, err := suite.network.App.EVMKeeper.ApplyMessageWithConfig(
+		suite.network.GetContext(),
+		*msg2,
+		nil,
+		false,
+		config,
+		txConfig2,
+		stateOverridePartial,
+	)
+	suite.Require().NoError(err)
+	suite.Require().NotNil(res2)
+	suite.Require().False(res2.Failed(), "VM error: %s", res2.VmError)
+	suite.Require().Len(res2.Ret, 64, "expected 64 bytes return (two 32-byte slots)")
+
+	returnedSlot0Diff := common.BytesToHash(res2.Ret[:32])
+	returnedSlot1Diff := common.BytesToHash(res2.Ret[32:64])
+
+	suite.Require().Equal(overrideValue0, returnedSlot0Diff,
+		"StateDiff override: slot0 should return the overridden value")
+	suite.Require().Equal(realValue1, returnedSlot1Diff,
+		"StateDiff override: slot1 (not in override) should return the real on-chain value")
+
+	// ---------------------------------------------------------------
+	// Test 3: Verify original on-chain state is unchanged after overrides
+	// ---------------------------------------------------------------
+	finalValue0 := suite.network.App.EVMKeeper.GetState(suite.network.GetContext(), contractAddr, slot0)
+	finalValue1 := suite.network.App.EVMKeeper.GetState(suite.network.GetContext(), contractAddr, slot1)
+	suite.Require().Equal(realValue0, finalValue0, "Original slot0 should not be modified")
+	suite.Require().Equal(realValue1, finalValue1, "Original slot1 should not be modified")
+}
+
+// TestStateOverrideCannotOverridePrecompile verifies that state override
+// returns an error when trying to override a precompile contract address.
+func (suite *KeeperTestSuite) TestStateOverrideCannotOverridePrecompile() {
+	suite.SetupTest()
+
+	sender := suite.keyring.GetKey(0)
+
+	// Use standard EVM precompile addresses (ecrecover=0x01, sha256=0x02, etc.)
+	// These are always present in ActivePrecompiles regardless of the chain configuration.
+	ecrecoverAddr := common.HexToAddress("0x0000000000000000000000000000000000000001")
+
+	proposerAddress := suite.network.GetContext().BlockHeader().ProposerAddress
+	config, err := suite.network.App.EVMKeeper.EVMConfig(
+		suite.network.GetContext(),
+		proposerAddress,
+	)
+	suite.Require().NoError(err)
+
+	txConfig := suite.network.App.EVMKeeper.TxConfig(
+		suite.network.GetContext(),
+		common.Hash{},
+	)
+
+	recipient := suite.keyring.GetAddr(1)
+	msg, err := suite.factory.GenerateGethCoreMsg(sender.Priv, types.EvmTxArgs{
+		To:     &recipient,
+		Amount: big.NewInt(100),
+	})
+	suite.Require().NoError(err)
+
+	testCases := []struct {
+		name          string
+		stateOverride types.StateOverride
+	}{
+		{
+			name: "fail - override precompile balance",
+			stateOverride: types.StateOverride{
+				ecrecoverAddr: types.OverrideAccount{
+					Balance: (*hexutil.Big)(big.NewInt(1e18)),
+				},
+			},
+		},
+		{
+			name: "fail - override precompile code",
+			stateOverride: types.StateOverride{
+				ecrecoverAddr: types.OverrideAccount{
+					Code: func() *hexutil.Bytes { b := hexutil.Bytes([]byte{0x60, 0x00}); return &b }(),
+				},
+			},
+		},
+		{
+			name: "fail - override precompile nonce",
+			stateOverride: types.StateOverride{
+				ecrecoverAddr: types.OverrideAccount{
+					Nonce: func() *hexutil.Uint64 { n := hexutil.Uint64(1); return &n }(),
+				},
+			},
+		},
+		{
+			name: "fail - override precompile state",
+			stateOverride: types.StateOverride{
+				ecrecoverAddr: types.OverrideAccount{
+					State: map[common.Hash]common.Hash{
+						common.HexToHash("0x01"): common.HexToHash("0x02"),
+					},
+				},
+			},
+		},
+		{
+			name: "fail - override precompile stateDiff",
+			stateOverride: types.StateOverride{
+				ecrecoverAddr: types.OverrideAccount{
+					StateDiff: map[common.Hash]common.Hash{
+						common.HexToHash("0x01"): common.HexToHash("0x02"),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			_, err := suite.network.App.EVMKeeper.ApplyMessageWithConfig(
+				suite.network.GetContext(),
+				*msg,
+				nil,
+				false,
+				config,
+				txConfig,
+				tc.stateOverride,
+			)
+			suite.Require().Error(err)
+			suite.Require().Contains(err.Error(), "is a precompile, state override is not allowed")
+		})
+	}
 }
 
 func (suite *KeeperTestSuite) TestGetProposerAddress() {
