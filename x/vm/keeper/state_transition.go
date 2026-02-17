@@ -263,6 +263,14 @@ func (k *Keeper) ApplyMessage(ctx sdk.Context, msg evmcore.Message, tracer vm.EV
 // # Commit parameter
 //
 // If commit is true, the `StateDB` will be committed, otherwise discarded.
+//
+// # State override parameter
+//
+// If state override is not nil, the `StateDB` will apply the state override
+// before EVM execution and discard the dirty state after execution,
+// no matter the execution result. This is only used for `eth_call`, `eth_tacSimulate` and `eth_estimateGas`
+// where the state should not be changed.
+
 func (k *Keeper) ApplyMessageWithConfig(
 	ctx sdk.Context,
 	msg evmcore.Message,

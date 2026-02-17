@@ -70,7 +70,7 @@ func (k Keeper) CallEVMWithData(
 		gasRes, err := k.EstimateGasInternal(ctx, &types.EthCallRequest{
 			Args:   args,
 			GasCap: config.DefaultGasCap,
-		}, types.Internal)
+		}, types.Internal, nil)
 		if err != nil {
 			return nil, err
 		}

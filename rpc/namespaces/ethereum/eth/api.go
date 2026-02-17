@@ -310,10 +310,11 @@ func (e *PublicAPI) TacSimulate(args evmtypes.TransactionArgs,
 	rpcLogs := rpctypes.ToRPCTypeLogs(data.Logs)
 
 	tacSimulateResult := rpctypes.TacSimulateResult{
-		Output:  hexutil.Bytes(data.Ret),
-		VmError: data.VmError,
-		Logs:    rpcLogs,
-		GasUsed: hexutil.Uint64(data.GasUsed),
+		Output:       hexutil.Bytes(data.Ret),
+		VmError:      data.VmError,
+		Logs:         rpcLogs,
+		GasUsed:      hexutil.Uint64(data.GasUsed),
+		GasEstimated: hexutil.Uint64(data.GasEstimated),
 	}
 
 	ret, err := json.Marshal(tacSimulateResult)

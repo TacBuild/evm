@@ -425,7 +425,7 @@ func (_m *EVMQueryClient) Storage(ctx context.Context, in *types.QueryStorageReq
 }
 
 // TacSimulate provides a mock function with given fields: ctx, in, opts
-func (_m *EVMQueryClient) TacSimulate(ctx context.Context, in *types.TacSimulateRequest, opts ...grpc.CallOption) (*types.MsgEthereumTxResponse, error) {
+func (_m *EVMQueryClient) TacSimulate(ctx context.Context, in *types.TacSimulateRequest, opts ...grpc.CallOption) (*types.TacSimulateResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -439,16 +439,16 @@ func (_m *EVMQueryClient) TacSimulate(ctx context.Context, in *types.TacSimulate
 		panic("no return value specified for TacSimulate")
 	}
 
-	var r0 *types.MsgEthereumTxResponse
+	var r0 *types.TacSimulateResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *types.TacSimulateRequest, ...grpc.CallOption) (*types.MsgEthereumTxResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *types.TacSimulateRequest, ...grpc.CallOption) (*types.TacSimulateResponse, error)); ok {
 		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *types.TacSimulateRequest, ...grpc.CallOption) *types.MsgEthereumTxResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *types.TacSimulateRequest, ...grpc.CallOption) *types.TacSimulateResponse); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*types.MsgEthereumTxResponse)
+			r0 = ret.Get(0).(*types.TacSimulateResponse)
 		}
 	}
 

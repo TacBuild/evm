@@ -260,7 +260,7 @@ func (k Keeper) EthCall(c context.Context, req *types.EthCallRequest) (*types.Ms
 	return k.callWithOverride(ctx, args, req.ProposerAddress, req.GasCap, nil)
 }
 
-func (k Keeper) TacSimulate(c context.Context, req *types.TacSimulateRequest) (*types.MsgEthereumTxResponse, error) {
+func (k Keeper) TacSimulate(c context.Context, req *types.TacSimulateRequest) (*types.TacSimulateResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -281,13 +281,40 @@ func (k Keeper) TacSimulate(c context.Context, req *types.TacSimulateRequest) (*
 		}
 	}
 
-	return k.callWithOverride(ctx, args, req.ProposerAddress, req.GasCap, stateOverride)
+	// Execute the call with state override to get output, logs, vmError
+	res, err := k.callWithOverride(ctx, args, req.ProposerAddress, req.GasCap, stateOverride)
+	if err != nil {
+		return nil, err
+	}
 
+	// Run gas estimation with state override using binary search
+	ethCallReq := &types.EthCallRequest{
+		Args:            req.Args,
+		GasCap:          req.GasCap,
+		ProposerAddress: req.ProposerAddress,
+		ChainId:         req.ChainId,
+	}
+
+	var gasEstimated uint64
+	gasEstimate, estimateErr := k.EstimateGasInternal(c, ethCallReq, types.RPC, stateOverride)
+	if estimateErr == nil {
+		gasEstimated = gasEstimate.Gas
+	}
+	// If estimation fails (e.g. revert), gasEstimated stays 0
+
+	return &types.TacSimulateResponse{
+		Hash:         res.Hash,
+		Logs:         res.Logs,
+		Ret:          res.Ret,
+		VmError:      res.VmError,
+		GasUsed:      res.GasUsed,
+		GasEstimated: gasEstimated,
+	}, nil
 }
 
 // EstimateGas implements eth_estimateGas rpc api.
 func (k Keeper) EstimateGas(c context.Context, req *types.EthCallRequest) (*types.EstimateGasResponse, error) {
-	return k.EstimateGasInternal(c, req, types.RPC)
+	return k.EstimateGasInternal(c, req, types.RPC, nil)
 }
 
 // EstimateGasInternal returns the gas estimation for the corresponding request.
@@ -295,7 +322,7 @@ func (k Keeper) EstimateGas(c context.Context, req *types.EthCallRequest) (*type
 // When called from the RPC client, we need to reset the gas meter before
 // simulating the transaction to have
 // an accurate gas estimation for EVM extensions transactions.
-func (k Keeper) EstimateGasInternal(c context.Context, req *types.EthCallRequest, fromType types.CallType) (*types.EstimateGasResponse, error) {
+func (k Keeper) EstimateGasInternal(c context.Context, req *types.EthCallRequest, fromType types.CallType, stateOverride types.StateOverride) (*types.EstimateGasResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -428,7 +455,7 @@ func (k Keeper) EstimateGasInternal(c context.Context, req *types.EthCallRequest
 			tmpCtx = evmante.BuildEvmExecutionCtx(tmpCtx).WithGasMeter(gasMeter)
 		}
 		// pass false to not commit StateDB
-		rsp, err = k.ApplyMessageWithConfig(tmpCtx, msg, nil, false, cfg, txConfig, nil)
+		rsp, err = k.ApplyMessageWithConfig(tmpCtx, msg, nil, false, cfg, txConfig, stateOverride)
 		if err != nil {
 			if errors.Is(err, core.ErrIntrinsicGas) {
 				return true, nil, nil // Special case, raise gas limit

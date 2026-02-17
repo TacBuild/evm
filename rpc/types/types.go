@@ -82,6 +82,8 @@ type TacSimulateResult struct {
 	Logs []ethtypes.Log `json:"logs,omitempty"`
 	// GasUsed is the gas used by the EVM execution, it is 0 if the execution is reverted
 	GasUsed hexutil.Uint64 `json:"gasUsed"`
+	// GasEstimated is the estimated gas limit needed to execute the transaction (from eth_estimateGas binary search)
+	GasEstimated hexutil.Uint64 `json:"gasEstimated"`
 }
 
 func ToRPCTypeLogs(logs []*evmtypes.Log) []ethtypes.Log {

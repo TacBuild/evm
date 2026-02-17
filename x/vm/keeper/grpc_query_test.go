@@ -1701,7 +1701,7 @@ func (suite *KeeperTestSuite) TestTacSimulate() {
 		getReq     func() *types.TacSimulateRequest
 		expPass    bool
 		expVMError bool
-		validate   func(res *types.MsgEthereumTxResponse)
+		validate   func(res *types.TacSimulateResponse)
 	}{
 		{
 			name: "fail - nil request",
@@ -1756,8 +1756,8 @@ func (suite *KeeperTestSuite) TestTacSimulate() {
 				}
 			},
 			expPass: true,
-			validate: func(res *types.MsgEthereumTxResponse) {
-				suite.Require().False(res.Failed(), "VM error: %s", res.VmError)
+			validate: func(res *types.TacSimulateResponse) {
+				suite.Require().Empty(res.VmError, "VM error: %s", res.VmError)
 				suite.Require().NotEmpty(res.Ret)
 			},
 		},
@@ -1817,8 +1817,8 @@ func (suite *KeeperTestSuite) TestTacSimulate() {
 				}
 			},
 			expPass: true,
-			validate: func(res *types.MsgEthereumTxResponse) {
-				suite.Require().False(res.Failed(), "VM error: %s", res.VmError)
+			validate: func(res *types.TacSimulateResponse) {
+				suite.Require().Empty(res.VmError, "VM error: %s", res.VmError)
 			},
 		},
 		{
@@ -1837,8 +1837,8 @@ func (suite *KeeperTestSuite) TestTacSimulate() {
 				}
 			},
 			expPass: true,
-			validate: func(res *types.MsgEthereumTxResponse) {
-				suite.Require().False(res.Failed(), "VM error: %s", res.VmError)
+			validate: func(res *types.TacSimulateResponse) {
+				suite.Require().Empty(res.VmError, "VM error: %s", res.VmError)
 			},
 		},
 	}
@@ -1854,7 +1854,7 @@ func (suite *KeeperTestSuite) TestTacSimulate() {
 				suite.Require().NotNil(res)
 
 				if tc.expVMError {
-					suite.Require().True(res.Failed(), "expected VM error but got success")
+					suite.Require().NotEmpty(res.VmError, "expected VM error but got success")
 				}
 
 				if tc.validate != nil {
@@ -1925,7 +1925,7 @@ func (suite *KeeperTestSuite) TestTacSimulateWithStateOverride() {
 	res, err := suite.network.App.EVMKeeper.TacSimulate(suite.network.GetContext(), req)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
-	suite.Require().False(res.Failed(), "VM error: %s", res.VmError)
+	suite.Require().Empty(res.VmError, "VM error: %s", res.VmError)
 
 	// The result should contain the overridden balance
 	returnedBalance := new(big.Int).SetBytes(res.Ret)

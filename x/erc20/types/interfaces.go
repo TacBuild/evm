@@ -35,7 +35,7 @@ type EVMKeeper interface {
 	// TODO: should these methods also be converted to use context.Context?
 	GetParams(ctx sdk.Context) evmtypes.Params
 	GetAccountWithoutBalance(ctx sdk.Context, addr common.Address) *statedb.Account
-	EstimateGasInternal(c context.Context, req *evmtypes.EthCallRequest, fromType evmtypes.CallType) (*evmtypes.EstimateGasResponse, error)
+	EstimateGasInternal(c context.Context, req *evmtypes.EthCallRequest, fromType evmtypes.CallType, stateOverride evmtypes.StateOverride) (*evmtypes.EstimateGasResponse, error)
 	ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*evmtypes.MsgEthereumTxResponse, error)
 	DeleteAccount(ctx sdk.Context, addr common.Address) error
 	IsAvailableStaticPrecompile(params *evmtypes.Params, address common.Address) bool
