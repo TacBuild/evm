@@ -60,7 +60,7 @@ service Query {
   }
 
   // TacSimulate implements the custom `eth_tacSimulate` rpc api which supports state override
-  rpc TacSimulate(TacSimulateRequest) returns (MsgEthereumTxResponse) {
+  rpc TacSimulate(TacSimulateRequest) returns (TacSimulateResponse) {
     option (google.api.http).get = "/cosmos/evm/vm/v1/tac_simulate";
   }
 
@@ -279,6 +279,24 @@ message TacSimulateRequest {
             "github.com/cosmos/cosmos-sdk/types.ConsAddress" ];
   // chain_id is the eip155 chain id parsed from the requested block header
   int64 chain_id = 5;
+}
+
+// TacSimulateResponse defines TacSimulate response
+message TacSimulateResponse {
+  // hash of the ethereum transaction in hex format
+  string hash = 1;
+  // logs contains the proto-compatible ethereum logs
+  repeated Log logs = 2;
+  // ret is the returned data from evm function (result or data supplied with
+  // revert opcode)
+  bytes ret = 3;
+  // vm_error is the error returned by vm execution
+  string vm_error = 4;
+  // gas_used specifies how much gas was consumed by the EVM execution
+  uint64 gas_used = 5;
+  // gas_estimated is the estimated minimum gas limit needed to execute
+  // the transaction successfully (result of binary search, like eth_estimateGas)
+  uint64 gas_estimated = 6;
 }
 
 // EstimateGasResponse defines EstimateGas response

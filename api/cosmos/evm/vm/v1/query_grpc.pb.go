@@ -59,7 +59,7 @@ type QueryClient interface {
 	// EthCall implements the `eth_call` rpc api
 	EthCall(ctx context.Context, in *EthCallRequest, opts ...grpc.CallOption) (*MsgEthereumTxResponse, error)
 	// TacSimulate implements the custom `eth_tacSimulate` rpc api which supports state override
-	TacSimulate(ctx context.Context, in *TacSimulateRequest, opts ...grpc.CallOption) (*MsgEthereumTxResponse, error)
+	TacSimulate(ctx context.Context, in *TacSimulateRequest, opts ...grpc.CallOption) (*TacSimulateResponse, error)
 	// EstimateGas implements the `eth_estimateGas` rpc api
 	EstimateGas(ctx context.Context, in *EthCallRequest, opts ...grpc.CallOption) (*EstimateGasResponse, error)
 	// TraceTx implements the `debug_traceTransaction` rpc api
@@ -160,8 +160,8 @@ func (c *queryClient) EthCall(ctx context.Context, in *EthCallRequest, opts ...g
 	return out, nil
 }
 
-func (c *queryClient) TacSimulate(ctx context.Context, in *TacSimulateRequest, opts ...grpc.CallOption) (*MsgEthereumTxResponse, error) {
-	out := new(MsgEthereumTxResponse)
+func (c *queryClient) TacSimulate(ctx context.Context, in *TacSimulateRequest, opts ...grpc.CallOption) (*TacSimulateResponse, error) {
+	out := new(TacSimulateResponse)
 	err := c.cc.Invoke(ctx, Query_TacSimulate_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -246,7 +246,7 @@ type QueryServer interface {
 	// EthCall implements the `eth_call` rpc api
 	EthCall(context.Context, *EthCallRequest) (*MsgEthereumTxResponse, error)
 	// TacSimulate implements the custom `eth_tacSimulate` rpc api which supports state override
-	TacSimulate(context.Context, *TacSimulateRequest) (*MsgEthereumTxResponse, error)
+	TacSimulate(context.Context, *TacSimulateRequest) (*TacSimulateResponse, error)
 	// EstimateGas implements the `eth_estimateGas` rpc api
 	EstimateGas(context.Context, *EthCallRequest) (*EstimateGasResponse, error)
 	// TraceTx implements the `debug_traceTransaction` rpc api
@@ -296,7 +296,7 @@ func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*Q
 func (UnimplementedQueryServer) EthCall(context.Context, *EthCallRequest) (*MsgEthereumTxResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EthCall not implemented")
 }
-func (UnimplementedQueryServer) TacSimulate(context.Context, *TacSimulateRequest) (*MsgEthereumTxResponse, error) {
+func (UnimplementedQueryServer) TacSimulate(context.Context, *TacSimulateRequest) (*TacSimulateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TacSimulate not implemented")
 }
 func (UnimplementedQueryServer) EstimateGas(context.Context, *EthCallRequest) (*EstimateGasResponse, error) {
