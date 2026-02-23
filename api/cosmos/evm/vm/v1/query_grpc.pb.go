@@ -8,6 +8,7 @@ package vmv1
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -58,7 +59,7 @@ type QueryClient interface {
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 	// EthCall implements the `eth_call` rpc api
 	EthCall(ctx context.Context, in *EthCallRequest, opts ...grpc.CallOption) (*MsgEthereumTxResponse, error)
-	// TacSimulate implements the custom `eth_tacSimulate` rpc api which supports state override
+	// TacSimulate implements the custom `tac_simulate` rpc api which supports state override
 	TacSimulate(ctx context.Context, in *TacSimulateRequest, opts ...grpc.CallOption) (*TacSimulateResponse, error)
 	// EstimateGas implements the `eth_estimateGas` rpc api
 	EstimateGas(ctx context.Context, in *EthCallRequest, opts ...grpc.CallOption) (*EstimateGasResponse, error)
@@ -245,7 +246,7 @@ type QueryServer interface {
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 	// EthCall implements the `eth_call` rpc api
 	EthCall(context.Context, *EthCallRequest) (*MsgEthereumTxResponse, error)
-	// TacSimulate implements the custom `eth_tacSimulate` rpc api which supports state override
+	// TacSimulate implements the custom `tac_simulate` rpc api which supports state override
 	TacSimulate(context.Context, *TacSimulateRequest) (*TacSimulateResponse, error)
 	// EstimateGas implements the `eth_estimateGas` rpc api
 	EstimateGas(context.Context, *EthCallRequest) (*EstimateGasResponse, error)

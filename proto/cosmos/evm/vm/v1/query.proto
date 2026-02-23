@@ -59,7 +59,7 @@ service Query {
     option (google.api.http).get = "/cosmos/evm/vm/v1/eth_call";
   }
 
-  // TacSimulate implements the custom `eth_tacSimulate` rpc api which supports state override
+  // TacSimulate implements the custom `tac_simulate` rpc api which supports state override
   rpc TacSimulate(TacSimulateRequest) returns (TacSimulateResponse) {
     option (google.api.http).get = "/cosmos/evm/vm/v1/tac_simulate";
   }

@@ -268,7 +268,7 @@ func (k *Keeper) ApplyMessage(ctx sdk.Context, msg evmcore.Message, tracer vm.EV
 //
 // If state override is not nil, the `StateDB` will apply the state override
 // before EVM execution and discard the dirty state after execution,
-// no matter the execution result. This is only used for `eth_call`, `eth_tacSimulate` and `eth_estimateGas`
+// no matter the execution result. This is only used for `eth_call`, `tac_simulate` and `eth_estimateGas`
 // where the state should not be changed.
 
 func (k *Keeper) ApplyMessageWithConfig(
