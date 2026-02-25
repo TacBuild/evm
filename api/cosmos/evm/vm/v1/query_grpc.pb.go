@@ -8,6 +8,7 @@ package vmv1
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -27,6 +28,7 @@ const (
 	Query_Code_FullMethodName              = "/cosmos.evm.vm.v1.Query/Code"
 	Query_Params_FullMethodName            = "/cosmos.evm.vm.v1.Query/Params"
 	Query_EthCall_FullMethodName           = "/cosmos.evm.vm.v1.Query/EthCall"
+	Query_TacSimulate_FullMethodName       = "/cosmos.evm.vm.v1.Query/TacSimulate"
 	Query_EstimateGas_FullMethodName       = "/cosmos.evm.vm.v1.Query/EstimateGas"
 	Query_TraceTx_FullMethodName           = "/cosmos.evm.vm.v1.Query/TraceTx"
 	Query_TraceBlock_FullMethodName        = "/cosmos.evm.vm.v1.Query/TraceBlock"
@@ -57,6 +59,8 @@ type QueryClient interface {
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 	// EthCall implements the `eth_call` rpc api
 	EthCall(ctx context.Context, in *EthCallRequest, opts ...grpc.CallOption) (*MsgEthereumTxResponse, error)
+	// TacSimulate implements the custom `tac_simulate` rpc api which supports state override
+	TacSimulate(ctx context.Context, in *TacSimulateRequest, opts ...grpc.CallOption) (*TacSimulateResponse, error)
 	// EstimateGas implements the `eth_estimateGas` rpc api
 	EstimateGas(ctx context.Context, in *EthCallRequest, opts ...grpc.CallOption) (*EstimateGasResponse, error)
 	// TraceTx implements the `debug_traceTransaction` rpc api
@@ -157,6 +161,15 @@ func (c *queryClient) EthCall(ctx context.Context, in *EthCallRequest, opts ...g
 	return out, nil
 }
 
+func (c *queryClient) TacSimulate(ctx context.Context, in *TacSimulateRequest, opts ...grpc.CallOption) (*TacSimulateResponse, error) {
+	out := new(TacSimulateResponse)
+	err := c.cc.Invoke(ctx, Query_TacSimulate_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *queryClient) EstimateGas(ctx context.Context, in *EthCallRequest, opts ...grpc.CallOption) (*EstimateGasResponse, error) {
 	out := new(EstimateGasResponse)
 	err := c.cc.Invoke(ctx, Query_EstimateGas_FullMethodName, in, out, opts...)
@@ -233,6 +246,8 @@ type QueryServer interface {
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 	// EthCall implements the `eth_call` rpc api
 	EthCall(context.Context, *EthCallRequest) (*MsgEthereumTxResponse, error)
+	// TacSimulate implements the custom `tac_simulate` rpc api which supports state override
+	TacSimulate(context.Context, *TacSimulateRequest) (*TacSimulateResponse, error)
 	// EstimateGas implements the `eth_estimateGas` rpc api
 	EstimateGas(context.Context, *EthCallRequest) (*EstimateGasResponse, error)
 	// TraceTx implements the `debug_traceTransaction` rpc api
@@ -281,6 +296,9 @@ func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*Q
 }
 func (UnimplementedQueryServer) EthCall(context.Context, *EthCallRequest) (*MsgEthereumTxResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EthCall not implemented")
+}
+func (UnimplementedQueryServer) TacSimulate(context.Context, *TacSimulateRequest) (*TacSimulateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TacSimulate not implemented")
 }
 func (UnimplementedQueryServer) EstimateGas(context.Context, *EthCallRequest) (*EstimateGasResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EstimateGas not implemented")
@@ -457,6 +475,24 @@ func _Query_EthCall_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_TacSimulate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TacSimulateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).TacSimulate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_TacSimulate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).TacSimulate(ctx, req.(*TacSimulateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Query_EstimateGas_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(EthCallRequest)
 	if err := dec(in); err != nil {
@@ -603,6 +639,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EthCall",
 			Handler:    _Query_EthCall_Handler,
+		},
+		{
+			MethodName: "TacSimulate",
+			Handler:    _Query_TacSimulate_Handler,
 		},
 		{
 			MethodName: "EstimateGas",

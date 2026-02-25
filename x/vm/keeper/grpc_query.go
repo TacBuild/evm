@@ -217,6 +217,32 @@ func (k Keeper) Params(c context.Context, _ *types.QueryParamsRequest) (*types.Q
 	}, nil
 }
 
+func (k Keeper) callWithOverride(ctx sdk.Context, args types.TransactionArgs, proposerAddress sdk.ConsAddress, gasCap uint64, stateOverride types.StateOverride) (*types.MsgEthereumTxResponse, error) {
+	cfg, err := k.EVMConfig(ctx, GetProposerAddress(ctx, proposerAddress))
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	// ApplyMessageWithConfig expect correct nonce set in msg
+	nonce := k.GetNonce(ctx, args.GetFrom())
+	args.Nonce = (*hexutil.Uint64)(&nonce)
+
+	msg, err := args.ToMessage(gasCap, cfg.BaseFee)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	txConfig := statedb.NewEmptyTxConfig(common.BytesToHash(ctx.HeaderHash()))
+
+	// pass false to not commit StateDB
+	res, err := k.ApplyMessageWithConfig(ctx, msg, nil, false, cfg, txConfig, stateOverride)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return res, nil
+}
+
 // EthCall implements eth_call rpc api.
 func (k Keeper) EthCall(c context.Context, req *types.EthCallRequest) (*types.MsgEthereumTxResponse, error) {
 	if req == nil {
@@ -231,34 +257,64 @@ func (k Keeper) EthCall(c context.Context, req *types.EthCallRequest) (*types.Ms
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	cfg, err := k.EVMConfig(ctx, GetProposerAddress(ctx, req.ProposerAddress))
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+	return k.callWithOverride(ctx, args, req.ProposerAddress, req.GasCap, nil)
+}
+
+func (k Keeper) TacSimulate(c context.Context, req *types.TacSimulateRequest) (*types.TacSimulateResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 
-	// ApplyMessageWithConfig expect correct nonce set in msg
-	nonce := k.GetNonce(ctx, args.GetFrom())
-	args.Nonce = (*hexutil.Uint64)(&nonce)
+	ctx := sdk.UnwrapSDKContext(c)
 
-	msg, err := args.ToMessage(req.GasCap, cfg.BaseFee)
+	var args types.TransactionArgs
+	err := json.Unmarshal(req.Args, &args)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	txConfig := statedb.NewEmptyTxConfig(common.BytesToHash(ctx.HeaderHash()))
-
-	// pass false to not commit StateDB
-	res, err := k.ApplyMessageWithConfig(ctx, msg, nil, false, cfg, txConfig)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+	var stateOverride types.StateOverride
+	if req.StateOverride != nil {
+		err = json.Unmarshal(req.StateOverride, &stateOverride)
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
 	}
 
-	return res, nil
+	// Execute the call with state override to get output, logs, vmError
+	res, err := k.callWithOverride(ctx, args, req.ProposerAddress, req.GasCap, stateOverride)
+	if err != nil {
+		return nil, err
+	}
+
+	// Run gas estimation with state override using binary search
+	ethCallReq := &types.EthCallRequest{
+		Args:            req.Args,
+		GasCap:          req.GasCap,
+		ProposerAddress: req.ProposerAddress,
+		ChainId:         req.ChainId,
+	}
+
+	var gasEstimated uint64
+	gasEstimate, estimateErr := k.EstimateGasInternal(c, ethCallReq, types.RPC, stateOverride)
+	if estimateErr == nil {
+		gasEstimated = gasEstimate.Gas
+	}
+	// If estimation fails (e.g. revert), gasEstimated stays 0
+
+	return &types.TacSimulateResponse{
+		Hash:         res.Hash,
+		Logs:         res.Logs,
+		Ret:          res.Ret,
+		VmError:      res.VmError,
+		GasUsed:      res.GasUsed,
+		GasEstimated: gasEstimated,
+	}, nil
 }
 
 // EstimateGas implements eth_estimateGas rpc api.
 func (k Keeper) EstimateGas(c context.Context, req *types.EthCallRequest) (*types.EstimateGasResponse, error) {
-	return k.EstimateGasInternal(c, req, types.RPC)
+	return k.EstimateGasInternal(c, req, types.RPC, nil)
 }
 
 // EstimateGasInternal returns the gas estimation for the corresponding request.
@@ -266,7 +322,7 @@ func (k Keeper) EstimateGas(c context.Context, req *types.EthCallRequest) (*type
 // When called from the RPC client, we need to reset the gas meter before
 // simulating the transaction to have
 // an accurate gas estimation for EVM extensions transactions.
-func (k Keeper) EstimateGasInternal(c context.Context, req *types.EthCallRequest, fromType types.CallType) (*types.EstimateGasResponse, error) {
+func (k Keeper) EstimateGasInternal(c context.Context, req *types.EthCallRequest, fromType types.CallType, stateOverride types.StateOverride) (*types.EstimateGasResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -399,7 +455,7 @@ func (k Keeper) EstimateGasInternal(c context.Context, req *types.EthCallRequest
 			tmpCtx = evmante.BuildEvmExecutionCtx(tmpCtx).WithGasMeter(gasMeter)
 		}
 		// pass false to not commit StateDB
-		rsp, err = k.ApplyMessageWithConfig(tmpCtx, msg, nil, false, cfg, txConfig)
+		rsp, err = k.ApplyMessageWithConfig(tmpCtx, msg, nil, false, cfg, txConfig, stateOverride)
 		if err != nil {
 			if errors.Is(err, core.ErrIntrinsicGas) {
 				return true, nil, nil // Special case, raise gas limit
@@ -498,7 +554,7 @@ func (k Keeper) TraceTx(c context.Context, req *types.QueryTraceTxRequest) (*typ
 		// reset gas meter for each transaction
 		ctx = evmante.BuildEvmExecutionCtx(ctx).
 			WithGasMeter(cosmosevmtypes.NewInfiniteGasMeterWithLimit(msg.GasLimit))
-		rsp, err := k.ApplyMessageWithConfig(ctx, *msg, nil, true, cfg, txConfig)
+		rsp, err := k.ApplyMessageWithConfig(ctx, *msg, nil, true, cfg, txConfig, nil)
 		if err != nil {
 			continue
 		}
@@ -680,7 +736,7 @@ func (k *Keeper) traceTx(
 	// Build EVM execution context
 	ctx = evmante.BuildEvmExecutionCtx(ctx).
 		WithGasMeter(cosmosevmtypes.NewInfiniteGasMeterWithLimit(msg.GasLimit))
-	res, err := k.ApplyMessageWithConfig(ctx, *msg, tracer, commitMessage, cfg, txConfig)
+	res, err := k.ApplyMessageWithConfig(ctx, *msg, tracer, commitMessage, cfg, txConfig, nil)
 	if err != nil {
 		return nil, 0, status.Error(codes.Internal, err.Error())
 	}

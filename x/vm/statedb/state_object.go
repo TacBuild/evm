@@ -74,6 +74,10 @@ type stateObject struct {
 	// flags
 	dirtyCode bool
 	suicided  bool
+	// used for state overriding, indicates whether the state of this account is overridden by the given state override,
+	// if true, it means all keys that are not in originStorage should be treated as zero value.
+	// used only for debug and state override simulation
+	stateOverriden bool
 }
 
 // newObject creates a state object.
@@ -230,6 +234,10 @@ func (s *stateObject) GetCommittedState(key common.Hash) common.Hash {
 	if value, cached := s.originStorage[key]; cached {
 		return value
 	}
+	if s.stateOverriden {
+		// If state is overridden but the key is not in originStorage, it means the value is default
+		return common.Hash{}
+	}
 	// If no live objects are available, load it from keeper
 	value := s.db.keeper.GetState(s.db.ctx, s.Address(), key)
 	s.originStorage[key] = value
@@ -262,4 +270,10 @@ func (s *stateObject) SetState(key common.Hash, value common.Hash) {
 
 func (s *stateObject) setState(key, value common.Hash) {
 	s.dirtyStorage[key] = value
+}
+
+// SetStateOverriden sets the state override flag to true, which means all keys that are not in originStorage should be treated as zero value.
+// Used only for debug and state override simulation
+func (s *stateObject) SetStateOverriden() {
+	s.stateOverriden = true
 }

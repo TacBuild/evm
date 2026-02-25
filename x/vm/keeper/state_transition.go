@@ -167,7 +167,7 @@ func (k *Keeper) ApplyTransaction(ctx sdk.Context, tx *ethtypes.Transaction) (*t
 	tmpCtx, commit := ctx.CacheContext()
 
 	// pass true to commit the StateDB
-	res, err := k.ApplyMessageWithConfig(tmpCtx, *msg, nil, true, cfg, txConfig)
+	res, err := k.ApplyMessageWithConfig(tmpCtx, *msg, nil, true, cfg, txConfig, nil)
 	if err != nil {
 		// when a transaction contains multiple msg, as long as one of the msg fails
 		// all gas will be deducted. so is not msg.Gas()
@@ -222,7 +222,7 @@ func (k *Keeper) ApplyMessage(ctx sdk.Context, msg evmcore.Message, tracer vm.EV
 	}
 
 	txConfig := statedb.NewEmptyTxConfig(common.BytesToHash(ctx.HeaderHash()))
-	return k.ApplyMessageWithConfig(ctx, msg, tracer, commit, cfg, txConfig)
+	return k.ApplyMessageWithConfig(ctx, msg, tracer, commit, cfg, txConfig, nil)
 }
 
 // ApplyMessageWithConfig computes the new state by applying the given message against the existing state.
@@ -263,6 +263,14 @@ func (k *Keeper) ApplyMessage(ctx sdk.Context, msg evmcore.Message, tracer vm.EV
 // # Commit parameter
 //
 // If commit is true, the `StateDB` will be committed, otherwise discarded.
+//
+// # State override parameter
+//
+// If state override is not nil, the `StateDB` will apply the state override
+// before EVM execution and discard the dirty state after execution,
+// no matter the execution result. This is only used for `eth_call`, `tac_simulate` and `eth_estimateGas`
+// where the state should not be changed.
+
 func (k *Keeper) ApplyMessageWithConfig(
 	ctx sdk.Context,
 	msg evmcore.Message,
@@ -270,6 +278,7 @@ func (k *Keeper) ApplyMessageWithConfig(
 	commit bool,
 	cfg *statedb.EVMConfig,
 	txConfig statedb.TxConfig,
+	stateOverride types.StateOverride,
 ) (*types.MsgEthereumTxResponse, error) {
 	var (
 		ret   []byte // return bytes from evm execution
@@ -311,6 +320,15 @@ func (k *Keeper) ApplyMessageWithConfig(
 	// under contexts where ante handlers are not run, for example `eth_call` and `eth_estimateGas`.
 	rules := cfg.ChainConfig.Rules(big.NewInt(ctx.BlockHeight()), true, uint64(ctx.BlockTime().Unix()))
 	stateDB.Prepare(rules, msg.From, common.Address{}, msg.To, evm.ActivePrecompiles(rules), msg.AccessList)
+
+	if stateOverride != nil {
+		if commit {
+			return nil, errorsmod.Wrap(types.ErrUnexpectedStateOverride, "state override is not nil")
+		}
+		if err := stateDB.ApplyStateOverride(stateOverride, evm.ActivePrecompiles(rules)); err != nil {
+			return nil, errorsmod.Wrap(err, "failed to apply state override")
+		}
+	}
 
 	if contractCreation {
 		// take over the nonce management from evm:

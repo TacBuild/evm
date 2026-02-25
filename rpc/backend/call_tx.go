@@ -372,6 +372,66 @@ func (b *Backend) DoCall(
 	return res, nil
 }
 
+func (b *Backend) DoTacSimulate(
+	args evmtypes.TransactionArgs,
+	blockNr rpctypes.BlockNumber,
+	stateOverride evmtypes.StateOverride,
+) (*evmtypes.TacSimulateResponse, error) {
+	bz, err := json.Marshal(&args)
+	if err != nil {
+		return nil, err
+	}
+
+	header, err := b.TendermintBlockByNumber(blockNr)
+	if err != nil {
+		// the error message imitates geth behavior
+		return nil, errors.New("header not found")
+	}
+
+	overrideBz, err := json.Marshal(stateOverride)
+	if err != nil {
+		return nil, err
+	}
+
+	req := evmtypes.TacSimulateRequest{
+		Args:            bz,
+		GasCap:          b.RPCGasCap(),
+		ProposerAddress: sdk.ConsAddress(header.Block.ProposerAddress),
+		ChainId:         b.chainID.Int64(),
+		StateOverride:   overrideBz,
+	}
+
+	// From ContextWithHeight: if the provided height is 0,
+	// it will return an empty context and the gRPC query will use
+	// the latest block height for querying.
+	ctx := rpctypes.ContextWithHeight(blockNr.Int64())
+	timeout := b.RPCEVMTimeout()
+
+	// Setup context so it may be canceled the call has completed
+	// or, in case of unmetered gas, setup a context with a timeout.
+	var cancel context.CancelFunc
+	if timeout > 0 {
+		ctx, cancel = context.WithTimeout(ctx, timeout)
+	} else {
+		ctx, cancel = context.WithCancel(ctx)
+	}
+
+	// Make sure the context is canceled when the call has completed
+	// this makes sure resources are cleaned up.
+	defer cancel()
+
+	res, err := b.queryClient.TacSimulate(ctx, &req)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = handleRevertError(res.VmError, res.Ret); err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 // GasPrice returns the current gas price based on Cosmos EVM' gas price oracle.
 func (b *Backend) GasPrice() (*hexutil.Big, error) {
 	var (

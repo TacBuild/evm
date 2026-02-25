@@ -137,9 +137,9 @@ func (_m *EVMKeeper) DeleteAccount(ctx types.Context, addr common.Address) error
 	return r0
 }
 
-// EstimateGasInternal provides a mock function with given fields: c, req, fromType
-func (_m *EVMKeeper) EstimateGasInternal(c context.Context, req *evmtypes.EthCallRequest, fromType evmtypes.CallType) (*evmtypes.EstimateGasResponse, error) {
-	ret := _m.Called(c, req, fromType)
+// EstimateGasInternal provides a mock function with given fields: c, req, fromType, stateOverride
+func (_m *EVMKeeper) EstimateGasInternal(c context.Context, req *evmtypes.EthCallRequest, fromType evmtypes.CallType, stateOverride evmtypes.StateOverride) (*evmtypes.EstimateGasResponse, error) {
+	ret := _m.Called(c, req, fromType, stateOverride)
 
 	if len(ret) == 0 {
 		panic("no return value specified for EstimateGasInternal")
@@ -147,19 +147,19 @@ func (_m *EVMKeeper) EstimateGasInternal(c context.Context, req *evmtypes.EthCal
 
 	var r0 *evmtypes.EstimateGasResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *evmtypes.EthCallRequest, evmtypes.CallType) (*evmtypes.EstimateGasResponse, error)); ok {
-		return rf(c, req, fromType)
+	if rf, ok := ret.Get(0).(func(context.Context, *evmtypes.EthCallRequest, evmtypes.CallType, evmtypes.StateOverride) (*evmtypes.EstimateGasResponse, error)); ok {
+		return rf(c, req, fromType, stateOverride)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *evmtypes.EthCallRequest, evmtypes.CallType) *evmtypes.EstimateGasResponse); ok {
-		r0 = rf(c, req, fromType)
+	if rf, ok := ret.Get(0).(func(context.Context, *evmtypes.EthCallRequest, evmtypes.CallType, evmtypes.StateOverride) *evmtypes.EstimateGasResponse); ok {
+		r0 = rf(c, req, fromType, stateOverride)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*evmtypes.EstimateGasResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *evmtypes.EthCallRequest, evmtypes.CallType) error); ok {
-		r1 = rf(c, req, fromType)
+	if rf, ok := ret.Get(1).(func(context.Context, *evmtypes.EthCallRequest, evmtypes.CallType, evmtypes.StateOverride) error); ok {
+		r1 = rf(c, req, fromType, stateOverride)
 	} else {
 		r1 = ret.Error(1)
 	}

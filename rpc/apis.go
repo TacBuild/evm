@@ -14,6 +14,7 @@ import (
 	"github.com/cosmos/evm/rpc/namespaces/ethereum/miner"
 	"github.com/cosmos/evm/rpc/namespaces/ethereum/net"
 	"github.com/cosmos/evm/rpc/namespaces/ethereum/personal"
+	"github.com/cosmos/evm/rpc/namespaces/ethereum/tac"
 	"github.com/cosmos/evm/rpc/namespaces/ethereum/txpool"
 	"github.com/cosmos/evm/rpc/namespaces/ethereum/web3"
 	"github.com/cosmos/evm/types"
@@ -37,6 +38,7 @@ const (
 	TxPoolNamespace   = "txpool"
 	DebugNamespace    = "debug"
 	MinerNamespace    = "miner"
+	TacNamespace      = "tac"
 
 	apiVersion = "1.0"
 )
@@ -152,6 +154,22 @@ func init() {
 					Version:   apiVersion,
 					Service:   miner.NewPrivateAPI(ctx, evmBackend),
 					Public:    false,
+				},
+			}
+		},
+		TacNamespace: func(ctx *server.Context,
+			clientCtx client.Context,
+			_ *rpcclient.WSClient,
+			allowUnprotectedTxs bool,
+			indexer types.EVMTxIndexer,
+		) []rpc.API {
+			evmBackend := backend.NewBackend(ctx, ctx.Logger, clientCtx, allowUnprotectedTxs, indexer)
+			return []rpc.API{
+				{
+					Namespace: TacNamespace,
+					Version:   apiVersion,
+					Service:   tac.NewTacAPI(ctx.Logger, evmBackend),
+					Public:    true,
 				},
 			}
 		},
