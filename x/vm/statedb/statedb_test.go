@@ -13,10 +13,19 @@ import (
 	"github.com/holiman/uint256"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/cosmos/evm/testutil/constants"
 	"github.com/cosmos/evm/x/vm/statedb"
+	"github.com/cosmos/evm/x/vm/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+// init configures global test EVM coin info (used by types.AdjustExtraDecimals*)
+// to avoid panics when statedb balance helpers are used.
+func init() {
+	configurator := types.NewEVMConfigurator()
+	_ = configurator.WithEVMCoinInfo(constants.ExampleAttoDenom, uint8(types.EighteenDecimals)).Configure()
+}
 
 var (
 	address       common.Address   = common.BigToAddress(big.NewInt(101))
@@ -590,6 +599,256 @@ func (suite *StateDBTestSuite) TestIterateStorage() {
 	})
 	suite.Require().NoError(err)
 	suite.Require().Equal(1, len(storage))
+}
+
+func (suite *StateDBTestSuite) TestSetBalance() {
+	testCases := []struct {
+		name     string
+		setup    func(*statedb.StateDB)
+		addr     common.Address
+		amount   *uint256.Int
+		expExist bool
+	}{
+		{
+			"set balance on new account",
+			func(db *statedb.StateDB) {},
+			address,
+			uint256.NewInt(500),
+			true,
+		},
+		{
+			"set balance on existing account",
+			func(db *statedb.StateDB) {
+				db.AddBalance(address, uint256.NewInt(100))
+			},
+			address,
+			uint256.NewInt(300),
+			true,
+		},
+		{
+			"set balance to zero on existing account",
+			func(db *statedb.StateDB) {
+				db.AddBalance(address, uint256.NewInt(100))
+				db.SetNonce(address, 1)
+			},
+			address,
+			uint256.NewInt(0),
+			true, // account still exists due to nonce
+		},
+		{
+			"set balance on different account",
+			func(db *statedb.StateDB) {
+				db.AddBalance(address, uint256.NewInt(100))
+			},
+			address2,
+			uint256.NewInt(200),
+			true,
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			db := statedb.New(sdk.Context{}, NewMockKeeper(), emptyTxConfig)
+			tc.setup(db)
+			db.SetBalance(tc.addr, tc.amount)
+
+			suite.Require().Equal(tc.amount, db.GetBalance(tc.addr))
+			suite.Require().Equal(tc.expExist, db.Exist(tc.addr))
+		})
+	}
+}
+
+func (suite *StateDBTestSuite) TestSetBalanceCommit() {
+	keeper := NewMockKeeper()
+	db := statedb.New(sdk.Context{}, keeper, emptyTxConfig)
+
+	// Create account with initial balance
+	db.AddBalance(address, uint256.NewInt(100))
+	suite.Require().NoError(db.Commit())
+
+	// Override balance
+	db = statedb.New(sdk.Context{}, keeper, emptyTxConfig)
+	db.SetBalance(address, uint256.NewInt(999))
+	suite.Require().Equal(uint256.NewInt(999), db.GetBalance(address))
+	suite.Require().NoError(db.Commit())
+
+	// Verify after re-read
+	db = statedb.New(sdk.Context{}, keeper, emptyTxConfig)
+	suite.Require().Equal(uint256.NewInt(999), db.GetBalance(address))
+}
+
+func (suite *StateDBTestSuite) TestSetStorage() {
+	key1 := common.BigToHash(big.NewInt(1))
+	value1 := common.BigToHash(big.NewInt(10))
+	key2 := common.BigToHash(big.NewInt(2))
+	value2 := common.BigToHash(big.NewInt(20))
+	key3 := common.BigToHash(big.NewInt(3))
+	value3 := common.BigToHash(big.NewInt(30))
+
+	testCases := []struct {
+		name    string
+		setup   func(*statedb.StateDB)
+		storage map[common.Hash]common.Hash
+		checkFn func(*statedb.StateDB)
+	}{
+		{
+			"set storage on new account",
+			func(db *statedb.StateDB) {},
+			map[common.Hash]common.Hash{key1: value1, key2: value2},
+			func(db *statedb.StateDB) {
+				suite.Require().Equal(value1, db.GetState(address, key1))
+				suite.Require().Equal(value2, db.GetState(address, key2))
+				suite.Require().Equal(common.Hash{}, db.GetState(address, key3), "non-overridden key should be zero")
+			},
+		},
+		{
+			"set storage replaces existing storage",
+			func(db *statedb.StateDB) {
+				// pre-set some storage
+				db.SetState(address, key1, common.BigToHash(big.NewInt(999)))
+				db.SetState(address, key3, value3)
+			},
+			map[common.Hash]common.Hash{key1: value1, key2: value2},
+			func(db *statedb.StateDB) {
+				suite.Require().Equal(value1, db.GetState(address, key1), "overridden key should have new value")
+				suite.Require().Equal(value2, db.GetState(address, key2), "new key should be set")
+				// key3 was in old storage but NOT in new override, should be zero due to stateOverriden
+				suite.Require().Equal(common.Hash{}, db.GetState(address, key3), "old key not in override should be zero")
+			},
+		},
+		{
+			"set storage inherits code and nonce and balance",
+			func(db *statedb.StateDB) {
+				db.SetNonce(address, 5)
+				db.AddBalance(address, uint256.NewInt(1000))
+				db.SetCode(address, []byte("contract code"))
+			},
+			map[common.Hash]common.Hash{key1: value1},
+			func(db *statedb.StateDB) {
+				suite.Require().Equal(value1, db.GetState(address, key1))
+				suite.Require().Equal(uint64(5), db.GetNonce(address), "nonce should be inherited")
+				suite.Require().Equal(uint256.NewInt(1000), db.GetBalance(address), "balance should be inherited")
+				suite.Require().Equal([]byte("contract code"), db.GetCode(address), "code should be inherited")
+			},
+		},
+		{
+			"set empty storage on existing account",
+			func(db *statedb.StateDB) {
+				db.SetState(address, key1, value1)
+				db.SetState(address, key2, value2)
+			},
+			map[common.Hash]common.Hash{},
+			func(db *statedb.StateDB) {
+				// All keys should return zero since storage is replaced with empty map
+				suite.Require().Equal(common.Hash{}, db.GetState(address, key1))
+				suite.Require().Equal(common.Hash{}, db.GetState(address, key2))
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			db := statedb.New(sdk.Context{}, NewMockKeeper(), emptyTxConfig)
+			tc.setup(db)
+			db.SetStorage(address, tc.storage)
+			tc.checkFn(db)
+		})
+	}
+}
+
+func (suite *StateDBTestSuite) TestSetStorageWithCommittedState() {
+	key1 := common.BigToHash(big.NewInt(1))
+	value1 := common.BigToHash(big.NewInt(10))
+	key2 := common.BigToHash(big.NewInt(2))
+	value2 := common.BigToHash(big.NewInt(20))
+	key3 := common.BigToHash(big.NewInt(3))
+	value3 := common.BigToHash(big.NewInt(30))
+
+	keeper := NewMockKeeper()
+
+	// First: commit some state
+	{
+		db := statedb.New(sdk.Context{}, keeper, emptyTxConfig)
+		db.SetNonce(address, 1)
+		db.AddBalance(address, uint256.NewInt(500))
+		db.SetCode(address, []byte("old code"))
+		db.SetState(address, key1, value1)
+		db.SetState(address, key2, value2)
+		suite.Require().NoError(db.Commit())
+	}
+
+	// Second: override storage with SetStorage (only key3)
+	{
+		db := statedb.New(sdk.Context{}, keeper, emptyTxConfig)
+		db.SetStorage(address, map[common.Hash]common.Hash{key3: value3})
+
+		// key3 should have the new value
+		suite.Require().Equal(value3, db.GetState(address, key3))
+		// key1 and key2 were committed but NOT in override — stateOverriden makes them zero
+		suite.Require().Equal(common.Hash{}, db.GetState(address, key1), "committed key not in override should be zero")
+		suite.Require().Equal(common.Hash{}, db.GetState(address, key2), "committed key not in override should be zero")
+
+		// Metadata should be inherited
+		suite.Require().Equal(uint64(1), db.GetNonce(address))
+		suite.Require().Equal(uint256.NewInt(500), db.GetBalance(address))
+		suite.Require().Equal([]byte("old code"), db.GetCode(address))
+	}
+}
+
+func (suite *StateDBTestSuite) TestSetStorageRevert() {
+	key1 := common.BigToHash(big.NewInt(1))
+	value1 := common.BigToHash(big.NewInt(10))
+	key2 := common.BigToHash(big.NewInt(2))
+	value2 := common.BigToHash(big.NewInt(20))
+
+	keeper := NewMockKeeper()
+
+	// Commit initial state
+	{
+		db := statedb.New(sdk.Context{}, keeper, emptyTxConfig)
+		db.SetNonce(address, 1)
+		db.AddBalance(address, uint256.NewInt(100))
+		db.SetState(address, key1, value1)
+		suite.Require().NoError(db.Commit())
+	}
+
+	// Snapshot, SetStorage, then revert
+	{
+		db := statedb.New(sdk.Context{}, keeper, emptyTxConfig)
+
+		rev := db.Snapshot()
+
+		db.SetStorage(address, map[common.Hash]common.Hash{key2: value2})
+		suite.Require().Equal(value2, db.GetState(address, key2))
+
+		db.RevertToSnapshot(rev)
+
+		// After revert, original committed state should be accessible
+		suite.Require().Equal(value1, db.GetState(address, key1), "original key should be restored after revert")
+	}
+}
+
+func (suite *StateDBTestSuite) TestSetBalanceRevert() {
+	keeper := NewMockKeeper()
+
+	// Commit initial balance
+	{
+		db := statedb.New(sdk.Context{}, keeper, emptyTxConfig)
+		db.AddBalance(address, uint256.NewInt(100))
+		suite.Require().NoError(db.Commit())
+	}
+
+	// Snapshot, SetBalance, then revert
+	{
+		db := statedb.New(sdk.Context{}, keeper, emptyTxConfig)
+
+		rev := db.Snapshot()
+		db.SetBalance(address, uint256.NewInt(999))
+		suite.Require().Equal(uint256.NewInt(999), db.GetBalance(address))
+
+		db.RevertToSnapshot(rev)
+		suite.Require().Equal(uint256.NewInt(100), db.GetBalance(address), "balance should be restored after revert")
+	}
 }
 
 func CollectContractStorage(db vm.StateDB) statedb.Storage {
