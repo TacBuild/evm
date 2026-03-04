@@ -3,8 +3,6 @@ package statedb
 import (
 	"errors"
 	"fmt"
-	"math/big"
-	"slices"
 	"sort"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -640,44 +638,4 @@ func (s *StateDB) SetStorage(addr common.Address, storage map[common.Hash]common
 		newObj.SetNonce(prev.Nonce())
 		newObj.SetBalance(prev.Balance())
 	}
-}
-
-// Apply overrides the fields of specified accounts into the given state.
-func (statedb *StateDB) ApplyStateOverride(diff types.StateOverride, activePrecompiles []common.Address) error {
-	if diff == nil {
-		return nil
-	}
-	for addr, account := range diff {
-		// check if the account is a precompile, if so, return error since state override is not allowed for precompiles
-		if slices.Index(activePrecompiles, addr) != -1 {
-			return fmt.Errorf("account %s is a precompile, state override is not allowed", addr.Hex())
-		}
-		// Override account nonce.
-		if account.Nonce != nil {
-			statedb.SetNonce(addr, uint64(*account.Nonce))
-		}
-		// Override account(contract) code.
-		if account.Code != nil {
-			statedb.SetCode(addr, *account.Code)
-		}
-		// Override account balance.
-		if account.Balance != nil {
-			u256Balance, _ := uint256.FromBig((*big.Int)(account.Balance))
-			statedb.SetBalance(addr, u256Balance)
-		}
-		if account.State != nil && account.StateDiff != nil {
-			return fmt.Errorf("account %s has both 'state' and 'stateDiff'", addr.Hex())
-		}
-		// Replace entire state if caller requires.
-		if account.State != nil {
-			statedb.SetStorage(addr, account.State)
-		}
-		// Apply state diff into specified accounts.
-		if account.StateDiff != nil {
-			for key, value := range account.StateDiff {
-				statedb.SetState(addr, key, value)
-			}
-		}
-	}
-	return nil
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/cosmos/evm/rpc/backend"
 	rpctypes "github.com/cosmos/evm/rpc/types"
 	"github.com/cosmos/evm/types"
+	"github.com/cosmos/evm/x/vm/overrides"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 
 	"cosmossdk.io/log"
@@ -66,7 +67,7 @@ type EthereumAPI interface {
 	//
 	// Allows developers to read data from the blockchain which includes executing
 	// smart contracts. However, no data is published to the Ethereum network.
-	Call(args evmtypes.TransactionArgs, blockNrOrHash rpctypes.BlockNumberOrHash, _ *evmtypes.StateOverride) (hexutil.Bytes, error)
+	Call(args evmtypes.TransactionArgs, blockNrOrHash rpctypes.BlockNumberOrHash, _ *overrides.StateOverride) (hexutil.Bytes, error)
 
 	// Chain Information
 	//
@@ -268,7 +269,7 @@ func (e *PublicAPI) GetProof(address common.Address,
 // Call performs a raw contract call.
 func (e *PublicAPI) Call(args evmtypes.TransactionArgs,
 	blockNrOrHash rpctypes.BlockNumberOrHash,
-	_ *evmtypes.StateOverride,
+	_ *overrides.StateOverride,
 ) (hexutil.Bytes, error) {
 	e.logger.Debug("eth_call", "args", args.String(), "block number or hash", blockNrOrHash)
 

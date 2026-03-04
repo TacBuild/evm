@@ -7,6 +7,7 @@ import (
 
 	"github.com/cosmos/evm/rpc/backend"
 	rpctypes "github.com/cosmos/evm/rpc/types"
+	"github.com/cosmos/evm/x/vm/overrides"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 
 	"cosmossdk.io/log"
@@ -29,7 +30,7 @@ func NewTacAPI(logger log.Logger, backend backend.EVMBackend) *TacAPI {
 // Simulate implements the custom `tac_simulate` rpc api which supports state override and event logs as result.
 func (api *TacAPI) Simulate(args evmtypes.TransactionArgs,
 	blockNrOrHash rpctypes.BlockNumberOrHash,
-	stateOverride evmtypes.StateOverride,
+	stateOverride overrides.StateOverride,
 ) (hexutil.Bytes, error) {
 	api.logger.Debug("tac_simulate", "args", args.String(), "block number or hash", blockNrOrHash, "state override", stateOverride)
 

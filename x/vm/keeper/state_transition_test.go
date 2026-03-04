@@ -24,6 +24,7 @@ import (
 	utiltx "github.com/cosmos/evm/testutil/tx"
 	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
 	"github.com/cosmos/evm/x/vm/keeper"
+	"github.com/cosmos/evm/x/vm/overrides"
 	"github.com/cosmos/evm/x/vm/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -749,6 +750,7 @@ func (suite *KeeperTestSuite) TestApplyMessageWithConfig() {
 				config,
 				txConfig,
 				nil,
+				nil,
 			)
 
 			if tc.expErr {
@@ -760,11 +762,6 @@ func (suite *KeeperTestSuite) TestApplyMessageWithConfig() {
 			}
 
 			err = suite.network.NextBlock()
-			if tc.expVMErr {
-				suite.Require().NotEmpty(res.VmError)
-				return
-			}
-
 			if tc.expVMErr {
 				suite.Require().NotEmpty(res.VmError)
 				return
@@ -791,7 +788,7 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 
 	testCases := []struct {
 		name          string
-		stateOverride types.StateOverride
+		stateOverride overrides.StateOverride
 		commit        bool
 		expErr        bool
 		expErrMsg     string
@@ -804,8 +801,8 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 		},
 		{
 			name: "success - override balance",
-			stateOverride: types.StateOverride{
-				recipient: types.OverrideAccount{
+			stateOverride: overrides.StateOverride{
+				recipient: overrides.OverrideAccount{
 					Balance: (*hexutil.Big)(big.NewInt(1e18)),
 				},
 			},
@@ -814,8 +811,8 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 		},
 		{
 			name: "success - override nonce",
-			stateOverride: types.StateOverride{
-				recipient: types.OverrideAccount{
+			stateOverride: overrides.StateOverride{
+				recipient: overrides.OverrideAccount{
 					Nonce: func() *hexutil.Uint64 { n := hexutil.Uint64(100); return &n }(),
 				},
 			},
@@ -824,8 +821,8 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 		},
 		{
 			name: "success - override code (empty code does not affect simple transfer)",
-			stateOverride: types.StateOverride{
-				recipient: types.OverrideAccount{
+			stateOverride: overrides.StateOverride{
+				recipient: overrides.OverrideAccount{
 					// Setting empty code on recipient - simple transfer should still work
 					Code: func() *hexutil.Bytes { b := hexutil.Bytes([]byte{}); return &b }(),
 				},
@@ -835,8 +832,8 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 		},
 		{
 			name: "success - override state diff",
-			stateOverride: types.StateOverride{
-				recipient: types.OverrideAccount{
+			stateOverride: overrides.StateOverride{
+				recipient: overrides.OverrideAccount{
 					StateDiff: map[common.Hash]common.Hash{
 						common.HexToHash("0x01"): common.HexToHash("0x02"),
 					},
@@ -847,8 +844,8 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 		},
 		{
 			name: "fail - state override with commit=true",
-			stateOverride: types.StateOverride{
-				recipient: types.OverrideAccount{
+			stateOverride: overrides.StateOverride{
+				recipient: overrides.OverrideAccount{
 					Balance: (*hexutil.Big)(big.NewInt(1e18)),
 				},
 			},
@@ -858,8 +855,8 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 		},
 		{
 			name: "fail - both state and stateDiff provided",
-			stateOverride: types.StateOverride{
-				recipient: types.OverrideAccount{
+			stateOverride: overrides.StateOverride{
+				recipient: overrides.OverrideAccount{
 					State: map[common.Hash]common.Hash{
 						common.HexToHash("0x01"): common.HexToHash("0x02"),
 					},
@@ -897,6 +894,7 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 				config,
 				txConfig,
 				tc.stateOverride,
+				nil,
 			)
 
 			if tc.expErr {
@@ -977,11 +975,11 @@ func (suite *KeeperTestSuite) TestStateOverrideBalanceCheck() {
 
 	// State override: set code for contractAddr and balance for targetAddr
 	overriddenBalance := big.NewInt(123456789)
-	stateOverride := types.StateOverride{
-		contractAddr: types.OverrideAccount{
+	stateOverride := overrides.StateOverride{
+		contractAddr: overrides.OverrideAccount{
 			Code: func() *hexutil.Bytes { b := hexutil.Bytes(balanceCheckerCode); return &b }(),
 		},
-		targetAddr: types.OverrideAccount{
+		targetAddr: overrides.OverrideAccount{
 			Balance: (*hexutil.Big)(overriddenBalance),
 		},
 	}
@@ -994,6 +992,7 @@ func (suite *KeeperTestSuite) TestStateOverrideBalanceCheck() {
 		config,
 		txConfig,
 		stateOverride,
+		nil,
 	)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
@@ -1084,8 +1083,8 @@ func (suite *KeeperTestSuite) TestStateOverrideStateMapResetsNonOverriddenKeys()
 	// Test 1: State override with State map (full replacement)
 	// Override only slot0 -> non-overridden slot1 MUST return zero
 	// ---------------------------------------------------------------
-	stateOverrideFullReplace := types.StateOverride{
-		contractAddr: types.OverrideAccount{
+	stateOverrideFullReplace := overrides.StateOverride{
+		contractAddr: overrides.OverrideAccount{
 			Code: func() *hexutil.Bytes { b := hexutil.Bytes(storageReaderCode); return &b }(),
 			State: map[common.Hash]common.Hash{
 				slot0: overrideValue0,
@@ -1102,6 +1101,7 @@ func (suite *KeeperTestSuite) TestStateOverrideStateMapResetsNonOverriddenKeys()
 		config,
 		txConfig,
 		stateOverrideFullReplace,
+		nil,
 	)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
@@ -1127,8 +1127,8 @@ func (suite *KeeperTestSuite) TestStateOverrideStateMapResetsNonOverriddenKeys()
 	})
 	suite.Require().NoError(err)
 
-	stateOverridePartial := types.StateOverride{
-		contractAddr: types.OverrideAccount{
+	stateOverridePartial := overrides.StateOverride{
+		contractAddr: overrides.OverrideAccount{
 			Code: func() *hexutil.Bytes { b := hexutil.Bytes(storageReaderCode); return &b }(),
 			StateDiff: map[common.Hash]common.Hash{
 				slot0: overrideValue0,
@@ -1150,6 +1150,7 @@ func (suite *KeeperTestSuite) TestStateOverrideStateMapResetsNonOverriddenKeys()
 		config,
 		txConfig2,
 		stateOverridePartial,
+		nil,
 	)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res2)
@@ -1205,36 +1206,36 @@ func (suite *KeeperTestSuite) TestStateOverrideCannotOverridePrecompile() {
 
 	testCases := []struct {
 		name          string
-		stateOverride types.StateOverride
+		stateOverride overrides.StateOverride
 	}{
 		{
 			name: "fail - override precompile balance",
-			stateOverride: types.StateOverride{
-				ecrecoverAddr: types.OverrideAccount{
+			stateOverride: overrides.StateOverride{
+				ecrecoverAddr: overrides.OverrideAccount{
 					Balance: (*hexutil.Big)(big.NewInt(1e18)),
 				},
 			},
 		},
 		{
 			name: "fail - override precompile code",
-			stateOverride: types.StateOverride{
-				ecrecoverAddr: types.OverrideAccount{
+			stateOverride: overrides.StateOverride{
+				ecrecoverAddr: overrides.OverrideAccount{
 					Code: func() *hexutil.Bytes { b := hexutil.Bytes([]byte{0x60, 0x00}); return &b }(),
 				},
 			},
 		},
 		{
 			name: "fail - override precompile nonce",
-			stateOverride: types.StateOverride{
-				ecrecoverAddr: types.OverrideAccount{
+			stateOverride: overrides.StateOverride{
+				ecrecoverAddr: overrides.OverrideAccount{
 					Nonce: func() *hexutil.Uint64 { n := hexutil.Uint64(1); return &n }(),
 				},
 			},
 		},
 		{
 			name: "fail - override precompile state",
-			stateOverride: types.StateOverride{
-				ecrecoverAddr: types.OverrideAccount{
+			stateOverride: overrides.StateOverride{
+				ecrecoverAddr: overrides.OverrideAccount{
 					State: map[common.Hash]common.Hash{
 						common.HexToHash("0x01"): common.HexToHash("0x02"),
 					},
@@ -1243,8 +1244,8 @@ func (suite *KeeperTestSuite) TestStateOverrideCannotOverridePrecompile() {
 		},
 		{
 			name: "fail - override precompile stateDiff",
-			stateOverride: types.StateOverride{
-				ecrecoverAddr: types.OverrideAccount{
+			stateOverride: overrides.StateOverride{
+				ecrecoverAddr: overrides.OverrideAccount{
 					StateDiff: map[common.Hash]common.Hash{
 						common.HexToHash("0x01"): common.HexToHash("0x02"),
 					},
@@ -1263,11 +1264,348 @@ func (suite *KeeperTestSuite) TestStateOverrideCannotOverridePrecompile() {
 				config,
 				txConfig,
 				tc.stateOverride,
+				nil,
 			)
 			suite.Require().Error(err)
 			suite.Require().Contains(err.Error(), "is a precompile, state override is not allowed")
 		})
 	}
+}
+
+// TestApplyMessageWithBlockOverrides verifies that BlockOverrides correctly override
+// the EVM block context fields (NUMBER, TIMESTAMP, COINBASE, DIFFICULTY, GASLIMIT, BASEFEE)
+// when calling ApplyMessageWithConfig.
+func (suite *KeeperTestSuite) TestApplyMessageWithBlockOverrides() {
+	suite.SetupTest()
+
+	sender := suite.keyring.GetKey(0)
+
+	// Contract address where we deploy code via state override
+	contractAddr := common.HexToAddress("0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+
+	// Get proposer address and EVM config
+	proposerAddress := suite.network.GetContext().BlockHeader().ProposerAddress
+	config, err := suite.network.App.EVMKeeper.EVMConfig(
+		suite.network.GetContext(),
+		proposerAddress,
+	)
+	suite.Require().NoError(err)
+
+	// -------------------------------------------------------------------
+	// Bytecode that returns NUMBER (block number):
+	// NUMBER PUSH1 0x00 MSTORE PUSH1 0x20 PUSH1 0x00 RETURN
+	// 43 60 00 52 60 20 60 00 f3
+	numberCode := []byte{0x43, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+
+	// Bytecode that returns TIMESTAMP:
+	// TIMESTAMP PUSH1 0x00 MSTORE PUSH1 0x20 PUSH1 0x00 RETURN
+	// 42 60 00 52 60 20 60 00 f3
+	timestampCode := []byte{0x42, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+
+	// Bytecode that returns COINBASE:
+	// COINBASE PUSH1 0x00 MSTORE PUSH1 0x20 PUSH1 0x00 RETURN
+	// 41 60 00 52 60 20 60 00 f3
+	coinbaseCode := []byte{0x41, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+
+	// Bytecode that returns DIFFICULTY (prevrandao after merge):
+	// DIFFICULTY PUSH1 0x00 MSTORE PUSH1 0x20 PUSH1 0x00 RETURN
+	// 44 60 00 52 60 20 60 00 f3
+	difficultyCode := []byte{0x44, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+
+	// Bytecode that returns GASLIMIT:
+	// GASLIMIT PUSH1 0x00 MSTORE PUSH1 0x20 PUSH1 0x00 RETURN
+	// 45 60 00 52 60 20 60 00 f3
+	gasLimitCode := []byte{0x45, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+
+	// Bytecode that returns BASEFEE:
+	// BASEFEE PUSH1 0x00 MSTORE PUSH1 0x20 PUSH1 0x00 RETURN
+	// 48 60 00 52 60 20 60 00 f3
+	baseFeeCode := []byte{0x48, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+
+	overriddenNumber := big.NewInt(999999)
+	overriddenTime := hexutil.Uint64(1234567890)
+	overriddenCoinbase := common.HexToAddress("0xCAFECAFECAFECAFECAFECAFECAFECAFECAFECAFE")
+	overriddenDifficulty := big.NewInt(42)
+	overriddenGasLimit := hexutil.Uint64(30000000)
+	overriddenBaseFee := big.NewInt(5000000000)
+
+	testCases := []struct {
+		name           string
+		code           []byte
+		blockOverrides *overrides.BlockOverrides
+		expValue       *big.Int
+		expErr         bool
+	}{
+		{
+			name: "success - override block number",
+			code: numberCode,
+			blockOverrides: &overrides.BlockOverrides{
+				Number: (*hexutil.Big)(overriddenNumber),
+			},
+			expValue: overriddenNumber,
+		},
+		{
+			name: "success - override timestamp",
+			code: timestampCode,
+			blockOverrides: &overrides.BlockOverrides{
+				Time: &overriddenTime,
+			},
+			expValue: big.NewInt(int64(overriddenTime)),
+		},
+		{
+			name: "success - override coinbase (feeRecipient)",
+			code: coinbaseCode,
+			blockOverrides: &overrides.BlockOverrides{
+				FeeRecipient: &overriddenCoinbase,
+			},
+			expValue: overriddenCoinbase.Big(),
+		},
+		{
+			name: "success - override difficulty via prevRandao (post-merge DIFFICULTY returns Random)",
+			code: difficultyCode,
+			blockOverrides: &overrides.BlockOverrides{
+				PrevRandao: func() *common.Hash {
+					h := common.BigToHash(overriddenDifficulty)
+					return &h
+				}(),
+			},
+			expValue: overriddenDifficulty,
+		},
+		{
+			name: "success - override gas limit",
+			code: gasLimitCode,
+			blockOverrides: &overrides.BlockOverrides{
+				GasLimit: &overriddenGasLimit,
+			},
+			expValue: big.NewInt(int64(overriddenGasLimit)),
+		},
+		{
+			name: "success - override baseFeePerGas",
+			code: baseFeeCode,
+			blockOverrides: &overrides.BlockOverrides{
+				BaseFeePerGas: (*hexutil.Big)(overriddenBaseFee),
+			},
+			expValue: overriddenBaseFee,
+		},
+		{
+			name:           "success - nil block overrides (use defaults)",
+			code:           numberCode,
+			blockOverrides: nil,
+			expValue:       big.NewInt(suite.network.GetContext().BlockHeight()),
+		},
+		{
+			name: "success - override multiple fields at once",
+			code: numberCode,
+			blockOverrides: &overrides.BlockOverrides{
+				Number:        (*hexutil.Big)(overriddenNumber),
+				Time:          &overriddenTime,
+				FeeRecipient:  &overriddenCoinbase,
+				BaseFeePerGas: (*hexutil.Big)(overriddenBaseFee),
+			},
+			expValue: overriddenNumber, // we check block number from the contract
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			msg, err := suite.factory.GenerateGethCoreMsg(sender.Priv, types.EvmTxArgs{
+				To:       &contractAddr,
+				Input:    []byte{},
+				GasLimit: 100000,
+			})
+			suite.Require().NoError(err)
+
+			txConfig := suite.network.App.EVMKeeper.TxConfig(
+				suite.network.GetContext(),
+				common.Hash{},
+			)
+
+			// Use state override to deploy contract code at contractAddr
+			stateOverride := overrides.StateOverride{
+				contractAddr: overrides.OverrideAccount{
+					Code: func() *hexutil.Bytes { b := hexutil.Bytes(tc.code); return &b }(),
+				},
+			}
+
+			res, err := suite.network.App.EVMKeeper.ApplyMessageWithConfig(
+				suite.network.GetContext(),
+				*msg,
+				nil,
+				false, // don't commit (required for state override)
+				config,
+				txConfig,
+				stateOverride,
+				tc.blockOverrides,
+			)
+
+			if tc.expErr {
+				suite.Require().Error(err)
+			} else {
+				suite.Require().NoError(err)
+				suite.Require().NotNil(res)
+				suite.Require().False(res.Failed(), "VM error: %s", res.VmError)
+
+				returnedValue := new(big.Int).SetBytes(res.Ret)
+				suite.Require().Equal(tc.expValue.String(), returnedValue.String(),
+					"block override value mismatch")
+			}
+		})
+	}
+}
+
+// TestBlockOverridesWithCommitTrue verifies that block overrides are rejected
+// when commit=true, similar to state overrides.
+func (suite *KeeperTestSuite) TestBlockOverridesWithCommitTrue() {
+	suite.SetupTest()
+
+	sender := suite.keyring.GetKey(0)
+	recipient := suite.keyring.GetAddr(1)
+
+	proposerAddress := suite.network.GetContext().BlockHeader().ProposerAddress
+	config, err := suite.network.App.EVMKeeper.EVMConfig(
+		suite.network.GetContext(),
+		proposerAddress,
+	)
+	suite.Require().NoError(err)
+
+	overriddenNumber := big.NewInt(777777)
+
+	msg, err := suite.factory.GenerateGethCoreMsg(sender.Priv, types.EvmTxArgs{
+		To:     &recipient,
+		Amount: big.NewInt(100),
+	})
+	suite.Require().NoError(err)
+
+	txConfig := suite.network.App.EVMKeeper.TxConfig(
+		suite.network.GetContext(),
+		common.Hash{},
+	)
+
+	// Block overrides should NOT be allowed with commit=true
+	_, err = suite.network.App.EVMKeeper.ApplyMessageWithConfig(
+		suite.network.GetContext(),
+		*msg,
+		nil,
+		true,
+		config,
+		txConfig,
+		nil,
+		&overrides.BlockOverrides{
+			Number: (*hexutil.Big)(overriddenNumber),
+		},
+	)
+	suite.Require().Error(err)
+	suite.Require().Contains(err.Error(), "block overrides are not nil")
+}
+
+// TestBlockOverridesPrevRandao verifies that the PREVRANDAO (DIFFICULTY post-merge)
+// opcode returns the overridden value from BlockOverrides.
+func (suite *KeeperTestSuite) TestBlockOverridesPrevRandao() {
+	suite.SetupTest()
+
+	sender := suite.keyring.GetKey(0)
+	contractAddr := common.HexToAddress("0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+
+	proposerAddress := suite.network.GetContext().BlockHeader().ProposerAddress
+	config, err := suite.network.App.EVMKeeper.EVMConfig(
+		suite.network.GetContext(),
+		proposerAddress,
+	)
+	suite.Require().NoError(err)
+
+	// DIFFICULTY opcode (0x44) returns prevRandao after the merge
+	// DIFFICULTY PUSH1 0x00 MSTORE PUSH1 0x20 PUSH1 0x00 RETURN
+	prevRandaoCode := []byte{0x44, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+
+	overriddenRandao := common.HexToHash("0xDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF")
+
+	msg, err := suite.factory.GenerateGethCoreMsg(sender.Priv, types.EvmTxArgs{
+		To:       &contractAddr,
+		Input:    []byte{},
+		GasLimit: 100000,
+	})
+	suite.Require().NoError(err)
+
+	txConfig := suite.network.App.EVMKeeper.TxConfig(
+		suite.network.GetContext(),
+		common.Hash{},
+	)
+
+	stateOverride := overrides.StateOverride{
+		contractAddr: overrides.OverrideAccount{
+			Code: func() *hexutil.Bytes { b := hexutil.Bytes(prevRandaoCode); return &b }(),
+		},
+	}
+
+	res, err := suite.network.App.EVMKeeper.ApplyMessageWithConfig(
+		suite.network.GetContext(),
+		*msg,
+		nil,
+		false,
+		config,
+		txConfig,
+		stateOverride,
+		&overrides.BlockOverrides{
+			PrevRandao: &overriddenRandao,
+		},
+	)
+	suite.Require().NoError(err)
+	suite.Require().NotNil(res)
+	suite.Require().False(res.Failed(), "VM error: %s", res.VmError)
+
+	// The DIFFICULTY opcode post-merge returns the random value which is
+	// the prevRandao field. It's returned as a uint256.
+	returnedHash := common.BytesToHash(res.Ret)
+	suite.Require().Equal(overriddenRandao, returnedHash,
+		"PrevRandao override should be reflected via DIFFICULTY opcode")
+}
+
+// TestBlockOverridesDoNotAffectContext verifies that block overrides
+// do not persist into the SDK context after execution.
+func (suite *KeeperTestSuite) TestBlockOverridesDoNotAffectContext() {
+	suite.SetupTest()
+
+	sender := suite.keyring.GetKey(0)
+	recipient := suite.keyring.GetAddr(1)
+
+	proposerAddress := suite.network.GetContext().BlockHeader().ProposerAddress
+	config, err := suite.network.App.EVMKeeper.EVMConfig(
+		suite.network.GetContext(),
+		proposerAddress,
+	)
+	suite.Require().NoError(err)
+
+	originalHeight := suite.network.GetContext().BlockHeight()
+	overriddenNumber := big.NewInt(999999)
+
+	msg, err := suite.factory.GenerateGethCoreMsg(sender.Priv, types.EvmTxArgs{
+		To:     &recipient,
+		Amount: big.NewInt(100),
+	})
+	suite.Require().NoError(err)
+
+	txConfig := suite.network.App.EVMKeeper.TxConfig(
+		suite.network.GetContext(),
+		common.Hash{},
+	)
+
+	_, err = suite.network.App.EVMKeeper.ApplyMessageWithConfig(
+		suite.network.GetContext(),
+		*msg,
+		nil,
+		false,
+		config,
+		txConfig,
+		nil,
+		&overrides.BlockOverrides{
+			Number: (*hexutil.Big)(overriddenNumber),
+		},
+	)
+	suite.Require().NoError(err)
+
+	// Verify that the SDK context block height is unchanged
+	suite.Require().Equal(originalHeight, suite.network.GetContext().BlockHeight(),
+		"Block overrides should not modify the SDK context")
 }
 
 func (suite *KeeperTestSuite) TestGetProposerAddress() {

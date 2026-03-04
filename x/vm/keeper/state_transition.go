@@ -14,6 +14,7 @@ import (
 	cmttypes "github.com/cometbft/cometbft/types"
 
 	cosmosevmtypes "github.com/cosmos/evm/types"
+	"github.com/cosmos/evm/x/vm/overrides"
 	"github.com/cosmos/evm/x/vm/statedb"
 	"github.com/cosmos/evm/x/vm/types"
 
@@ -167,7 +168,7 @@ func (k *Keeper) ApplyTransaction(ctx sdk.Context, tx *ethtypes.Transaction) (*t
 	tmpCtx, commit := ctx.CacheContext()
 
 	// pass true to commit the StateDB
-	res, err := k.ApplyMessageWithConfig(tmpCtx, *msg, nil, true, cfg, txConfig, nil)
+	res, err := k.ApplyMessageWithConfig(tmpCtx, *msg, nil, true, cfg, txConfig, nil, nil)
 	if err != nil {
 		// when a transaction contains multiple msg, as long as one of the msg fails
 		// all gas will be deducted. so is not msg.Gas()
@@ -222,7 +223,7 @@ func (k *Keeper) ApplyMessage(ctx sdk.Context, msg evmcore.Message, tracer vm.EV
 	}
 
 	txConfig := statedb.NewEmptyTxConfig(common.BytesToHash(ctx.HeaderHash()))
-	return k.ApplyMessageWithConfig(ctx, msg, tracer, commit, cfg, txConfig, nil)
+	return k.ApplyMessageWithConfig(ctx, msg, tracer, commit, cfg, txConfig, nil, nil)
 }
 
 // ApplyMessageWithConfig computes the new state by applying the given message against the existing state.
@@ -270,6 +271,11 @@ func (k *Keeper) ApplyMessage(ctx sdk.Context, msg evmcore.Message, tracer vm.EV
 // before EVM execution and discard the dirty state after execution,
 // no matter the execution result. This is only used for `eth_call`, `tac_simulate` and `eth_estimateGas`
 // where the state should not be changed.
+//
+// # Block overrides parameter
+//
+// If block overrides is not nil, the EVM block context fields will be overridden
+// before execution. Block overrides are not allowed when commit is true.
 
 func (k *Keeper) ApplyMessageWithConfig(
 	ctx sdk.Context,
@@ -278,7 +284,8 @@ func (k *Keeper) ApplyMessageWithConfig(
 	commit bool,
 	cfg *statedb.EVMConfig,
 	txConfig statedb.TxConfig,
-	stateOverride types.StateOverride,
+	stateOverride overrides.StateOverride,
+	blockOverrides *overrides.BlockOverrides,
 ) (*types.MsgEthereumTxResponse, error) {
 	var (
 		ret   []byte // return bytes from evm execution
@@ -287,6 +294,14 @@ func (k *Keeper) ApplyMessageWithConfig(
 
 	stateDB := statedb.New(ctx, k, txConfig)
 	evm := k.NewEVM(ctx, msg, cfg, tracer, stateDB)
+
+	// Apply block overrides if provided
+	if blockOverrides != nil {
+		if commit {
+			return nil, errorsmod.Wrap(types.ErrUnexpectedBlockOverrides, "block overrides are not nil")
+		}
+		blockOverrides.Apply(&evm.Context)
+	}
 
 	leftoverGas := msg.GasLimit
 
@@ -325,7 +340,7 @@ func (k *Keeper) ApplyMessageWithConfig(
 		if commit {
 			return nil, errorsmod.Wrap(types.ErrUnexpectedStateOverride, "state override is not nil")
 		}
-		if err := stateDB.ApplyStateOverride(stateOverride, evm.ActivePrecompiles(rules)); err != nil {
+		if err := stateOverride.Apply(stateDB, evm.ActivePrecompiles(rules)); err != nil {
 			return nil, errorsmod.Wrap(err, "failed to apply state override")
 		}
 	}

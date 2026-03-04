@@ -20,6 +20,7 @@ import (
 	"github.com/cosmos/evm/testutil/integration/os/network"
 	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
 	"github.com/cosmos/evm/x/vm/keeper/testdata"
+	"github.com/cosmos/evm/x/vm/overrides"
 	"github.com/cosmos/evm/x/vm/statedb"
 	"github.com/cosmos/evm/x/vm/types"
 
@@ -1776,8 +1777,8 @@ func (suite *KeeperTestSuite) TestTacSimulate() {
 				suite.Require().NoError(err)
 
 				// Override balance for newAddr so it can pay for gas
-				stateOverride := types.StateOverride{
-					newAddr: types.OverrideAccount{
+				stateOverride := overrides.StateOverride{
+					newAddr: overrides.OverrideAccount{
 						Balance: (*hexutil.Big)(big.NewInt(1e18)),
 					},
 				}
@@ -1805,7 +1806,7 @@ func (suite *KeeperTestSuite) TestTacSimulate() {
 				suite.Require().NoError(err)
 
 				// Empty state override
-				stateOverride := types.StateOverride{}
+				stateOverride := overrides.StateOverride{}
 				stateOverrideBytes, err := json.Marshal(stateOverride)
 				suite.Require().NoError(err)
 
@@ -1904,11 +1905,11 @@ func (suite *KeeperTestSuite) TestTacSimulateWithStateOverride() {
 	})
 	suite.Require().NoError(err)
 
-	stateOverride := types.StateOverride{
-		contractAddr: types.OverrideAccount{
+	stateOverride := overrides.StateOverride{
+		contractAddr: overrides.OverrideAccount{
 			Code: func() *hexutil.Bytes { b := hexutil.Bytes(balanceCheckerCode); return &b }(),
 		},
-		targetAddr: types.OverrideAccount{
+		targetAddr: overrides.OverrideAccount{
 			Balance: (*hexutil.Big)(overriddenBalance),
 		},
 	}

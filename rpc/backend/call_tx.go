@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	rpctypes "github.com/cosmos/evm/rpc/types"
+	"github.com/cosmos/evm/x/vm/overrides"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 
 	errorsmod "cosmossdk.io/errors"
@@ -375,7 +376,7 @@ func (b *Backend) DoCall(
 func (b *Backend) DoTacSimulate(
 	args evmtypes.TransactionArgs,
 	blockNr rpctypes.BlockNumber,
-	stateOverride evmtypes.StateOverride,
+	stateOverride overrides.StateOverride,
 ) (*evmtypes.TacSimulateResponse, error) {
 	bz, err := json.Marshal(&args)
 	if err != nil {

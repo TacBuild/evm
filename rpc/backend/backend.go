@@ -19,6 +19,7 @@ import (
 	rpctypes "github.com/cosmos/evm/rpc/types"
 	"github.com/cosmos/evm/server/config"
 	cosmosevmtypes "github.com/cosmos/evm/types"
+	"github.com/cosmos/evm/x/vm/overrides"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 
 	"cosmossdk.io/log"
@@ -110,7 +111,7 @@ type EVMBackend interface {
 	SetTxDefaults(args evmtypes.TransactionArgs) (evmtypes.TransactionArgs, error)
 	EstimateGas(args evmtypes.TransactionArgs, blockNrOptional *rpctypes.BlockNumber) (hexutil.Uint64, error)
 	DoCall(args evmtypes.TransactionArgs, blockNr rpctypes.BlockNumber) (*evmtypes.MsgEthereumTxResponse, error)
-	DoTacSimulate(args evmtypes.TransactionArgs, blockNr rpctypes.BlockNumber, stateOverride evmtypes.StateOverride) (*evmtypes.TacSimulateResponse, error)
+	DoTacSimulate(args evmtypes.TransactionArgs, blockNr rpctypes.BlockNumber, stateOverride overrides.StateOverride) (*evmtypes.TacSimulateResponse, error)
 	GasPrice() (*hexutil.Big, error)
 
 	// Filter API
