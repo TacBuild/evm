@@ -425,10 +425,7 @@ func (b *Backend) DoTacSimulate(
 		return nil, err
 	}
 
-	if err = handleRevertError(res.VmError, res.Ret); err != nil {
-		return nil, err
-	}
-
+	// return result as is
 	return res, nil
 }
 
