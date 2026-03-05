@@ -47,6 +47,7 @@ func (api *TacAPI) Simulate(args evmtypes.TransactionArgs,
 	rpcLogs := rpctypes.ToRPCTypeLogs(data.Logs)
 
 	tacSimulateResult := rpctypes.TacSimulateResult{
+		Status:       len(data.VmError) == 0,
 		Output:       hexutil.Bytes(data.Ret),
 		VmError:      data.VmError,
 		Logs:         rpcLogs,

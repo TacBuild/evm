@@ -74,6 +74,8 @@ type OneFeeHistory struct {
 }
 
 type TacSimulateResult struct {
+	// Status of the EVM execution, true if the execution is successful, false if the execution is reverted (vmError is not empty)
+	Status bool `json:"success"`
 	// Output is the result of the EVM execution, it is the same as the output of eth_call
 	Output hexutil.Bytes `json:"output"`
 	// VmError is the revert reason if the EVM execution is reverted, it is empty if the execution is successful
