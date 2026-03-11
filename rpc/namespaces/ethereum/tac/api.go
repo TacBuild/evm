@@ -31,6 +31,7 @@ func NewTacAPI(logger log.Logger, backend backend.EVMBackend) *TacAPI {
 func (api *TacAPI) Simulate(args evmtypes.TransactionArgs,
 	blockNrOrHash rpctypes.BlockNumberOrHash,
 	stateOverride overrides.StateOverride,
+	blockOverrides *overrides.BlockOverrides,
 ) (hexutil.Bytes, error) {
 	api.logger.Debug("tac_simulate", "args", args.String(), "block number or hash", blockNrOrHash, "state override", stateOverride)
 
@@ -38,7 +39,7 @@ func (api *TacAPI) Simulate(args evmtypes.TransactionArgs,
 	if err != nil {
 		return nil, err
 	}
-	data, err := api.backend.DoTacSimulate(args, blockNum, stateOverride)
+	data, err := api.backend.DoTacSimulate(args, blockNum, stateOverride, blockOverrides)
 	if err != nil {
 		return []byte{}, err
 	}

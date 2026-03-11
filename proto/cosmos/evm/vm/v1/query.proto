@@ -271,14 +271,15 @@ message TacSimulateRequest {
   bytes args = 1;
   // state_override defines the state override for the call, it uses the same json format as the json rpc api.
   bytes state_override = 2;
+  bytes block_overrides = 3;
   // gas_cap defines the default gas cap to be used
-  uint64 gas_cap = 3;
+  uint64 gas_cap = 4;
   // proposer_address of the requested block in hex format
-  bytes proposer_address = 4
+  bytes proposer_address = 5
       [ (gogoproto.casttype) =
             "github.com/cosmos/cosmos-sdk/types.ConsAddress" ];
   // chain_id is the eip155 chain id parsed from the requested block header
-  int64 chain_id = 5;
+  int64 chain_id = 6;
 }
 
 // TacSimulateResponse defines TacSimulate response
@@ -340,6 +341,10 @@ message QueryTraceTxRequest {
   int64 chain_id = 9;
   // block_max_gas of the block of the requested transaction
   int64 block_max_gas = 10;
+  // state_override defines the state override for the trace.
+  bytes state_override = 11;
+  // block_overrides defines the block override for the trace.
+  bytes block_overrides = 12;
 }
 
 // QueryTraceTxResponse defines TraceTx response

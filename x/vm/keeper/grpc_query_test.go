@@ -1939,6 +1939,187 @@ func (suite *KeeperTestSuite) TestTacSimulateWithStateOverride() {
 		"Original state should not be modified")
 }
 
+func (suite *KeeperTestSuite) TestTacSimulateWithBlockOverrides() {
+	suite.SetupTest()
+
+	sender := suite.keyring.GetAddr(0)
+
+	// Contract address where we inject code via state override
+	contractAddr := common.HexToAddress("0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+
+	// Bytecode that returns NUMBER: NUMBER PUSH1 0 MSTORE PUSH1 0x20 PUSH1 0 RETURN
+	numberCode := []byte{0x43, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+	// Bytecode that returns TIMESTAMP: TIMESTAMP PUSH1 0 MSTORE PUSH1 0x20 PUSH1 0 RETURN
+	timestampCode := []byte{0x42, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+	// Bytecode that returns COINBASE: COINBASE PUSH1 0 MSTORE PUSH1 0x20 PUSH1 0 RETURN
+	coinbaseCode := []byte{0x41, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+	// Bytecode that returns GASLIMIT: GASLIMIT PUSH1 0 MSTORE PUSH1 0x20 PUSH1 0 RETURN
+	gasLimitCode := []byte{0x45, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+	// Bytecode that returns DIFFICULTY/PREVRANDAO: DIFFICULTY PUSH1 0 MSTORE PUSH1 0x20 PUSH1 0 RETURN
+	prevRandaoCode := []byte{0x44, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+	// Bytecode that returns BASEFEE: BASEFEE PUSH1 0 MSTORE PUSH1 0x20 PUSH1 0 RETURN
+	baseFeeCode := []byte{0x48, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+
+	overriddenNumber := big.NewInt(999_999)
+	overriddenTime := hexutil.Uint64(1_234_567_890)
+	overriddenCoinbase := common.HexToAddress("0xCAFECAFECAFECAFECAFECAFECAFECAFECAFECAFE")
+	overriddenGasLimit := hexutil.Uint64(30_000_000)
+	overriddenRandao := common.BigToHash(big.NewInt(0xdeadcafe))
+	overriddenBaseFee := big.NewInt(5_000_000_000)
+
+	buildReq := func(code []byte, bo *overrides.BlockOverrides) *types.TacSimulateRequest {
+		gas := hexutil.Uint64(100_000)
+		args, err := json.Marshal(&types.TransactionArgs{
+			From: &sender,
+			To:   &contractAddr,
+			Gas:  &gas,
+		})
+		suite.Require().NoError(err)
+
+		// Inject bytecode at contractAddr via state override
+		codeBytes := hexutil.Bytes(code)
+		stateOverride := overrides.StateOverride{
+			contractAddr: overrides.OverrideAccount{Code: &codeBytes},
+		}
+		stateOverrideBytes, err := json.Marshal(stateOverride)
+		suite.Require().NoError(err)
+
+		var blockOverrideBytes []byte
+		if bo != nil {
+			blockOverrideBytes, err = json.Marshal(bo)
+			suite.Require().NoError(err)
+		}
+
+		return &types.TacSimulateRequest{
+			Args:            args,
+			StateOverride:   stateOverrideBytes,
+			BlockOverrides:  blockOverrideBytes,
+			GasCap:          config.DefaultGasCap,
+			ProposerAddress: suite.network.GetContext().BlockHeader().ProposerAddress,
+		}
+	}
+
+	testCases := []struct {
+		name     string
+		req      func() *types.TacSimulateRequest
+		expValue *big.Int
+		expErr   bool
+	}{
+		{
+			name: "fail - invalid block overrides json",
+			req: func() *types.TacSimulateRequest {
+				gas := hexutil.Uint64(100_000)
+				args, err := json.Marshal(&types.TransactionArgs{
+					From: &sender,
+					To:   &contractAddr,
+					Gas:  &gas,
+				})
+				suite.Require().NoError(err)
+				return &types.TacSimulateRequest{
+					Args:            args,
+					BlockOverrides:  []byte("not-json"),
+					GasCap:          config.DefaultGasCap,
+					ProposerAddress: suite.network.GetContext().BlockHeader().ProposerAddress,
+				}
+			},
+			expErr: true,
+		},
+		{
+			name: "success - override block number",
+			req: func() *types.TacSimulateRequest {
+				return buildReq(numberCode, &overrides.BlockOverrides{
+					Number: (*hexutil.Big)(overriddenNumber),
+				})
+			},
+			expValue: overriddenNumber,
+		},
+		{
+			name: "success - override timestamp",
+			req: func() *types.TacSimulateRequest {
+				return buildReq(timestampCode, &overrides.BlockOverrides{
+					Time: &overriddenTime,
+				})
+			},
+			expValue: big.NewInt(int64(overriddenTime)),
+		},
+		{
+			name: "success - override coinbase (feeRecipient)",
+			req: func() *types.TacSimulateRequest {
+				return buildReq(coinbaseCode, &overrides.BlockOverrides{
+					FeeRecipient: &overriddenCoinbase,
+				})
+			},
+			expValue: overriddenCoinbase.Big(),
+		},
+		{
+			name: "success - override gas limit",
+			req: func() *types.TacSimulateRequest {
+				return buildReq(gasLimitCode, &overrides.BlockOverrides{
+					GasLimit: &overriddenGasLimit,
+				})
+			},
+			expValue: big.NewInt(int64(overriddenGasLimit)),
+		},
+		{
+			name: "success - override prevRandao (post-merge DIFFICULTY opcode)",
+			req: func() *types.TacSimulateRequest {
+				return buildReq(prevRandaoCode, &overrides.BlockOverrides{
+					PrevRandao: &overriddenRandao,
+				})
+			},
+			expValue: overriddenRandao.Big(),
+		},
+		{
+			name: "success - override baseFeePerGas",
+			req: func() *types.TacSimulateRequest {
+				return buildReq(baseFeeCode, &overrides.BlockOverrides{
+					BaseFeePerGas: (*hexutil.Big)(overriddenBaseFee),
+				})
+			},
+			expValue: overriddenBaseFee,
+		},
+		{
+			name: "success - nil block overrides uses context defaults",
+			req: func() *types.TacSimulateRequest {
+				return buildReq(numberCode, nil)
+			},
+			expValue: big.NewInt(suite.network.GetContext().BlockHeight()),
+		},
+		{
+			name: "success - multiple overrides at once (check number)",
+			req: func() *types.TacSimulateRequest {
+				return buildReq(numberCode, &overrides.BlockOverrides{
+					Number:        (*hexutil.Big)(overriddenNumber),
+					Time:          &overriddenTime,
+					FeeRecipient:  &overriddenCoinbase,
+					BaseFeePerGas: (*hexutil.Big)(overriddenBaseFee),
+				})
+			},
+			expValue: overriddenNumber,
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			res, err := suite.network.App.EVMKeeper.TacSimulate(
+				suite.network.GetContext(),
+				tc.req(),
+			)
+			if tc.expErr {
+				suite.Require().Error(err)
+				return
+			}
+			suite.Require().NoError(err)
+			suite.Require().NotNil(res)
+			suite.Require().Empty(res.VmError, "unexpected VM error: %s", res.VmError)
+
+			returnedValue := new(big.Int).SetBytes(res.Ret)
+			suite.Require().Equal(tc.expValue.String(), returnedValue.String(),
+				"block override value mismatch")
+		})
+	}
+}
+
 func (suite *KeeperTestSuite) TestEmptyRequest() {
 	suite.SetupTest()
 	k := suite.network.App.EVMKeeper

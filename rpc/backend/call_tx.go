@@ -377,6 +377,7 @@ func (b *Backend) DoTacSimulate(
 	args evmtypes.TransactionArgs,
 	blockNr rpctypes.BlockNumber,
 	stateOverride overrides.StateOverride,
+	blockOverrides *overrides.BlockOverrides,
 ) (*evmtypes.TacSimulateResponse, error) {
 	bz, err := json.Marshal(&args)
 	if err != nil {
@@ -389,7 +390,12 @@ func (b *Backend) DoTacSimulate(
 		return nil, errors.New("header not found")
 	}
 
-	overrideBz, err := json.Marshal(stateOverride)
+	stateOverrideBz, err := json.Marshal(stateOverride)
+	if err != nil {
+		return nil, err
+	}
+
+	blockOverridesBz, err := json.Marshal(blockOverrides)
 	if err != nil {
 		return nil, err
 	}
@@ -399,7 +405,8 @@ func (b *Backend) DoTacSimulate(
 		GasCap:          b.RPCGasCap(),
 		ProposerAddress: sdk.ConsAddress(header.Block.ProposerAddress),
 		ChainId:         b.chainID.Int64(),
-		StateOverride:   overrideBz,
+		StateOverride:   stateOverrideBz,
+		BlockOverrides:  blockOverridesBz,
 	}
 
 	// From ContextWithHeight: if the provided height is 0,

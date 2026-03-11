@@ -282,8 +282,17 @@ func (k Keeper) TacSimulate(c context.Context, req *types.TacSimulateRequest) (*
 		}
 	}
 
+	var blockOverrides *overrides.BlockOverrides
+	if req.BlockOverrides != nil {
+		blockOverrides = &overrides.BlockOverrides{}
+		err = json.Unmarshal(req.BlockOverrides, blockOverrides)
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+
 	// Execute the call with state override to get output, logs, vmError
-	res, err := k.callWithOverride(ctx, args, req.ProposerAddress, req.GasCap, stateOverride, nil)
+	res, err := k.callWithOverride(ctx, args, req.ProposerAddress, req.GasCap, stateOverride, blockOverrides)
 	if err != nil {
 		return nil, err
 	}
