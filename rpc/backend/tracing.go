@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -209,4 +210,89 @@ func (b *Backend) TraceBlock(height rpctypes.BlockNumber,
 	}
 
 	return decodedResults, nil
+}
+
+// TraceCall performs a simulated call with tracing at the given block number/hash.
+// It mirrors geth's debug_traceCall: optional stateOverrides and blockOverrides are applied
+// before executing the call, and the call itself is traced with the provided TraceConfig.
+func (b *Backend) TraceCall(
+	args evmtypes.TransactionArgs,
+	blockNrOrHash rpctypes.BlockNumberOrHash,
+	config *rpctypes.TraceCallConfig,
+) (interface{}, error) {
+	// Resolve block number
+	blockNr, err := b.BlockNumberFromTendermint(blockNrOrHash)
+	if err != nil {
+		return nil, err
+	}
+
+	header, err := b.TendermintBlockByNumber(blockNr)
+	if err != nil {
+		return nil, errors.New("header not found")
+	}
+
+	// Build base TraceConfig
+	var traceConfig *evmtypes.TraceConfig
+	if config != nil {
+		traceConfig = config.TraceConfig
+	}
+
+	// Marshal call args
+	argsBz, err := json.Marshal(&args)
+	if err != nil {
+		return nil, err
+	}
+
+	// Marshal state overrides (nil-safe)
+	var stateOverrideBz []byte
+	if config != nil && config.StateOverrides != nil {
+		stateOverrideBz, err = json.Marshal(config.StateOverrides)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Marshal block overrides (nil-safe)
+	var blockOverridesBz []byte
+	if config != nil && config.BlockOverrides != nil {
+		blockOverridesBz, err = json.Marshal(config.BlockOverrides)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req := evmtypes.QueryTraceCallRequest{
+		Args:            argsBz,
+		GasCap:          b.RPCGasCap(),
+		ProposerAddress: sdk.ConsAddress(header.Block.ProposerAddress),
+		ChainId:         b.chainID.Int64(),
+		TraceConfig:     traceConfig,
+		StateOverride:   stateOverrideBz,
+		BlockOverrides:  blockOverridesBz,
+	}
+
+	// Use the block itself as the context height: we are simulating a call on top
+	// of the committed state at this height (not replaying a past tx).
+	ctx := rpctypes.ContextWithHeight(blockNr.Int64())
+	timeout := b.RPCEVMTimeout()
+
+	var cancel func()
+	if timeout > 0 {
+		ctx, cancel = context.WithTimeout(ctx, timeout)
+	} else {
+		ctx, cancel = context.WithCancel(ctx)
+	}
+	defer cancel()
+
+	res, err := b.queryClient.TraceCall(ctx, &req)
+	if err != nil {
+		return nil, err
+	}
+
+	var result interface{}
+	if err := json.Unmarshal(res.Data, &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }

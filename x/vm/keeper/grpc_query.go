@@ -760,6 +760,148 @@ func (k *Keeper) traceTx(
 	return &result, txConfig.LogIndex + uint(len(res.Logs)), nil
 }
 
+// TraceCall implements the `debug_traceCall` gRPC method.
+// It performs a simulated EVM call with optional state and block overrides
+// and traces the execution, mirroring geth's debug_traceCall.
+func (k Keeper) TraceCall(c context.Context, req *types.QueryTraceCallRequest) (*types.QueryTraceCallResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+
+	if req.TraceConfig != nil && req.TraceConfig.Limit < 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "output limit cannot be negative, got %d", req.TraceConfig.Limit)
+	}
+
+	ctx := sdk.UnwrapSDKContext(c)
+
+	cfg, err := k.EVMConfig(ctx, GetProposerAddress(ctx, req.ProposerAddress))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to load evm config: %s", err.Error())
+	}
+
+	baseFee := k.feeMarketWrapper.CalculateBaseFee(ctx)
+	if baseFee != nil {
+		cfg.BaseFee = baseFee
+	}
+
+	// Parse call args
+	var args types.TransactionArgs
+	if err := json.Unmarshal(req.Args, &args); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "failed to unmarshal call args: %s", err.Error())
+	}
+
+	// Apply gas cap
+	gasCap := req.GasCap
+	if gasCap == 0 {
+		gasCap = 25_000_000
+	}
+	if args.Gas == nil || uint64(*args.Gas) == 0 {
+		gas := hexutil.Uint64(gasCap)
+		args.Gas = &gas
+	}
+
+	msg, err := args.ToMessage(gasCap, cfg.BaseFee)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "failed to convert args to message: %s", err.Error())
+	}
+
+	// Parse state overrides
+	var stateOverride overrides.StateOverride
+	if len(req.StateOverride) > 0 {
+		if err := json.Unmarshal(req.StateOverride, &stateOverride); err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "failed to unmarshal state override: %s", err.Error())
+		}
+	}
+
+	// Parse block overrides
+	var blockOverrides *overrides.BlockOverrides
+	if len(req.BlockOverrides) > 0 {
+		blockOverrides = new(overrides.BlockOverrides)
+		if err := json.Unmarshal(req.BlockOverrides, blockOverrides); err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "failed to unmarshal block overrides: %s", err.Error())
+		}
+	}
+
+	txConfig := statedb.NewEmptyTxConfig(common.BytesToHash(ctx.HeaderHash()))
+
+	if req.TraceConfig == nil {
+		req.TraceConfig = &types.TraceConfig{}
+	}
+
+	var tracerJSONConfig json.RawMessage
+	if req.TraceConfig.TracerJsonConfig != "" {
+		_ = json.Unmarshal([]byte(req.TraceConfig.TracerJsonConfig), &tracerJSONConfig)
+	}
+
+	// Build tracer
+	var (
+		tracer  tracers.Tracer
+		timeout = defaultTraceTimeout
+	)
+
+	var chainOverrides *ethparams.ChainConfig
+	if req.TraceConfig.Overrides != nil {
+		chainOverrides = req.TraceConfig.Overrides.EthereumConfig(cfg.ChainConfig.ChainID)
+	}
+
+	logConfig := logger.Config{
+		EnableMemory:     req.TraceConfig.EnableMemory,
+		DisableStorage:   req.TraceConfig.DisableStorage,
+		DisableStack:     req.TraceConfig.DisableStack,
+		EnableReturnData: req.TraceConfig.EnableReturnData,
+		Debug:            req.TraceConfig.Debug,
+		Limit:            int(req.TraceConfig.Limit),
+		Overrides:        chainOverrides,
+	}
+	tracer = logger.NewStructLogger(&logConfig)
+
+	tCtx := &tracers.Context{
+		BlockHash: txConfig.BlockHash,
+	}
+	if req.TraceConfig.Tracer != "" {
+		if tracer, err = tracers.DefaultDirectory.New(req.TraceConfig.Tracer, tCtx, tracerJSONConfig); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to create tracer: %s", err.Error())
+		}
+	}
+
+	if req.TraceConfig.Timeout != "" {
+		if timeout, err = time.ParseDuration(req.TraceConfig.Timeout); err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid timeout: %s", err.Error())
+		}
+	}
+
+	deadlineCtx, cancel := context.WithTimeout(c, timeout)
+	defer cancel()
+
+	go func() {
+		<-deadlineCtx.Done()
+		if errors.Is(deadlineCtx.Err(), context.DeadlineExceeded) {
+			tracer.Stop(errors.New("execution timeout"))
+		}
+	}()
+
+	ctx = evmante.BuildEvmExecutionCtx(ctx).
+		WithGasMeter(cosmosevmtypes.NewInfiniteGasMeterWithLimit(msg.GasLimit))
+
+	if _, err = k.ApplyMessageWithConfig(ctx, msg, tracer, false, cfg, txConfig, stateOverride, blockOverrides); err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to apply message: %s", err.Error())
+	}
+
+	traceResult, err := tracer.GetResult()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get tracer result: %s", err.Error())
+	}
+
+	resultData, err := json.Marshal(traceResult)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.QueryTraceCallResponse{
+		Data: resultData,
+	}, nil
+}
+
 // BaseFee implements the Query/BaseFee gRPC method
 func (k Keeper) BaseFee(c context.Context, _ *types.QueryBaseFeeRequest) (*types.QueryBaseFeeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)

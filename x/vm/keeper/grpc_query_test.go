@@ -2120,6 +2120,341 @@ func (suite *KeeperTestSuite) TestTacSimulateWithBlockOverrides() {
 	}
 }
 
+func (suite *KeeperTestSuite) TestTraceCall() {
+	suite.SetupTest()
+
+	sender := suite.keyring.GetAddr(0)
+
+	// Contract address where we inject code via state override
+	contractAddr := common.HexToAddress("0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+
+	// Bytecodes for opcode-based tests
+	// NUMBER  PUSH1 0 MSTORE PUSH1 0x20 PUSH1 0 RETURN
+	numberCode := []byte{0x43, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+	// TIMESTAMP PUSH1 0 MSTORE PUSH1 0x20 PUSH1 0 RETURN
+	timestampCode := []byte{0x42, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+	// COINBASE  PUSH1 0 MSTORE PUSH1 0x20 PUSH1 0 RETURN
+	coinbaseCode := []byte{0x41, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+	// GASLIMIT  PUSH1 0 MSTORE PUSH1 0x20 PUSH1 0 RETURN
+	gasLimitCode := []byte{0x45, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+	// DIFFICULTY/PREVRANDAO  PUSH1 0 MSTORE PUSH1 0x20 PUSH1 0 RETURN
+	prevRandaoCode := []byte{0x44, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+	// BASEFEE   PUSH1 0 MSTORE PUSH1 0x20 PUSH1 0 RETURN
+	baseFeeCode := []byte{0x48, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
+	// STOP (returns nothing — used for plain call tests)
+	stopCode := []byte{0x00}
+
+	overriddenNumber := big.NewInt(888_888)
+	overriddenTime := hexutil.Uint64(1_111_111_111)
+	overriddenCoinbase := common.HexToAddress("0xCAFECAFECAFECAFECAFECAFECAFECAFECAFECAFE")
+	overriddenGasLimit := hexutil.Uint64(40_000_000)
+	overriddenRandao := common.BigToHash(big.NewInt(0xbeefcafe))
+	overriddenBaseFee := big.NewInt(3_000_000_000)
+
+	// buildReq builds a QueryTraceCallRequest with code injected at contractAddr via state override.
+	buildReq := func(code []byte, so overrides.StateOverride, bo *overrides.BlockOverrides, traceConfig *types.TraceConfig) *types.QueryTraceCallRequest {
+		gas := hexutil.Uint64(100_000)
+		argsBz, err := json.Marshal(&types.TransactionArgs{
+			From: &sender,
+			To:   &contractAddr,
+			Gas:  &gas,
+		})
+		suite.Require().NoError(err)
+
+		// Merge code into state override map (caller may pass extra accounts)
+		if so == nil {
+			so = overrides.StateOverride{}
+		}
+		codeBytes := hexutil.Bytes(code)
+		so[contractAddr] = overrides.OverrideAccount{Code: &codeBytes}
+		soBz, err := json.Marshal(so)
+		suite.Require().NoError(err)
+
+		var boBz []byte
+		if bo != nil {
+			boBz, err = json.Marshal(bo)
+			suite.Require().NoError(err)
+		}
+
+		return &types.QueryTraceCallRequest{
+			Args:            argsBz,
+			GasCap:          config.DefaultGasCap,
+			ProposerAddress: suite.network.GetContext().BlockHeader().ProposerAddress,
+			ChainId:         suite.network.GetEIP155ChainID().Int64(),
+			TraceConfig:     traceConfig,
+			StateOverride:   soBz,
+			BlockOverrides:  boBz,
+		}
+	}
+
+	testCases := []struct {
+		name     string
+		req      func() *types.QueryTraceCallRequest
+		validate func(data []byte)
+		expErr   bool
+	}{
+		{
+			name:   "fail - nil request",
+			req:    func() *types.QueryTraceCallRequest { return nil },
+			expErr: true,
+		},
+		{
+			name: "fail - invalid args json",
+			req: func() *types.QueryTraceCallRequest {
+				return &types.QueryTraceCallRequest{
+					Args:            []byte("not-json"),
+					GasCap:          config.DefaultGasCap,
+					ProposerAddress: suite.network.GetContext().BlockHeader().ProposerAddress,
+				}
+			},
+			expErr: true,
+		},
+		{
+			name: "fail - invalid state override json",
+			req: func() *types.QueryTraceCallRequest {
+				gas := hexutil.Uint64(100_000)
+				argsBz, err := json.Marshal(&types.TransactionArgs{
+					From: &sender,
+					To:   &contractAddr,
+					Gas:  &gas,
+				})
+				suite.Require().NoError(err)
+				return &types.QueryTraceCallRequest{
+					Args:          argsBz,
+					GasCap:        config.DefaultGasCap,
+					StateOverride: []byte("not-json"),
+				}
+			},
+			expErr: true,
+		},
+		{
+			name: "fail - invalid block overrides json",
+			req: func() *types.QueryTraceCallRequest {
+				gas := hexutil.Uint64(100_000)
+				argsBz, err := json.Marshal(&types.TransactionArgs{
+					From: &sender,
+					To:   &contractAddr,
+					Gas:  &gas,
+				})
+				suite.Require().NoError(err)
+				return &types.QueryTraceCallRequest{
+					Args:           argsBz,
+					GasCap:         config.DefaultGasCap,
+					BlockOverrides: []byte("not-json"),
+				}
+			},
+			expErr: true,
+		},
+		{
+			name: "fail - negative trace limit",
+			req: func() *types.QueryTraceCallRequest {
+				return buildReq(stopCode, nil, nil, &types.TraceConfig{Limit: -1})
+			},
+			expErr: true,
+		},
+		{
+			name: "success - default struct logger trace",
+			req:  func() *types.QueryTraceCallRequest { return buildReq(stopCode, nil, nil, nil) },
+			validate: func(data []byte) {
+				// StructLogger output contains gas, failed, structLogs
+				suite.Require().Contains(string(data), "gas")
+				suite.Require().Contains(string(data), "failed")
+				suite.Require().Contains(string(data), "structLogs")
+			},
+		},
+		{
+			name: "success - disabled stack and storage",
+			req: func() *types.QueryTraceCallRequest {
+				return buildReq(stopCode, nil, nil, &types.TraceConfig{
+					DisableStack:   true,
+					DisableStorage: true,
+					EnableMemory:   false,
+				})
+			},
+			validate: func(data []byte) {
+				suite.Require().Contains(string(data), "structLogs")
+			},
+		},
+		{
+			name: "success - javascript tracer",
+			req: func() *types.QueryTraceCallRequest {
+				return buildReq(stopCode, nil, nil, &types.TraceConfig{
+					Tracer: "{data: [], fault: function(log) {}, step: function(log) { this.data.push(log.op.toString()); }, result: function() { return this.data; }}",
+				})
+			},
+			validate: func(data []byte) {
+				// JS tracer returns a JSON array
+				suite.Require().True(len(data) > 0)
+			},
+		},
+		{
+			name: "success - override block number",
+			req: func() *types.QueryTraceCallRequest {
+				return buildReq(numberCode, nil, &overrides.BlockOverrides{
+					Number: (*hexutil.Big)(overriddenNumber),
+				}, nil)
+			},
+			validate: func(data []byte) {
+				// returnValue field in StructLogger contains the 32-byte hex return
+				suite.Require().Contains(string(data), "returnValue")
+				// decode returnValue manually
+				var result struct {
+					ReturnValue string `json:"returnValue"`
+				}
+				suite.Require().NoError(json.Unmarshal(data, &result))
+				retBytes := common.FromHex(result.ReturnValue)
+				got := new(big.Int).SetBytes(retBytes)
+				suite.Require().Equal(overriddenNumber.String(), got.String())
+			},
+		},
+		{
+			name: "success - override timestamp",
+			req: func() *types.QueryTraceCallRequest {
+				return buildReq(timestampCode, nil, &overrides.BlockOverrides{
+					Time: &overriddenTime,
+				}, nil)
+			},
+			validate: func(data []byte) {
+				var result struct {
+					ReturnValue string `json:"returnValue"`
+				}
+				suite.Require().NoError(json.Unmarshal(data, &result))
+				retBytes := common.FromHex(result.ReturnValue)
+				got := new(big.Int).SetBytes(retBytes)
+				suite.Require().Equal(big.NewInt(int64(overriddenTime)).String(), got.String())
+			},
+		},
+		{
+			name: "success - override coinbase",
+			req: func() *types.QueryTraceCallRequest {
+				return buildReq(coinbaseCode, nil, &overrides.BlockOverrides{
+					FeeRecipient: &overriddenCoinbase,
+				}, nil)
+			},
+			validate: func(data []byte) {
+				var result struct {
+					ReturnValue string `json:"returnValue"`
+				}
+				suite.Require().NoError(json.Unmarshal(data, &result))
+				retBytes := common.FromHex(result.ReturnValue)
+				got := new(big.Int).SetBytes(retBytes)
+				suite.Require().Equal(overriddenCoinbase.Big().String(), got.String())
+			},
+		},
+		{
+			name: "success - override gas limit",
+			req: func() *types.QueryTraceCallRequest {
+				return buildReq(gasLimitCode, nil, &overrides.BlockOverrides{
+					GasLimit: &overriddenGasLimit,
+				}, nil)
+			},
+			validate: func(data []byte) {
+				var result struct {
+					ReturnValue string `json:"returnValue"`
+				}
+				suite.Require().NoError(json.Unmarshal(data, &result))
+				retBytes := common.FromHex(result.ReturnValue)
+				got := new(big.Int).SetBytes(retBytes)
+				suite.Require().Equal(big.NewInt(int64(overriddenGasLimit)).String(), got.String())
+			},
+		},
+		{
+			name: "success - override prevRandao (post-merge DIFFICULTY)",
+			req: func() *types.QueryTraceCallRequest {
+				return buildReq(prevRandaoCode, nil, &overrides.BlockOverrides{
+					PrevRandao: &overriddenRandao,
+				}, nil)
+			},
+			validate: func(data []byte) {
+				var result struct {
+					ReturnValue string `json:"returnValue"`
+				}
+				suite.Require().NoError(json.Unmarshal(data, &result))
+				retBytes := common.FromHex(result.ReturnValue)
+				got := new(big.Int).SetBytes(retBytes)
+				suite.Require().Equal(overriddenRandao.Big().String(), got.String())
+			},
+		},
+		{
+			name: "success - override baseFeePerGas",
+			req: func() *types.QueryTraceCallRequest {
+				return buildReq(baseFeeCode, nil, &overrides.BlockOverrides{
+					BaseFeePerGas: (*hexutil.Big)(overriddenBaseFee),
+				}, nil)
+			},
+			validate: func(data []byte) {
+				var result struct {
+					ReturnValue string `json:"returnValue"`
+				}
+				suite.Require().NoError(json.Unmarshal(data, &result))
+				retBytes := common.FromHex(result.ReturnValue)
+				got := new(big.Int).SetBytes(retBytes)
+				suite.Require().Equal(overriddenBaseFee.String(), got.String())
+			},
+		},
+		{
+			name: "success - nil block overrides uses context defaults",
+			req:  func() *types.QueryTraceCallRequest { return buildReq(numberCode, nil, nil, nil) },
+			validate: func(data []byte) {
+				var result struct {
+					ReturnValue string `json:"returnValue"`
+				}
+				suite.Require().NoError(json.Unmarshal(data, &result))
+				retBytes := common.FromHex(result.ReturnValue)
+				got := new(big.Int).SetBytes(retBytes)
+				suite.Require().Equal(
+					big.NewInt(suite.network.GetContext().BlockHeight()).String(),
+					got.String(),
+				)
+			},
+		},
+		{
+			name: "success - state override sets balance visible to contract",
+			req: func() *types.QueryTraceCallRequest {
+				// Balance-checker contract: PUSH20 <addr> BALANCE PUSH1 0 MSTORE PUSH1 0x20 PUSH1 0 RETURN
+				targetAddr := common.HexToAddress("0x1234567890123456789012345678901234567890")
+				checkerCode := append([]byte{0x73}, append(targetAddr.Bytes(),
+					[]byte{0x31, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}...)...)
+				overriddenBal := big.NewInt(42_000_000)
+				so := overrides.StateOverride{
+					targetAddr: overrides.OverrideAccount{
+						Balance: (*hexutil.Big)(overriddenBal),
+					},
+				}
+				return buildReq(checkerCode, so, nil, nil)
+			},
+			validate: func(data []byte) {
+				overriddenBal := big.NewInt(42_000_000)
+				var result struct {
+					ReturnValue string `json:"returnValue"`
+				}
+				suite.Require().NoError(json.Unmarshal(data, &result))
+				retBytes := common.FromHex(result.ReturnValue)
+				got := new(big.Int).SetBytes(retBytes)
+				suite.Require().Equal(overriddenBal.String(), got.String())
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			res, err := suite.network.App.EVMKeeper.TraceCall(
+				suite.network.GetContext(),
+				tc.req(),
+			)
+			if tc.expErr {
+				suite.Require().Error(err)
+				return
+			}
+			suite.Require().NoError(err)
+			suite.Require().NotNil(res)
+			if tc.validate != nil {
+				tc.validate(res.Data)
+			}
+		})
+	}
+}
+
 func (suite *KeeperTestSuite) TestEmptyRequest() {
 	suite.SetupTest()
 	k := suite.network.App.EVMKeeper

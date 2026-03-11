@@ -99,6 +99,18 @@ func (a *API) TraceBlockByHash(hash common.Hash, config *evmtypes.TraceConfig) (
 	return a.backend.TraceBlock(rpctypes.BlockNumber(resBlock.Block.Height), config, resBlock)
 }
 
+// TraceCall executes a simulated call and returns the structured execution trace.
+// It mirrors geth's debug_traceCall: optional stateOverrides and blockOverrides
+// are applied before execution.
+func (a *API) TraceCall(
+	args evmtypes.TransactionArgs,
+	blockNrOrHash rpctypes.BlockNumberOrHash,
+	config *rpctypes.TraceCallConfig,
+) (interface{}, error) {
+	a.logger.Debug("debug_traceCall", "args", args, "block", blockNrOrHash)
+	return a.backend.TraceCall(args, blockNrOrHash, config)
+}
+
 // BlockProfile turns on goroutine profiling for nsec seconds and writes profile data to
 // file. It uses a profile rate of 1 for most accurate information. If a different rate is
 // desired, set the rate and write the profile manually.

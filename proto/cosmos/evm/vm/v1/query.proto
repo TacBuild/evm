@@ -80,6 +80,11 @@ service Query {
     option (google.api.http).get = "/cosmos/evm/vm/v1/trace_block";
   }
 
+  // TraceCall implements the `debug_traceCall` rpc api
+  rpc TraceCall(QueryTraceCallRequest) returns (QueryTraceCallResponse) {
+    option (google.api.http).post = "/cosmos/evm/vm/v1/trace_call";
+  }
+
   // BaseFee queries the base fee of the parent block of the current block,
   // it's similar to feemarket module's method, but also checks london hardfork
   // status.
@@ -341,10 +346,6 @@ message QueryTraceTxRequest {
   int64 chain_id = 9;
   // block_max_gas of the block of the requested transaction
   int64 block_max_gas = 10;
-  // state_override defines the state override for the trace.
-  bytes state_override = 11;
-  // block_overrides defines the block override for the trace.
-  bytes block_overrides = 12;
 }
 
 // QueryTraceTxResponse defines TraceTx response
@@ -382,6 +383,34 @@ message QueryTraceBlockRequest {
 // QueryTraceBlockResponse defines TraceBlock response
 message QueryTraceBlockResponse {
   // data is the response serialized in bytes
+  bytes data = 1;
+}
+
+// QueryTraceCallRequest defines TraceCall request (debug_traceCall).
+// It accepts call arguments, an optional trace config, and optional
+// state/block overrides — mirroring geth's debug_traceCall.
+message QueryTraceCallRequest {
+  // args is the JSON-encoded TransactionArgs for the simulated call
+  bytes args = 1;
+  // gas_cap is the max gas allowed for the call
+  uint64 gas_cap = 2;
+  // proposer_address is the address of the block proposer
+  bytes proposer_address = 3
+      [ (gogoproto.casttype) =
+            "github.com/cosmos/cosmos-sdk/types.ConsAddress" ];
+  // chain_id is the eip155 chain id
+  int64 chain_id = 4;
+  // trace_config holds extra parameters to trace functions
+  TraceConfig trace_config = 5;
+  // state_override is optional JSON-encoded StateOverride map
+  bytes state_override = 6;
+  // block_overrides is optional JSON-encoded BlockOverrides
+  bytes block_overrides = 7;
+}
+
+// QueryTraceCallResponse defines TraceCall response
+message QueryTraceCallResponse {
+  // data is the tracer output serialized in bytes
   bytes data = 1;
 }
 
