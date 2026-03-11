@@ -297,9 +297,6 @@ func (k *Keeper) ApplyMessageWithConfig(
 
 	// Apply block overrides if provided
 	if blockOverrides != nil {
-		if commit {
-			return nil, errorsmod.Wrap(types.ErrUnexpectedBlockOverrides, "block overrides are not nil")
-		}
 		blockOverrides.Apply(&evm.Context)
 	}
 
@@ -337,9 +334,6 @@ func (k *Keeper) ApplyMessageWithConfig(
 	stateDB.Prepare(rules, msg.From, common.Address{}, msg.To, evm.ActivePrecompiles(rules), msg.AccessList)
 
 	if stateOverride != nil {
-		if commit {
-			return nil, errorsmod.Wrap(types.ErrUnexpectedStateOverride, "state override is not nil")
-		}
 		if err := stateOverride.Apply(stateDB, evm.ActivePrecompiles(rules)); err != nil {
 			return nil, errorsmod.Wrap(err, "failed to apply state override")
 		}

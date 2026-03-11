@@ -88,12 +88,6 @@ var (
 
 	// ErrABIUnpack returns an error if the contract ABI unpacking fails
 	ErrABIUnpack = errorsmod.Register(ModuleName, codeErrABIUnpack, "contract ABI unpack failed")
-
-	// ErrUnexpectedStateOverride returns an error if the state override is not nil when commit is true
-	ErrUnexpectedStateOverride = errorsmod.Register(ModuleName, codeErrUnexpectedStateOverride, "state override is not allowed when commit is true")
-
-	// ErrUnexpectedBlockOverrides returns an error if block overrides are provided when commit is true
-	ErrUnexpectedBlockOverrides = errorsmod.Register(ModuleName, codeErrUnexpectedBlockOverrides, "block overrides are not allowed when commit is true")
 )
 
 // NewExecErrorWithReason unpacks the revert return bytes and returns a wrapped error

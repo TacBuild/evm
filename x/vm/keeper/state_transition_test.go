@@ -843,17 +843,6 @@ func (suite *KeeperTestSuite) TestApplyMessageWithStateOverride() {
 			expErr: false,
 		},
 		{
-			name: "fail - state override with commit=true",
-			stateOverride: overrides.StateOverride{
-				recipient: overrides.OverrideAccount{
-					Balance: (*hexutil.Big)(big.NewInt(1e18)),
-				},
-			},
-			commit:    true,
-			expErr:    true,
-			expErrMsg: "state override is not nil",
-		},
-		{
 			name: "fail - both state and stateDiff provided",
 			stateOverride: overrides.StateOverride{
 				recipient: overrides.OverrideAccount{
@@ -988,7 +977,7 @@ func (suite *KeeperTestSuite) TestStateOverrideBalanceCheck() {
 		suite.network.GetContext(),
 		*msg,
 		nil,
-		false, // don't commit
+		false,
 		config,
 		txConfig,
 		stateOverride,
@@ -1431,7 +1420,7 @@ func (suite *KeeperTestSuite) TestApplyMessageWithBlockOverrides() {
 				suite.network.GetContext(),
 				*msg,
 				nil,
-				false, // don't commit (required for state override)
+				false,
 				config,
 				txConfig,
 				stateOverride,
@@ -1451,51 +1440,6 @@ func (suite *KeeperTestSuite) TestApplyMessageWithBlockOverrides() {
 			}
 		})
 	}
-}
-
-// TestBlockOverridesWithCommitTrue verifies that block overrides are rejected
-// when commit=true, similar to state overrides.
-func (suite *KeeperTestSuite) TestBlockOverridesWithCommitTrue() {
-	suite.SetupTest()
-
-	sender := suite.keyring.GetKey(0)
-	recipient := suite.keyring.GetAddr(1)
-
-	proposerAddress := suite.network.GetContext().BlockHeader().ProposerAddress
-	config, err := suite.network.App.EVMKeeper.EVMConfig(
-		suite.network.GetContext(),
-		proposerAddress,
-	)
-	suite.Require().NoError(err)
-
-	overriddenNumber := big.NewInt(777777)
-
-	msg, err := suite.factory.GenerateGethCoreMsg(sender.Priv, types.EvmTxArgs{
-		To:     &recipient,
-		Amount: big.NewInt(100),
-	})
-	suite.Require().NoError(err)
-
-	txConfig := suite.network.App.EVMKeeper.TxConfig(
-		suite.network.GetContext(),
-		common.Hash{},
-	)
-
-	// Block overrides should NOT be allowed with commit=true
-	_, err = suite.network.App.EVMKeeper.ApplyMessageWithConfig(
-		suite.network.GetContext(),
-		*msg,
-		nil,
-		true,
-		config,
-		txConfig,
-		nil,
-		&overrides.BlockOverrides{
-			Number: (*hexutil.Big)(overriddenNumber),
-		},
-	)
-	suite.Require().Error(err)
-	suite.Require().Contains(err.Error(), "block overrides are not nil")
 }
 
 // TestBlockOverridesPrevRandao verifies that the PREVRANDAO (DIFFICULTY post-merge)
