@@ -2,10 +2,14 @@ package evmd
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/cosmos/evm/config"
 	testconstants "github.com/cosmos/evm/testutil/constants"
+	epochstypes "github.com/cosmos/evm/x/epochs/types"
 	erc20types "github.com/cosmos/evm/x/erc20/types"
 	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
+	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
@@ -62,4 +66,50 @@ func NewFeeMarketGenesisState() *feemarkettypes.GenesisState {
 	feeMarketGenState.Params.NoBaseFee = true
 
 	return feeMarketGenState
+}
+
+// NewLiquidStakeGenesisState returns a genesis state for the liquidstake module
+// with ModulePaused set to false, suitable for test environments.
+func NewLiquidStakeGenesisState() *liquidstaketypes.GenesisState {
+	lsGenState := liquidstaketypes.DefaultGenesisState()
+	lsGenState.Params.ModulePaused = false
+	return lsGenState
+}
+
+// NewEpochsGenesisState returns a genesis state for the epochs module where
+// epochs are marked as already started (EpochCountingStarted=true) so they do
+// not fire immediately on the very first block. The next epoch transition will
+// occur after a full Duration has elapsed from startTime.
+func NewEpochsGenesisState() *epochstypes.GenesisState {
+	startTime := time.Now().UTC()
+	epochs := []epochstypes.EpochInfo{
+		{
+			Identifier:              "day",
+			StartTime:               startTime,
+			Duration:                time.Hour * 24,
+			CurrentEpoch:            1,
+			CurrentEpochStartHeight: 1,
+			CurrentEpochStartTime:   startTime,
+			EpochCountingStarted:    true,
+		},
+		{
+			Identifier:              "hour",
+			StartTime:               startTime,
+			Duration:                time.Hour,
+			CurrentEpoch:            1,
+			CurrentEpochStartHeight: 1,
+			CurrentEpochStartTime:   startTime,
+			EpochCountingStarted:    true,
+		},
+		{
+			Identifier:              "week",
+			StartTime:               startTime,
+			Duration:                time.Hour * 24 * 7,
+			CurrentEpoch:            1,
+			CurrentEpochStartHeight: 1,
+			CurrentEpochStartTime:   startTime,
+			EpochCountingStarted:    true,
+		},
+	}
+	return epochstypes.NewGenesisState(epochs)
 }

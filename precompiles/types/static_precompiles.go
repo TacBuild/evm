@@ -13,10 +13,12 @@ import (
 	distprecompile "github.com/cosmos/evm/precompiles/distribution"
 	govprecompile "github.com/cosmos/evm/precompiles/gov"
 	ics20precompile "github.com/cosmos/evm/precompiles/ics20"
+	liquidstakeprecompile "github.com/cosmos/evm/precompiles/liquidstake"
 	"github.com/cosmos/evm/precompiles/p256"
 	slashingprecompile "github.com/cosmos/evm/precompiles/slashing"
 	stakingprecompile "github.com/cosmos/evm/precompiles/staking"
 	erc20Keeper "github.com/cosmos/evm/x/erc20/keeper"
+	liquidstakekeeper "github.com/cosmos/evm/x/liquidstake/keeper"
 	transferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
 	channelkeeper "github.com/cosmos/ibc-go/v10/modules/core/04-channel/keeper"
 
@@ -169,5 +171,15 @@ func (s StaticPrecompiles) WithSlashingPrecompile(
 	)
 
 	s[slashingPrecompile.Address()] = slashingPrecompile
+	return s
+}
+
+// WithLiquidStakePrecompile adds the liquid stake precompile to the static precompiles.
+func (s StaticPrecompiles) WithLiquidStakePrecompile(
+	liquidStakeKeeper liquidstakekeeper.Keeper,
+	bankKeeper cmn.BankKeeper,
+) StaticPrecompiles {
+	lsPrecompile := liquidstakeprecompile.NewPrecompile(liquidStakeKeeper, bankKeeper)
+	s[lsPrecompile.Address()] = lsPrecompile
 	return s
 }

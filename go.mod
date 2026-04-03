@@ -280,6 +280,8 @@ replace (
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.1
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
+	// TacBuild LSM fork of cosmos-sdk
+	github.com/cosmos/cosmos-sdk => ../cosmos-sdk
 )
 
 retract (

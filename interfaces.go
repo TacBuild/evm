@@ -3,9 +3,11 @@ package evm
 import (
 	"encoding/json"
 
+	epochskeeper "github.com/cosmos/evm/x/epochs/keeper"
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
 	"github.com/cosmos/evm/x/ibc/callbacks/keeper"
+	liquidstakekeeper "github.com/cosmos/evm/x/liquidstake/keeper"
 	precisebankkeeper "github.com/cosmos/evm/x/precisebank/keeper"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 	transferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
@@ -49,6 +51,7 @@ type EvmApp interface { //nolint:revive
 	GetAuthzKeeper() authzkeeper.Keeper
 	GetDistrKeeper() distrkeeper.Keeper
 	GetStakingKeeper() *stakingkeeper.Keeper
+	GetLiquidStakeKeeper() liquidstakekeeper.Keeper
 	GetMintKeeper() mintkeeper.Keeper
 	GetPreciseBankKeeper() *precisebankkeeper.Keeper
 	GetFeeGrantKeeper() feegrantkeeper.Keeper
@@ -56,6 +59,7 @@ type EvmApp interface { //nolint:revive
 	GetCallbackKeeper() keeper.ContractKeeper
 	GetTransferKeeper() transferkeeper.Keeper
 	SetTransferKeeper(transferKeeper transferkeeper.Keeper)
+	GetEpochsKeeper() *epochskeeper.Keeper
 	DefaultGenesis() map[string]json.RawMessage
 	GetKey(storeKey string) *storetypes.KVStoreKey
 	GetAnteHandler() sdk.AnteHandler

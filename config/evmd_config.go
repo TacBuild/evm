@@ -10,6 +10,7 @@ import (
 	cosmosevmutils "github.com/cosmos/evm/utils"
 	erc20types "github.com/cosmos/evm/x/erc20/types"
 	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
+	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
 	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
@@ -47,6 +48,9 @@ var maccPerms = map[string][]string{
 	feemarkettypes.ModuleName:   nil,
 	erc20types.ModuleName:       {authtypes.Minter, authtypes.Burner},
 	precisebanktypes.ModuleName: {authtypes.Minter, authtypes.Burner},
+
+	// Tac modules
+	liquidstaketypes.ModuleName: {authtypes.Minter, authtypes.Burner},
 }
 
 // BlockedAddresses returns all the app's blocked account addresses.

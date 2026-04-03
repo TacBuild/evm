@@ -28,6 +28,9 @@ import (
 	precompiletypes "github.com/cosmos/evm/precompiles/types"
 	srvflags "github.com/cosmos/evm/server/flags"
 	"github.com/cosmos/evm/utils"
+	"github.com/cosmos/evm/x/epochs"
+	epochskeeper "github.com/cosmos/evm/x/epochs/keeper"
+	epochstypes "github.com/cosmos/evm/x/epochs/types"
 	"github.com/cosmos/evm/x/erc20"
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
 	erc20types "github.com/cosmos/evm/x/erc20/types"
@@ -37,6 +40,9 @@ import (
 	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
 	ibccallbackskeeper "github.com/cosmos/evm/x/ibc/callbacks/keeper"
 
+	"github.com/cosmos/evm/x/liquidstake"
+	liquidstakekeeper "github.com/cosmos/evm/x/liquidstake/keeper"
+	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
 	"github.com/cosmos/evm/x/precisebank"
 	precisebankkeeper "github.com/cosmos/evm/x/precisebank/keeper"
 	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
@@ -192,6 +198,12 @@ type EVMD struct {
 	PreciseBankKeeper precisebankkeeper.Keeper
 	EVMMempool        *evmmempool.ExperimentalEVMMempool
 
+	// Epochs keeper
+	EpochsKeeper *epochskeeper.Keeper
+
+	// LiquidStake keeper
+	LiquidStakeKeeper liquidstakekeeper.Keeper
+
 	// the module manager
 	ModuleManager      *module.Manager
 	BasicModuleManager module.BasicManager
@@ -240,6 +252,8 @@ func NewExampleApp(
 		upgradetypes.StoreKey, feegrant.StoreKey, evidencetypes.StoreKey, authzkeeper.StoreKey,
 		// ibc keys
 		ibcexported.StoreKey, ibctransfertypes.StoreKey,
+		// liquidstake & epochs keys
+		liquidstaketypes.StoreKey, epochstypes.StoreKey,
 		// Cosmos EVM store keys
 		evmtypes.StoreKey, feemarkettypes.StoreKey, erc20types.StoreKey, precisebanktypes.StoreKey,
 	)
@@ -290,7 +304,7 @@ func NewExampleApp(
 		authAddr,
 	)
 
-	app.BankKeeper = bankkeeper.NewBaseKeeper(
+	baseBankKeeper := bankkeeper.NewBaseKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[banktypes.StoreKey]),
 		app.AccountKeeper,
@@ -298,6 +312,7 @@ func NewExampleApp(
 		authAddr,
 		logger,
 	)
+	app.BankKeeper = baseBankKeeper
 
 	// optional: enable sign mode textual by overwriting the default tx config (after setting the bank keeper)
 	enabledSignModes := append(authtx.DefaultSignModes, signingtypes.SignMode_SIGN_MODE_TEXTUAL) //nolint:gocritic
@@ -420,6 +435,28 @@ func NewExampleApp(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
+	// Epochs keeper
+	app.EpochsKeeper = epochskeeper.NewKeeper(
+		keys[epochstypes.StoreKey],
+	)
+
+	// LiquidStake keeper
+	app.LiquidStakeKeeper = liquidstakekeeper.NewKeeper(
+		appCodec,
+		keys[liquidstaketypes.StoreKey],
+		app.AccountKeeper,
+		baseBankKeeper,
+		*app.StakingKeeper,
+		app.MintKeeper,
+		app.DistrKeeper,
+		app.SlashingKeeper,
+		app.MsgServiceRouter(),
+		authAddr,
+	)
+
+	// Set epochs hooks
+	app.EpochsKeeper.SetHooks(app.LiquidStakeKeeper.EpochHooks())
+
 	// Cosmos EVM keepers
 	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(
 		appCodec, authtypes.NewModuleAddress(govtypes.ModuleName),
@@ -464,6 +501,7 @@ func NewExampleApp(
 			app.GovKeeper,
 			app.SlashingKeeper,
 			appCodec,
+			app.LiquidStakeKeeper,
 		),
 	)
 
@@ -572,6 +610,9 @@ func NewExampleApp(
 		feemarket.NewAppModule(app.FeeMarketKeeper),
 		erc20.NewAppModule(app.Erc20Keeper, app.AccountKeeper),
 		precisebank.NewAppModule(app.PreciseBankKeeper, app.BankKeeper, app.AccountKeeper),
+		// Tac modules
+		epochs.NewAppModule(*app.EpochsKeeper),
+		liquidstake.NewAppModule(app.LiquidStakeKeeper),
 	)
 
 	// BasicModuleManager defines the module BasicManager which is in charge of setting up basic,
@@ -605,6 +646,10 @@ func NewExampleApp(
 	// NOTE: capability module's beginblocker must come before any modules using capabilities (e.g. IBC)
 	app.ModuleManager.SetOrderBeginBlockers(
 		minttypes.ModuleName,
+
+		// Tac modules - epochs must run before liquidstake
+		epochstypes.ModuleName,
+		liquidstaketypes.ModuleName,
 
 		// IBC modules
 		ibcexported.ModuleName, ibctransfertypes.ModuleName,
@@ -640,6 +685,8 @@ func NewExampleApp(
 		feegrant.ModuleName, upgradetypes.ModuleName, consensusparamtypes.ModuleName,
 		precisebanktypes.ModuleName,
 		vestingtypes.ModuleName,
+		epochstypes.ModuleName,
+		liquidstaketypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -663,6 +710,8 @@ func NewExampleApp(
 		ibctransfertypes.ModuleName,
 		genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
 		feegrant.ModuleName, upgradetypes.ModuleName, vestingtypes.ModuleName,
+		// Tac modules
+		epochstypes.ModuleName, liquidstaketypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
 	app.ModuleManager.SetOrderExportGenesis(genesisModuleOrder...)
@@ -894,6 +943,12 @@ func (app *EVMD) DefaultGenesis() map[string]json.RawMessage {
 	erc20GenState := NewErc20GenesisState()
 	genesis[erc20types.ModuleName] = app.appCodec.MustMarshalJSON(erc20GenState)
 
+	lsGenState := NewLiquidStakeGenesisState()
+	genesis[liquidstaketypes.ModuleName] = app.appCodec.MustMarshalJSON(lsGenState)
+
+	epochsGenState := NewEpochsGenesisState()
+	genesis[epochstypes.ModuleName] = app.appCodec.MustMarshalJSON(epochsGenState)
+
 	return genesis
 }
 
@@ -1037,6 +1092,14 @@ func (app *EVMD) GetDistrKeeper() distrkeeper.Keeper {
 
 func (app *EVMD) GetStakingKeeper() *stakingkeeper.Keeper {
 	return app.StakingKeeper
+}
+
+func (app *EVMD) GetLiquidStakeKeeper() liquidstakekeeper.Keeper {
+	return app.LiquidStakeKeeper
+}
+
+func (app *EVMD) GetEpochsKeeper() *epochskeeper.Keeper {
+	return app.EpochsKeeper
 }
 
 func (app *EVMD) GetMintKeeper() mintkeeper.Keeper {

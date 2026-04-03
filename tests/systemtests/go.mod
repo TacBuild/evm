@@ -210,6 +210,8 @@ require (
 replace (
 	github.com/cosmos/evm => ../..
 	github.com/ethereum/go-ethereum => github.com/cosmos/go-ethereum v1.16.2-cosmos-1
+	// TacBuild LSM fork of cosmos-sdk
+	github.com/cosmos/cosmos-sdk => ../../../cosmos-sdk
 )
 
 replace cosmossdk.io/store => cosmossdk.io/store v1.1.2

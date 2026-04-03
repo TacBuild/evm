@@ -7,6 +7,7 @@ import (
 	evmaddress "github.com/cosmos/evm/encoding/address"
 	cmn "github.com/cosmos/evm/precompiles/common"
 	erc20Keeper "github.com/cosmos/evm/x/erc20/keeper"
+	liquidstakekeeper "github.com/cosmos/evm/x/liquidstake/keeper"
 	transferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
 	channelkeeper "github.com/cosmos/ibc-go/v10/modules/core/04-channel/keeper"
 
@@ -72,6 +73,7 @@ func DefaultStaticPrecompiles(
 	govKeeper govkeeper.Keeper,
 	slashingKeeper slashingkeeper.Keeper,
 	codec codec.Codec,
+	liquidStakeKeeper liquidstakekeeper.Keeper,
 	opts ...Option,
 ) map[common.Address]vm.PrecompiledContract {
 	precompiles := NewStaticPrecompiles().
@@ -83,7 +85,8 @@ func DefaultStaticPrecompiles(
 		WithICS20Precompile(bankKeeper, stakingKeeper, transferKeeper, channelKeeper, erc20Keeper).
 		WithBankPrecompile(bankKeeper, erc20Keeper).
 		WithGovPrecompile(govKeeper, bankKeeper, codec, opts...).
-		WithSlashingPrecompile(slashingKeeper, bankKeeper, opts...)
+		WithSlashingPrecompile(slashingKeeper, bankKeeper, opts...).
+		WithLiquidStakePrecompile(liquidStakeKeeper, bankKeeper)
 
 	return map[common.Address]vm.PrecompiledContract(precompiles)
 }
