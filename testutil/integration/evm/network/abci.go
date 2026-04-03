@@ -71,7 +71,13 @@ func (n *IntegrationNetwork) finalizeBlockAndCommit(duration time.Duration, txBy
 		return nil, err
 	}
 
-	newCtx := n.app.GetBaseApp().NewContextLegacy(false, header)
+	// commit changes first so that NewUncachedContext reads the committed store
+	_, err = n.app.Commit()
+	if err != nil {
+		return nil, err
+	}
+
+	newCtx := n.app.GetBaseApp().NewUncachedContext(false, header)
 
 	// Update context header
 	newCtx = newCtx.WithMinGasPrices(n.ctx.MinGasPrices())
@@ -84,10 +90,7 @@ func (n *IntegrationNetwork) finalizeBlockAndCommit(duration time.Duration, txBy
 	newCtx = newCtx.WithHeaderHash(header.AppHash)
 	n.ctx = newCtx
 
-	// commit changes
-	_, err = n.app.Commit()
-
-	return res, err
+	return res, nil
 }
 
 // buildFinalizeBlockReq is a helper function to build
