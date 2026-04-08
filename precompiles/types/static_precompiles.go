@@ -14,6 +14,7 @@ import (
 	govprecompile "github.com/cosmos/evm/precompiles/gov"
 	ics20precompile "github.com/cosmos/evm/precompiles/ics20"
 	liquidstakeprecompile "github.com/cosmos/evm/precompiles/liquidstake"
+	ed25519precompile "github.com/cosmos/evm/precompiles/ed25519"
 	"github.com/cosmos/evm/precompiles/p256"
 	slashingprecompile "github.com/cosmos/evm/precompiles/slashing"
 	stakingprecompile "github.com/cosmos/evm/precompiles/staking"
@@ -171,6 +172,16 @@ func (s StaticPrecompiles) WithSlashingPrecompile(
 	)
 
 	s[slashingPrecompile.Address()] = slashingPrecompile
+	return s
+}
+
+// WithEd25519Precompile adds the ed25519 precompile to the static precompiles.
+func (s StaticPrecompiles) WithEd25519Precompile() StaticPrecompiles {
+	ed25519Precompile, err := ed25519precompile.NewPrecompile()
+	if err != nil {
+		panic(fmt.Errorf("failed to instantiate ed25519 precompile: %w", err))
+	}
+	s[ed25519Precompile.Address()] = ed25519Precompile
 	return s
 }
 

@@ -80,6 +80,7 @@ func DefaultStaticPrecompiles(
 		WithPraguePrecompiles().
 		WithP256Precompile().
 		WithBech32Precompile().
+		WithEd25519Precompile().
 		WithStakingPrecompile(stakingKeeper, bankKeeper, opts...).
 		WithDistributionPrecompile(distributionKeeper, stakingKeeper, bankKeeper, opts...).
 		WithICS20Precompile(bankKeeper, stakingKeeper, transferKeeper, channelKeeper, erc20Keeper).
