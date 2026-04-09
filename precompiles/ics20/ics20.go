@@ -110,13 +110,13 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readOnly bool) (bz [
 			// TODO Approval transactions => need cosmos-sdk v0.46 & ibc-go v6.2.0
 			// Authorization Methods:
 			case authorization.ApproveMethod:
-				bz, err = p.Approve(ctx, evm.Origin, stateDB, method, args)
+				bz, err = p.Approve(ctx, contract.CallerAddress, stateDB, method, args)
 			case authorization.RevokeMethod:
-				bz, err = p.Revoke(ctx, evm.Origin, stateDB, method, args)
+				bz, err = p.Revoke(ctx, contract.CallerAddress, stateDB, method, args)
 			case authorization.IncreaseAllowanceMethod:
-				bz, err = p.IncreaseAllowance(ctx, evm.Origin, stateDB, method, args)
+				bz, err = p.IncreaseAllowance(ctx, contract.CallerAddress, stateDB, method, args)
 			case authorization.DecreaseAllowanceMethod:
-				bz, err = p.DecreaseAllowance(ctx, evm.Origin, stateDB, method, args)
+				bz, err = p.DecreaseAllowance(ctx, contract.CallerAddress, stateDB, method, args)
 			// ICS20 transactions
 			case TransferMethod:
 				bz, err = p.Transfer(ctx, evm.Origin, contract, stateDB, method, args)
