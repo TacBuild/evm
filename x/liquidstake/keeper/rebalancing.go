@@ -108,10 +108,6 @@ func (k Keeper) Rebalance(
 			break
 		}
 
-		// sync liquidTokenMap applied rebalancing
-		liquidTokenMap[maxVal.OperatorAddress] = liquidTokenMap[maxVal.OperatorAddress].Sub(amountNeeded)
-		liquidTokenMap[minVal.OperatorAddress] = liquidTokenMap[minVal.OperatorAddress].Add(amountNeeded)
-
 		// try redelegation from max validator to min validator
 		redelegation := types.Redelegation{
 			Delegator:    proxyAcc,
@@ -134,6 +130,10 @@ func (k Keeper) Rebalance(
 				types.AmountKeyVal, amountNeeded.String(),
 				types.ErrorKeyVal, err.Error(),
 			)
+		} else {
+			// sync liquidTokenMap only on successful redelegation
+			liquidTokenMap[maxVal.OperatorAddress] = liquidTokenMap[maxVal.OperatorAddress].Sub(amountNeeded)
+			liquidTokenMap[minVal.OperatorAddress] = liquidTokenMap[minVal.OperatorAddress].Add(amountNeeded)
 		}
 
 		redelegations = append(redelegations, redelegation)
@@ -269,21 +269,23 @@ func (k Keeper) AutocompoundStakingRewards(ctx sdk.Context, whitelistedValsMap t
 		)
 	}
 
-	// re-staking of the accumulated rewards
+	// re-staking of the accumulated rewards and sending fee — both in one atomic cachedCtx
 	cachedCtx, writeCache := ctx.CacheContext()
 	delegableAmount := autoCompoundableAmount.Sub(autocompoundFee.Amount)
 	err = k.LiquidDelegate(cachedCtx, types.LiquidStakeProxyAcc, activeVals, delegableAmount, whitelistedValsMap)
 	if err != nil {
 		return fmt.Errorf("failted to re-stake the accumulated rewards: %w", err)
 	}
-	writeCache()
 
 	// move autocompounding fee from the balance to fee account
 	feeAccountAddr := sdk.MustAccAddressFromBech32(params.FeeAccountAddress)
-	err = k.bankKeeper.SendCoins(ctx, types.LiquidStakeProxyAcc, feeAccountAddr, sdk.NewCoins(autocompoundFee))
-	if err != nil {
-		return fmt.Errorf("failed to send autocompound fee to fee account: %w", err)
+	if autocompoundFee.IsPositive() {
+		err = k.bankKeeper.SendCoins(cachedCtx, types.LiquidStakeProxyAcc, feeAccountAddr, sdk.NewCoins(autocompoundFee))
+		if err != nil {
+			return fmt.Errorf("failed to send autocompound fee to fee account: %w", err)
+		}
 	}
+	writeCache()
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(

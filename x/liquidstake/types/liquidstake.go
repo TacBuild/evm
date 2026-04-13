@@ -171,7 +171,7 @@ func (avs ActiveLiquidValidators) TotalWeight(whitelistedValsMap WhitelistedVals
 
 // NativeTokenToGTAC returns GtacTotalSupply * nativeTokenAmount / netAmount
 func NativeTokenToGTAC(nativeTokenAmount, gTACTotalSupplyAmount math.Int, netAmount math.LegacyDec) (gTACAmount math.Int) {
-	return math.LegacyNewDecFromInt(gTACTotalSupplyAmount).MulTruncate(math.LegacyNewDecFromInt(nativeTokenAmount)).QuoTruncate(netAmount.TruncateDec()).TruncateInt()
+	return math.LegacyNewDecFromInt(gTACTotalSupplyAmount).MulTruncate(math.LegacyNewDecFromInt(nativeTokenAmount)).QuoTruncate(netAmount).TruncateInt()
 }
 
 // GTACToNativeToken returns gTACAmount * netAmount / GtacTotalSupply with truncations
@@ -185,7 +185,11 @@ func DeductFeeRate(input, feeRate math.LegacyDec) (feeDeductedOutput math.Legacy
 }
 
 func (nas NetAmountState) CalcNetAmount() math.LegacyDec {
-	return math.LegacyNewDecFromInt(nas.TotalLiquidTokens.Add(nas.TotalUnbondingBalance))
+	return math.LegacyNewDecFromInt(
+		nas.TotalLiquidTokens.
+			Add(nas.TotalUnbondingBalance).
+			Add(nas.ProxyAccBalance),
+	).Add(nas.TotalRemainingRewards)
 }
 
 func (nas NetAmountState) CalcMintRate() math.LegacyDec {

@@ -634,7 +634,7 @@ func (k Keeper) LSMDelegate(
 	liquidBondDenom := k.LiquidBondDenom(ctx)
 	gTACMintAmount = lsmRedeemResp.Amount.Amount
 
-	if nas.GtacTotalSupply.IsPositive() {
+	if nas.GtacTotalSupply.IsPositive() && nas.NetAmount.IsPositive() {
 		gTACMintAmount = types.NativeTokenToGTAC(
 			gTACMintAmount,
 			nas.GtacTotalSupply,
