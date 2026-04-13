@@ -176,7 +176,7 @@ func createStakingValidator(val *cmttypes.Validator, bondedAmt sdkmath.Int, oper
 		Jailed:            false,
 		Status:            stakingtypes.Bonded,
 		Tokens:            bondedAmt,
-		DelegatorShares:   sdkmath.LegacyNewDecFromInt(bondedAmt),
+		DelegatorShares:   sdkmath.LegacyOneDec(),
 		Description:       stakingtypes.Description{},
 		UnbondingHeight:   int64(0),
 		UnbondingTime:     time.Unix(0, 0).UTC(),
@@ -232,9 +232,7 @@ func createDelegations(validators []stakingtypes.Validator, fromAccount sdktypes
 	amountOfValidators := len(validators)
 	delegations := make([]stakingtypes.Delegation, 0, amountOfValidators)
 	for _, val := range validators {
-		// Use the validator's DelegatorShares as the delegation shares so that
-		// shares/tokens ratio is 1:1 and LSM tokenize works correctly.
-		delegation := stakingtypes.NewDelegation(fromAccount.String(), val.OperatorAddress, val.DelegatorShares)
+		delegation := stakingtypes.NewDelegation(fromAccount.String(), val.OperatorAddress, sdkmath.LegacyOneDec())
 		delegations = append(delegations, delegation)
 	}
 	return delegations

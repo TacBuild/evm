@@ -180,6 +180,11 @@ func (s *KeeperTestSuite) liquidStaking(liquidStaker sdk.AccAddress, stakingAmt 
 // setupWhitelistedValidators whitelists the first n existing network validators
 // in liquidstake params and calls UpdateLiquidValidatorSet.
 // This uses already-bonded validators, which is required for liquid staking to work.
+//
+// NOTE: Genesis validators are created with DelegatorShares=1.0 and Tokens=1e18,
+// giving a sub-unit shares/tokens ratio that breaks LSM TokenizeShares for small amounts.
+// This function normalises the ratio to 1:1 (DelegatorShares = Tokens) so that
+// LiquidUnstake and StakeToLP work correctly in tests.
 func (s *KeeperTestSuite) setupWhitelistedValidators(n int, _ int64) ([]sdk.AccAddress, []sdk.ValAddress) {
 	s.T().Helper()
 	ctx := s.nw.GetContext()
@@ -203,16 +208,31 @@ func (s *KeeperTestSuite) setupWhitelistedValidators(n int, _ int64) ([]sdk.AccA
 	addrs := make([]sdk.AccAddress, n)
 	valOpers := make([]sdk.ValAddress, n)
 	for i := range n {
-		valAddr, err := sdk.ValAddressFromBech32(validators[i].OperatorAddress)
+		val := validators[i]
+		valAddr, err := sdk.ValAddressFromBech32(val.OperatorAddress)
 		s.Require().NoError(err)
 		valOpers[i] = valAddr
 		addrs[i] = sdk.AccAddress(valAddr)
 
+		// Normalise DelegatorShares so that shares/tokens = 1:1.
+		// Genesis validators start with DelegatorShares=1.0 and Tokens=1e18, which
+		// causes sub-unit shares for small amounts and breaks MsgTokenizeShares.
+		if !val.Tokens.IsZero() && !val.DelegatorShares.Equal(sdkmath.LegacyNewDecFromInt(val.Tokens)) {
+			val.DelegatorShares = sdkmath.LegacyNewDecFromInt(val.Tokens)
+			sk.SetValidator(ctx, val)
+			// Also update the genesis delegation to match the new shares.
+			del, delErr := sk.GetDelegation(ctx, addrs[i], valAddr)
+			if delErr == nil {
+				del.Shares = val.DelegatorShares
+				s.Require().NoError(sk.SetDelegation(ctx, del))
+			}
+		}
+
 		s.keeper.SetLiquidValidator(ctx, types.LiquidValidator{
-			OperatorAddress: validators[i].OperatorAddress,
+			OperatorAddress: val.OperatorAddress,
 		})
 		params.WhitelistedValidators = append(params.WhitelistedValidators, types.WhitelistedValidator{
-			ValidatorAddress: validators[i].OperatorAddress,
+			ValidatorAddress: val.OperatorAddress,
 			TargetWeight:     valWeight,
 		})
 	}
@@ -222,7 +242,6 @@ func (s *KeeperTestSuite) setupWhitelistedValidators(n int, _ int64) ([]sdk.AccA
 	return addrs, valOpers
 }
 
-// fundLiquidBondDenom mints liquid bond denom directly to an address
 // (used when we need a pre-existing gTAC balance without going through LiquidStake).
 func (s *KeeperTestSuite) fundLiquidBondDenom(addr sdk.AccAddress, amt sdkmath.Int) {
 	s.T().Helper()
