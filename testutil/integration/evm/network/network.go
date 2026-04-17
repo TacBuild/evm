@@ -235,15 +235,13 @@ func (n *IntegrationNetwork) configureAndInitChain(evmApp evm.EvmApp) error {
 		return err
 	}
 
-	// Commit genesis changes before creating context so that n.ctx is backed
-	// by the committed store (app.cms) via NewUncachedContext. Using
-	// NewContextLegacy here would wrap the already-drained finalizeBlockState.ms
-	// and any writes to n.ctx between blocks would be silently lost.
+	// TODO - this might not be the best way to initilize the context
+	n.ctx = evmApp.GetBaseApp().NewContextLegacy(false, header)
+
+	// Commit genesis changes
 	if _, err := evmApp.Commit(); err != nil {
 		return err
 	}
-
-	n.ctx = evmApp.GetBaseApp().NewUncachedContext(false, header)
 
 	// Set networks global parameters
 	var blockMaxGas uint64 = math.MaxUint64
