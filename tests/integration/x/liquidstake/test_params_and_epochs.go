@@ -74,6 +74,9 @@ func (s *KeeperTestSuite) TestParamsPersistAfterNextBlock() {
 	got := s.keeper.GetParams(ctx)
 	s.Require().Equal(sentinel, got.UnstakeFeeRate.String(), "param must be readable before NextBlock")
 
+	// Commit the current ctx state so it survives FinalizeBlock's new context.
+	s.Require().NoError(s.nw.CommitState())
+
 	// Advance one block – this calls FinalizeBlock + Commit.
 	s.Require().NoError(s.nw.NextBlock())
 
@@ -94,6 +97,9 @@ func (s *KeeperTestSuite) TestParamsPersistAfterMultipleNextBlocks() {
 	sentinel := "0.042000000000000000"
 	params.UnstakeFeeRate = mustNewDecFromStr(sentinel)
 	s.Require().NoError(s.keeper.SetParams(ctx, params))
+
+	// Commit so the param survives FinalizeBlock's context replacement.
+	s.Require().NoError(s.nw.CommitState())
 
 	for i := 1; i <= 3; i++ {
 		s.Require().NoError(s.nw.NextBlock())
@@ -123,6 +129,9 @@ func (s *KeeperTestSuite) TestWhitelistedValidatorsPersistAfterNextBlock() {
 		})
 	}
 	s.Require().NoError(s.keeper.SetParams(ctx, params))
+
+	// Commit so whitelist survives FinalizeBlock's context replacement.
+	s.Require().NoError(s.nw.CommitState())
 
 	s.Require().NoError(s.nw.NextBlock())
 
@@ -206,6 +215,9 @@ func (s *KeeperTestSuite) TestUpdateLiquidValidatorSetBasic() {
 	activeVals := s.keeper.GetActiveLiquidValidators(ctx, wvMap)
 	s.Require().Len(activeVals, 2, "must have 2 active liquid validators before NextBlock")
 
+	// Commit so params survive FinalizeBlock's context replacement.
+	s.Require().NoError(s.nw.CommitState())
+
 	// Advance one block.
 	s.Require().NoError(s.nw.NextBlock())
 
@@ -243,6 +255,7 @@ func (s *KeeperTestSuite) TestEpochHookWithWhitelistedValidators() {
 	s.keeper.UpdateLiquidValidatorSet(ctx, true)
 
 	// Block 1 — commit the params to the store.
+	s.Require().NoError(s.nw.CommitState())
 	s.Require().NoError(s.nw.NextBlock())
 
 	ctx1 := s.ctx()

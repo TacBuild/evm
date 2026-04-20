@@ -494,6 +494,9 @@ func (s *KeeperTestSuite) TestMsgServer_StakeToLP_Success() {
 	}
 	s.Require().NoError(s.keeper.SetParams(ctx, params))
 	s.keeper.UpdateLiquidValidatorSet(ctx, true)
+	// Commit so params survive; then NextBlock to refresh ctx to the committed store.
+	s.Require().NoError(s.nw.CommitState())
+	s.Require().NoError(s.nw.NextBlock())
 
 	ctx = s.ctx()
 	wvMap := s.keeper.GetParams(ctx).WhitelistedValsMap()

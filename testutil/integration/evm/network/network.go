@@ -384,3 +384,21 @@ func (n *IntegrationNetwork) CheckTx(txBytes []byte) (*abcitypes.ResponseCheckTx
 	}
 	return res, nil
 }
+
+// CommitState flushes any in-memory keeper writes that were made directly
+// through n.ctx (which is backed by a CacheMultiStore in NewContextLegacy mode)
+// to the underlying root MultiStore, so that they survive the next NextBlock call.
+//
+// Usage: call CommitState() immediately after keeper.SetParams / keeper.SetXxx
+// calls made through n.ctx, before calling NextBlock().
+//
+// Internally it casts ctx.MultiStore() to CacheMultiStore and calls Write().
+// This is safe because NewContextLegacy backs the ctx with finalizeBlockState.ms
+// which is a CacheMultiStore wrapping the root cms.
+func (n *IntegrationNetwork) CommitState() error {
+	ms := n.ctx.MultiStore()
+	if cms, ok := ms.(storetypes.CacheMultiStore); ok {
+		cms.Write()
+	}
+	return nil
+}

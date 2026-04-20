@@ -90,6 +90,9 @@ func (s *KeeperTestSuite) SetupTest() {
 	skParams.MaxEntries = 7
 	skParams.MaxValidators = 30
 	s.Require().NoError(s.nw.App.GetStakingKeeper().SetParams(ctx, skParams))
+
+	// Commit initial params so they survive the first NextBlock.
+	s.Require().NoError(s.nw.CommitState())
 }
 
 // ctx is a shorthand to avoid verbose s.nw.GetContext() calls in tests.
@@ -142,6 +145,8 @@ func (s *KeeperTestSuite) CreateValidators(powers []int64) ([]sdk.AccAddress, []
 		s.Require().NoError(err)
 	}
 
+	// Commit validator writes before advancing the block.
+	s.Require().NoError(s.nw.CommitState())
 	s.Require().NoError(s.nw.NextBlock())
 	return addrs, valAddrs, pks
 }
@@ -150,6 +155,7 @@ func (s *KeeperTestSuite) CreateValidators(powers []int64) ([]sdk.AccAddress, []
 func (s *KeeperTestSuite) advanceHeight(n int) {
 	s.T().Helper()
 	for range n {
+		s.Require().NoError(s.nw.CommitState())
 		s.Require().NoError(s.nw.NextBlockAfter(blockDuration))
 	}
 }
@@ -174,7 +180,8 @@ func (s *KeeperTestSuite) liquidStaking(liquidStaker sdk.AccAddress, stakingAmt 
 	}
 	after := bk.GetBalance(ctx, liquidStaker, params.LiquidBondDenom).Amount
 	s.Require().EqualValues(mintAmt, after.Sub(before))
-	return nil
+	// Commit so gTAC supply and bank state survive the next NextBlock.
+	return s.nw.CommitState()
 }
 
 // setupWhitelistedValidators whitelists the first n existing network validators
@@ -238,6 +245,10 @@ func (s *KeeperTestSuite) setupWhitelistedValidators(n int, _ int64) ([]sdk.AccA
 	}
 	s.Require().NoError(s.keeper.SetParams(ctx, params))
 	s.keeper.UpdateLiquidValidatorSet(ctx, true)
+
+	// Commit so the whitelist and liquid-validator state survive the next
+	// NextBlock's NewContextLegacy replacement (old CacheMultiStore behaviour).
+	s.Require().NoError(s.nw.CommitState())
 
 	return addrs, valOpers
 }

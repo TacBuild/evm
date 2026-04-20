@@ -469,7 +469,8 @@ func (s *KeeperTestSuite) TestBeforeEpochStart_RebalanceEpochViaNextBlock() {
 	})
 	s.Require().NoError(s.keeper.SetParams(ctx, params))
 
-	// Commit the new whitelist via NextBlock, then advance past 24 h to fire "day" epoch.
+	// Commit the new whitelist, then advance past 24 h to fire "day" epoch.
+	s.Require().NoError(s.nw.CommitState())
 	s.Require().NoError(s.nw.NextBlock())
 	s.Require().NoError(s.nw.NextBlockAfter(24*time.Hour + time.Second))
 

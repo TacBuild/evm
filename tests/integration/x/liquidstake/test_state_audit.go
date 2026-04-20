@@ -216,6 +216,8 @@ func (s *KeeperTestSuite) TestStateAudit_FullFlow() {
 	// Advance several blocks so staking rewards accrue.
 	// Each NextBlockAfter(blockDuration) ticks the chain by 6s.
 	// A rebalance epoch is 1h, so we jump 2 hours = ~2 epochs.
+	// CommitState first so Phase 2 writes survive the upcoming NextBlockAfter calls.
+	s.Require().NoError(s.nw.CommitState())
 	for range 3 {
 		s.Require().NoError(s.nw.NextBlockAfter(time.Hour + time.Second))
 	}
@@ -242,6 +244,8 @@ func (s *KeeperTestSuite) TestStateAudit_FullFlow() {
 	// -----------------------------------------------------------------------
 	s.T().Log("=== PHASE 4: LiquidUnstake ===")
 
+	// Commit epoch-advance writes before calling LiquidUnstake.
+	s.Require().NoError(s.nw.CommitState())
 	ctx = s.ctx()
 	params = s.keeper.GetParams(ctx)
 
@@ -308,6 +312,8 @@ func (s *KeeperTestSuite) TestStateAudit_FullFlow() {
 
 	// Advance past the unbonding completion time by adding a small buffer.
 	bondBalBeforeComplete := s.nw.App.GetBankKeeper().GetBalance(ctx, delegator, bondDenom).Amount
+	// Commit LiquidUnstake writes so the unbonding entry survives NextBlockAfter.
+	s.Require().NoError(s.nw.CommitState())
 	s.Require().NoError(s.nw.NextBlockAfter(unbondingDuration + time.Minute))
 	ctx = s.ctx()
 
