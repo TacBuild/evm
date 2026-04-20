@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
+	evmmempool "github.com/cosmos/evm/mempool"
 	testconstants "github.com/cosmos/evm/testutil/constants"
 	"github.com/cosmos/evm/testutil/integration/evm/factory"
 	"github.com/cosmos/evm/testutil/integration/evm/grpc"
@@ -40,6 +41,17 @@ func NewMempoolIntegrationTestSuite(create network.CreateEvmApp, options ...netw
 // SetupTest initializes the test environment with default settings.
 func (s *IntegrationTestSuite) SetupTest() {
 	s.SetupTestWithChainID(testconstants.ExampleChainID)
+}
+
+// TearDownTest stops background goroutines of the EVM mempool (scheduleReorgLoop)
+// before the next SetupTest resets the global testingEvmCoinInfo to nil,
+// which would cause a nil-pointer panic in those goroutines.
+func (s *IntegrationTestSuite) TearDownTest() {
+	if s.network != nil {
+		if m, ok := s.network.App.GetMempool().(*evmmempool.ExperimentalEVMMempool); ok {
+			_ = m.Close()
+		}
+	}
 }
 
 // SetupTestWithChainID initializes the test environment with a specific chain ID.
