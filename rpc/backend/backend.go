@@ -204,7 +204,7 @@ func NewBackend(
 		RPCClient:           rpcClient,
 		QueryClient:         types.NewQueryClient(clientCtx),
 		Logger:              logger.With("module", "backend"),
-		EvmChainID:          big.NewInt(int64(appConf.EVM.EVMChainID)), //nolint:gosec // G115 // won't exceed uint64
+		EvmChainID:          new(big.Int).SetUint64(evmtypes.GetChainConfig().ChainId), // derive from global chainConfig set by keeper, not app.toml
 		Cfg:                 appConf,
 		AllowUnprotectedTxs: allowUnprotectedTxs,
 		Indexer:             indexer,
