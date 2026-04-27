@@ -52,6 +52,7 @@ func (k *Keeper) NewEVMWithOverridePrecompiles(
 		Time:        uint64(ctx.BlockHeader().Time.Unix()), //#nosec G115 -- int overflow is not a concern here
 		Difficulty:  big.NewInt(0),                         // unused. Only required in PoW context
 		BaseFee:     cfg.BaseFee,
+		BlobBaseFee: big.NewInt(0), // blob txs are not supported; set to 0 to prevent nil panic on BLOBBASEFEE opcode (0x4a)
 		Random:      &common.MaxHash, // need to be different than nil to signal it is after the merge and pick up the right opcodes
 	}
 
