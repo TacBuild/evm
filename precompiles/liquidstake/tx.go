@@ -2,11 +2,14 @@ package liquidstake
 
 import (
 	"fmt"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
 
 	cmn "github.com/cosmos/evm/precompiles/common"
+	erc20precompile "github.com/cosmos/evm/precompiles/erc20"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	keeper "github.com/cosmos/evm/x/liquidstake/keeper"
@@ -24,6 +27,37 @@ const (
 
 // Ensure imports are used (compiler workaround)
 var _ *types.MsgLiquidStake
+
+// emitLiquidBondDenomTransferEvent resolves the ERC-20 contract for the
+// liquidBondDenom from the erc20 module state and emits a Transfer event.
+// This is needed because native cosmos token mints/burns do not emit ERC-20
+// events automatically.
+func (p Precompile) emitLiquidBondDenomTransferEvent(
+	ctx sdk.Context,
+	stateDB vm.StateDB,
+	from, to common.Address,
+	amount *big.Int,
+) error {
+	liquidBondDenom := p.liquidStakeKeeper.LiquidBondDenom(ctx)
+
+	id := p.erc20Keeper.GetTokenPairID(ctx, liquidBondDenom)
+	pair, ok := p.erc20Keeper.GetTokenPair(ctx, id)
+	if !ok {
+		return fmt.Errorf("ERC-20 token pair not found for liquidBondDenom %s", liquidBondDenom)
+	}
+
+	contract, err := p.erc20Keeper.InstantiateERC20Precompile(ctx, pair.GetERC20Contract(), false)
+	if err != nil {
+		return err
+	}
+
+	erc20pc, ok := contract.(*erc20precompile.Precompile)
+	if !ok {
+		return fmt.Errorf("unexpected precompile type for liquidBondDenom %s", liquidBondDenom)
+	}
+
+	return erc20pc.EmitTransferEvent(ctx, stateDB, from, to, amount)
+}
 
 func (p Precompile) LiquidStake(
 	ctx sdk.Context,
@@ -56,7 +90,12 @@ func (p Precompile) LiquidStake(
 
 	msgSrv := keeper.NewMsgServerImpl(p.liquidStakeKeeper)
 
-	if _, err = msgSrv.LiquidStake(ctx, msg); err != nil {
+	resp, err := msgSrv.LiquidStake(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.emitLiquidBondDenomTransferEvent(ctx, stateDB, common.Address{}, *delegatorAddr, resp.MintedAmount.BigInt()); err != nil {
 		return nil, err
 	}
 
@@ -96,7 +135,12 @@ func (p Precompile) StakeToLP(
 
 	msgSrv := keeper.NewMsgServerImpl(p.liquidStakeKeeper)
 
-	if _, err = msgSrv.StakeToLP(ctx, msg); err != nil {
+	resp, err := msgSrv.StakeToLP(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.emitLiquidBondDenomTransferEvent(ctx, stateDB, common.Address{}, *delegatorAddr, resp.MintedAmount.BigInt()); err != nil {
 		return nil, err
 	}
 
@@ -133,6 +177,10 @@ func (p Precompile) LiquidUnstake(
 
 	resp, err := msgSrv.LiquidUnstake(ctx, msg)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := p.emitLiquidBondDenomTransferEvent(ctx, stateDB, *delegatorAddr, common.Address{}, resp.BurnedAmount.BigInt()); err != nil {
 		return nil, err
 	}
 

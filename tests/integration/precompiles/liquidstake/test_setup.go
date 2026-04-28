@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/stretchr/testify/suite"
 
 	liquidstake "github.com/cosmos/evm/precompiles/liquidstake"
@@ -12,6 +13,7 @@ import (
 	"github.com/cosmos/evm/testutil/integration/evm/grpc"
 	"github.com/cosmos/evm/testutil/integration/evm/network"
 	testkeyring "github.com/cosmos/evm/testutil/keyring"
+	erc20types "github.com/cosmos/evm/x/erc20/types"
 	liquidstaketypes "github.com/cosmos/evm/x/liquidstake/types"
 )
 
@@ -30,6 +32,7 @@ type PrecompileTestSuite struct {
 
 	liquidValidatorAddr common.Address
 	liquidValidator     stakingtypes.Validator
+	liquidBondERC20Addr common.Address
 
 	ValidatorAddr common.Address
 	Validator     stakingtypes.Validator
@@ -113,5 +116,24 @@ func (s *PrecompileTestSuite) SetupTest() {
 		panic(err)
 	}
 
-	s.precompile = liquidstake.NewPrecompile(lsKeeper, nw.App.GetBankKeeper())
+	// Register liquidBondDenom as ERC-20 token pair (needed for Transfer event emission).
+	// We do NOT enable it as a native precompile here because that would register a
+	// codehash and add it to the precompile set, increasing gas overhead in unrelated
+	// tests. The token pair lookup is sufficient for emitting Transfer events.
+	liquidBondDenom := params.LiquidBondDenom
+	liquidBondERC20Addr := denomToERC20Addr(liquidBondDenom)
+	erc20Keeper := nw.App.GetErc20Keeper()
+	lsmTokenPair := erc20types.NewTokenPair(liquidBondERC20Addr, liquidBondDenom, erc20types.OWNER_MODULE)
+	if err := erc20Keeper.SetToken(ctx, lsmTokenPair); err != nil {
+		panic(err)
+	}
+	s.liquidBondERC20Addr = liquidBondERC20Addr
+
+	s.precompile = liquidstake.NewPrecompile(lsKeeper, nw.App.GetBankKeeper(), erc20Keeper)
+}
+
+// denomToERC20Addr replicates the keccak256-based address derivation used in tacchain upgrades.
+func denomToERC20Addr(denom string) common.Address {
+	hash := crypto.Keccak256([]byte(denom))
+	return common.BytesToAddress(hash)
 }

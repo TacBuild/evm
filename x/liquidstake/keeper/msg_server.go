@@ -61,7 +61,7 @@ func (k msgServer) LiquidStake(goCtx context.Context, msg *types.MsgLiquidStake)
 			sdk.NewAttribute(types.AttributeKeyCValue, cValue.String()),
 		),
 	})
-	return &types.MsgLiquidStakeResponse{}, nil
+	return &types.MsgLiquidStakeResponse{MintedAmount: gTACMintAmount}, nil
 }
 
 func (k msgServer) StakeToLP(goCtx context.Context, msg *types.MsgStakeToLP) (*types.MsgStakeToLPResponse, error) {
@@ -103,11 +103,15 @@ func (k msgServer) StakeToLP(goCtx context.Context, msg *types.MsgStakeToLP) (*t
 		),
 	})
 
+	totalMinted := gTACMintAmount
+
 	if (msg.LiquidAmount != sdk.Coin{}) && (msg.LiquidAmount.Amount != math.Int{}) && msg.LiquidAmount.Amount.IsPositive() {
 		gTACMintAmount, err := k.Keeper.LiquidStake(ctx, types.LiquidStakeProxyAcc, msg.GetDelegator(), msg.LiquidAmount)
 		if err != nil {
 			return nil, err
 		}
+
+		totalMinted = totalMinted.Add(gTACMintAmount)
 
 		gTACMinted := sdk.Coin{
 			Denom:  liquidBondDenom,
@@ -134,7 +138,7 @@ func (k msgServer) StakeToLP(goCtx context.Context, msg *types.MsgStakeToLP) (*t
 		})
 	}
 
-	return &types.MsgStakeToLPResponse{}, nil
+	return &types.MsgStakeToLPResponse{MintedAmount: totalMinted}, nil
 }
 
 func (k msgServer) LiquidUnstake(goCtx context.Context, msg *types.MsgLiquidUnstake) (*types.MsgLiquidUnstakeResponse, error) {
@@ -165,6 +169,7 @@ func (k msgServer) LiquidUnstake(goCtx context.Context, msg *types.MsgLiquidUnst
 	})
 	return &types.MsgLiquidUnstakeResponse{
 		CompletionTime: completionTime,
+		BurnedAmount:   msg.Amount.Amount,
 	}, nil
 }
 

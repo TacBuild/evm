@@ -54,7 +54,12 @@ message MsgLiquidStake {
 }
 
 // MsgLiquidStakeResponse defines the MsgLiquidStake response type.
-message MsgLiquidStakeResponse {}
+message MsgLiquidStakeResponse {
+  string minted_amount = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "cosmossdk.io/math.Int"
+  ];
+}
 
 // MsgStakeToLP defines a SDK message for performing an LSM-transfer of staked
 // TAC into gTAC with locking into an LP.
@@ -75,7 +80,12 @@ message MsgStakeToLP {
 }
 
 // MsgStakeToLPResponse defines the MsgStakeToLP response type.
-message MsgStakeToLPResponse {}
+message MsgStakeToLPResponse {
+  string minted_amount = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "cosmossdk.io/math.Int"
+  ];
+}
 
 // MsgLiquidUnstake defines a SDK message for performing an undelegation of
 // liquid staking from a delegate.
@@ -95,6 +105,10 @@ message MsgLiquidUnstake {
 message MsgLiquidUnstakeResponse {
   google.protobuf.Timestamp completion_time = 1
       [ (gogoproto.nullable) = false, (gogoproto.stdtime) = true ];
+  string burned_amount = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "cosmossdk.io/math.Int"
+  ];
 }
 
 message MsgUpdateParams {

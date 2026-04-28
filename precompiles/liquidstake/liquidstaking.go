@@ -14,6 +14,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
 	"github.com/cosmos/evm/x/liquidstake/keeper"
 )
 
@@ -41,6 +42,7 @@ type Precompile struct {
 
 	abi.ABI
 	liquidStakeKeeper keeper.Keeper
+	erc20Keeper       *erc20keeper.Keeper
 }
 
 // NewPrecompile creates a new liquid staking Precompile instance as a
@@ -48,6 +50,7 @@ type Precompile struct {
 func NewPrecompile(
 	liquidStakeKeeper keeper.Keeper,
 	bankKeeper cmn.BankKeeper,
+	erc20Keeper *erc20keeper.Keeper,
 ) *Precompile {
 	return &Precompile{
 		Precompile: cmn.Precompile{
@@ -58,6 +61,7 @@ func NewPrecompile(
 		},
 		ABI:               ABI,
 		liquidStakeKeeper: liquidStakeKeeper,
+		erc20Keeper:       erc20Keeper,
 	}
 }
 

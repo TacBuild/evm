@@ -87,7 +87,7 @@ func DefaultStaticPrecompiles(
 		WithBankPrecompile(bankKeeper, erc20Keeper).
 		WithGovPrecompile(govKeeper, bankKeeper, codec, opts...).
 		WithSlashingPrecompile(slashingKeeper, bankKeeper, opts...).
-		WithLiquidStakePrecompile(liquidStakeKeeper, bankKeeper)
+		WithLiquidStakePrecompile(liquidStakeKeeper, bankKeeper, erc20Keeper)
 
 	return map[common.Address]vm.PrecompiledContract(precompiles)
 }

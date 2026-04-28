@@ -11,10 +11,10 @@ import (
 	"github.com/cosmos/evm/precompiles/bech32"
 	cmn "github.com/cosmos/evm/precompiles/common"
 	distprecompile "github.com/cosmos/evm/precompiles/distribution"
+	ed25519precompile "github.com/cosmos/evm/precompiles/ed25519"
 	govprecompile "github.com/cosmos/evm/precompiles/gov"
 	ics20precompile "github.com/cosmos/evm/precompiles/ics20"
 	liquidstakeprecompile "github.com/cosmos/evm/precompiles/liquidstake"
-	ed25519precompile "github.com/cosmos/evm/precompiles/ed25519"
 	"github.com/cosmos/evm/precompiles/p256"
 	slashingprecompile "github.com/cosmos/evm/precompiles/slashing"
 	stakingprecompile "github.com/cosmos/evm/precompiles/staking"
@@ -189,8 +189,9 @@ func (s StaticPrecompiles) WithEd25519Precompile() StaticPrecompiles {
 func (s StaticPrecompiles) WithLiquidStakePrecompile(
 	liquidStakeKeeper liquidstakekeeper.Keeper,
 	bankKeeper cmn.BankKeeper,
+	erc20keeper *erc20Keeper.Keeper,
 ) StaticPrecompiles {
-	lsPrecompile := liquidstakeprecompile.NewPrecompile(liquidStakeKeeper, bankKeeper)
+	lsPrecompile := liquidstakeprecompile.NewPrecompile(liquidStakeKeeper, bankKeeper, erc20keeper)
 	s[lsPrecompile.Address()] = lsPrecompile
 	return s
 }
