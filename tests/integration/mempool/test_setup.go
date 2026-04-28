@@ -47,15 +47,32 @@ func (s *IntegrationTestSuite) SetupTest() {
 // before the next SetupTest resets the global testingEvmCoinInfo to nil,
 // which would cause a nil-pointer panic in those goroutines.
 func (s *IntegrationTestSuite) TearDownTest() {
-	if s.network != nil {
-		if m, ok := s.network.App.GetMempool().(*evmmempool.ExperimentalEVMMempool); ok {
-			_ = m.Close()
-		}
+	s.shutdownMempool()
+}
+
+// shutdownMempool closes the EVM mempool of the current network (if any) and
+// waits for all its background goroutines (scheduleReorgLoop / runReorg) to
+// finish. This MUST be called before the next network.New() resets the global
+// testingEvmCoinInfo to nil, otherwise still-running runReorg goroutines from
+// the previous mempool will dereference the nil coin info and panic.
+func (s *IntegrationTestSuite) shutdownMempool() {
+	if s.network == nil {
+		return
 	}
+	if m, ok := s.network.App.GetMempool().(*evmmempool.ExperimentalEVMMempool); ok {
+		_ = m.Close()
+	}
+	s.network = nil
 }
 
 // SetupTestWithChainID initializes the test environment with a specific chain ID.
 func (s *IntegrationTestSuite) SetupTestWithChainID(chainID testconstants.ChainID) {
+	// Subtests invoke s.SetupTest() manually inside s.Run(...), and testify
+	// does not call TearDownTest between such subtests. Close the previous
+	// mempool here so its background goroutines stop before the next
+	// network.New() resets the global EVM coin info.
+	s.shutdownMempool()
+
 	s.keyring = keyring.New(20)
 
 	options := []network.ConfigOption{

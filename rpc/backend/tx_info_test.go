@@ -41,6 +41,15 @@ func setupMockBackend(t *testing.T) *Backend {
 	ctx.Viper.Set("telemetry.global-labels", []interface{}{})
 	ctx.Viper.Set("evm.evm-chain-id", constants.ExampleChainID.EVMChainID)
 
+	// Initialize the global EVM chain config so that NewBackend can read
+	// EvmChainID from it. Under the `test` build tag the chainConfig is
+	// nil by default and must be set explicitly.
+	chainCfg := evmtypes.DefaultChainConfig(constants.ExampleChainID.EVMChainID)
+	if err := evmtypes.SetChainConfig(chainCfg); err != nil {
+		// Ignore "already set" errors so that multiple tests can share state.
+		t.Logf("SetChainConfig: %v", err)
+	}
+
 	baseDir := t.TempDir()
 	nodeDirName := "node"
 	clientDir := filepath.Join(baseDir, nodeDirName, "evmoscli")
