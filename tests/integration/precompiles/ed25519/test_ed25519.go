@@ -223,8 +223,7 @@ func (s *PrecompileTestSuite) TestRun() {
 }
 
 func (s *PrecompileTestSuite) TestNewPrecompile() {
-	precompile, err := edprecompile.NewPrecompile()
-	s.Require().NoError(err)
+	precompile := edprecompile.NewPrecompile()
 	s.Require().NotNil(precompile)
 	s.Require().NotNil(precompile.ABI)
 	s.Require().Contains(precompile.Methods, edprecompile.ED25519VerifyMethod)

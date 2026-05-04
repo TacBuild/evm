@@ -20,10 +20,7 @@ type PrecompileTestSuite struct {
 }
 
 func NewPrecompileTestSuite(create network.CreateEvmApp) *PrecompileTestSuite {
-	precompile, err := edprecompile.NewPrecompile()
-	if err != nil {
-		panic(err)
-	}
+	precompile := edprecompile.NewPrecompile()
 	return &PrecompileTestSuite{
 		create:     create,
 		precompile: precompile,
@@ -36,8 +33,7 @@ func (s *PrecompileTestSuite) SetupTest() {
 	s.ed25519Pub = edPub
 	s.ed25519Priv = edPriv
 
-	s.precompile, err = edprecompile.NewPrecompile()
-	s.Require().NoError(err)
+	s.precompile = edprecompile.NewPrecompile()
 }
 
 func sigToBytes32Arr(sig []byte) [2][32]byte {

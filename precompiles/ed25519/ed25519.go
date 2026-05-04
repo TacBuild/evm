@@ -13,10 +13,23 @@ import (
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 )
 
-// Embed abi json file to the executable binary. Needed when importing as dependency.
-//
-//go:embed abi.json
-var f embed.FS
+var _ vm.PrecompiledContract = &Precompile{}
+
+var (
+	// Embed abi json file to the executable binary. Needed when importing as dependency.
+	//
+	//go:embed abi.json
+	f   embed.FS
+	ABI abi.ABI
+)
+
+func init() {
+	var err error
+	ABI, err = cmn.LoadABI(f, "abi.json")
+	if err != nil {
+		panic(err)
+	}
+}
 
 const (
 	Ed25519VerifyBaseGas = 2000
@@ -30,15 +43,10 @@ type Precompile struct {
 	abi.ABI
 }
 
-func NewPrecompile() (*Precompile, error) {
-	abi, err := cmn.LoadABI(f, "abi.json")
-	if err != nil {
-		return nil, err
-	}
-
+func NewPrecompile() *Precompile {
 	return &Precompile{
-		ABI: abi,
-	}, nil
+		ABI: ABI,
+	}
 }
 
 func (Precompile) Address() common.Address {
