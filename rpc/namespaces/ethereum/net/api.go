@@ -21,7 +21,7 @@ type PublicAPI struct {
 // NewPublicAPI creates an instance of the public Net Web3 API.
 func NewPublicAPI(_ *server.Context, clientCtx client.Context) *PublicAPI {
 	return &PublicAPI{
-		networkVersion: evmtypes.GetChainConfig().ChainId, // derive from global chainConfig set by keeper, not app.toml
+		networkVersion: evmtypes.GetChainConfig().ChainId,
 		tmClient:       clientCtx.Client.(rpcclient.Client),
 	}
 }
