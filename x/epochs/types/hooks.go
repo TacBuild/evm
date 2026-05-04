@@ -1,11 +1,9 @@
 package types
 
 import (
-	fmt "fmt"
+	"errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/cosmos/evm/utils"
 )
 
 type EpochHooks interface {
@@ -26,34 +24,18 @@ func NewMultiEpochHooks(hooks ...EpochHooks) MultiEpochHooks {
 
 // AfterEpochEnd is called when epoch is going to be ended, epochNumber is the number of epoch that is ending.
 func (h MultiEpochHooks) AfterEpochEnd(ctx sdk.Context, epochIdentifier string, epochNumber int64) error {
+	var errs error
 	for i := range h {
-		panicCatchingEpochHook(ctx, h[i].AfterEpochEnd, epochIdentifier, epochNumber)
+		errs = errors.Join(errs, h[i].AfterEpochEnd(ctx, epochIdentifier, epochNumber))
 	}
-
-	return nil
+	return errs
 }
 
 // BeforeEpochStart is called when epoch is going to be started, epochNumber is the number of epoch that is starting.
 func (h MultiEpochHooks) BeforeEpochStart(ctx sdk.Context, epochIdentifier string, epochNumber int64) error {
+	var errs error
 	for i := range h {
-		panicCatchingEpochHook(ctx, h[i].BeforeEpochStart, epochIdentifier, epochNumber)
+		errs = errors.Join(errs, h[i].BeforeEpochStart(ctx, epochIdentifier, epochNumber))
 	}
-
-	return nil
-}
-
-func panicCatchingEpochHook(
-	ctx sdk.Context,
-	hookFn func(ctx sdk.Context, epochIdentifier string, epochNumber int64) error,
-	epochIdentifier string,
-	epochNumber int64,
-) {
-	wrappedHookFn := func(ctx sdk.Context) error {
-		return hookFn(ctx, epochIdentifier, epochNumber)
-	}
-	// TODO: Thread info for which hook this is, may be dependent on larger hook system refactoring
-	err := utils.ApplyFuncIfNoError(ctx, wrappedHookFn)
-	if err != nil {
-		ctx.Logger().Error(fmt.Sprintf("error in epoch hook %v", err))
-	}
+	return errs
 }

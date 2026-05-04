@@ -43,7 +43,13 @@ func (k Keeper) BeginBlocker(ctx sdk.Context) {
 					sdk.NewAttribute(types.AttributeEpochNumber, fmt.Sprintf("%d", epochInfo.CurrentEpoch)),
 				),
 			)
-			k.AfterEpochEnd(ctx, epochInfo.Identifier, epochInfo.CurrentEpoch)
+			cacheCtx, writeCache := ctx.CacheContext()
+			if err := k.AfterEpochEnd(cacheCtx, epochInfo.Identifier, epochInfo.CurrentEpoch); err != nil {
+				// purposely ignoring the error here not to halt the chain if the hook fails
+				logger.Error(fmt.Sprintf("error in AfterEpochEnd hook for epoch %s number %d: %v", epochInfo.Identifier, epochInfo.CurrentEpoch, err))
+			} else {
+				writeCache()
+			}
 			epochInfo.CurrentEpoch++
 			epochInfo.CurrentEpochStartTime = epochInfo.CurrentEpochStartTime.Add(epochInfo.Duration)
 			logger.Info(fmt.Sprintf("Starting epoch with identifier %s epoch number %d", epochInfo.Identifier, epochInfo.CurrentEpoch))
@@ -58,7 +64,13 @@ func (k Keeper) BeginBlocker(ctx sdk.Context) {
 			),
 		)
 		k.setEpochInfo(ctx, epochInfo)
-		k.BeforeEpochStart(ctx, epochInfo.Identifier, epochInfo.CurrentEpoch)
+		cacheCtx, writeCache := ctx.CacheContext()
+		if err := k.BeforeEpochStart(cacheCtx, epochInfo.Identifier, epochInfo.CurrentEpoch); err != nil {
+			// purposely ignoring the error here not to halt the chain if the hook fails
+			logger.Error(fmt.Sprintf("error in BeforeEpochStart hook for epoch %s number %d: %v", epochInfo.Identifier, epochInfo.CurrentEpoch, err))
+		} else {
+			writeCache()
+		}
 
 		return false
 	})
