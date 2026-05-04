@@ -304,7 +304,7 @@ func NewExampleApp(
 		authAddr,
 	)
 
-	baseBankKeeper := bankkeeper.NewBaseKeeper(
+	app.BankKeeper = bankkeeper.NewBaseKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[banktypes.StoreKey]),
 		app.AccountKeeper,
@@ -312,7 +312,6 @@ func NewExampleApp(
 		authAddr,
 		logger,
 	)
-	app.BankKeeper = baseBankKeeper
 
 	// optional: enable sign mode textual by overwriting the default tx config (after setting the bank keeper)
 	enabledSignModes := append(authtx.DefaultSignModes, signingtypes.SignMode_SIGN_MODE_TEXTUAL) //nolint:gocritic
@@ -445,7 +444,7 @@ func NewExampleApp(
 		appCodec,
 		keys[liquidstaketypes.StoreKey],
 		app.AccountKeeper,
-		baseBankKeeper,
+		app.BankKeeper,
 		*app.StakingKeeper,
 		app.MintKeeper,
 		app.DistrKeeper,
