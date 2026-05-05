@@ -6,7 +6,7 @@ import (
 
 	rpcclient "github.com/cometbft/cometbft/rpc/client"
 
-	evmtypes "github.com/cosmos/evm/x/vm/types"
+	"github.com/cosmos/evm/server/config"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/server"
@@ -19,9 +19,13 @@ type PublicAPI struct {
 }
 
 // NewPublicAPI creates an instance of the public Net Web3 API.
-func NewPublicAPI(_ *server.Context, clientCtx client.Context) *PublicAPI {
+func NewPublicAPI(ctx *server.Context, clientCtx client.Context) *PublicAPI {
+	cfg, err := config.GetConfig(ctx.Viper)
+	if err != nil {
+		panic(err)
+	}
 	return &PublicAPI{
-		networkVersion: evmtypes.GetChainConfig().ChainId,
+		networkVersion: cfg.EVM.EVMChainID,
 		tmClient:       clientCtx.Client.(rpcclient.Client),
 	}
 }
