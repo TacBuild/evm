@@ -273,6 +273,8 @@ require (
 replace (
 	// use cosmos fork of keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
+	// TacBuild LSM fork of cosmos-sdk
+	github.com/cosmos/cosmos-sdk => github.com/TacBuild/cosmos-sdk v0.53.6-tac.1
 	// use Cosmos geth fork
 	// branch: release/1.16
 	github.com/ethereum/go-ethereum => github.com/cosmos/go-ethereum v1.16.2-cosmos-1
@@ -280,8 +282,6 @@ replace (
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.1
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
-	// TacBuild LSM fork of cosmos-sdk
-	github.com/cosmos/cosmos-sdk => ../cosmos-sdk
 )
 
 retract (
