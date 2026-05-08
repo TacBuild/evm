@@ -72,8 +72,8 @@ func DefaultStaticPrecompiles(
 	channelKeeper *channelkeeper.Keeper,
 	govKeeper govkeeper.Keeper,
 	slashingKeeper slashingkeeper.Keeper,
-	codec codec.Codec,
 	liquidStakeKeeper liquidstakekeeper.Keeper,
+	codec codec.Codec,
 	opts ...Option,
 ) map[common.Address]vm.PrecompiledContract {
 	precompiles := NewStaticPrecompiles().

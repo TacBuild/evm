@@ -499,8 +499,8 @@ func NewExampleApp(
 			app.IBCKeeper.ChannelKeeper,
 			app.GovKeeper,
 			app.SlashingKeeper,
-			appCodec,
 			app.LiquidStakeKeeper,
+			appCodec,
 		),
 	)
 
