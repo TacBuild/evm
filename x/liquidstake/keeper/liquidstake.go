@@ -812,7 +812,8 @@ func (k Keeper) LiquidUnstake(
 		var weightedShare math.LegacyDec
 
 		// calculate delShares from tokens with validation
-		weightedShare, err = k.stakingKeeper.ValidateUnbondAmount(ctx, proxyAcc, val.GetOperator(), unbondingAmounts[i].TruncateInt())
+		unbondAmt := unbondingAmounts[i].TruncateInt()
+		weightedShare, err = k.stakingKeeper.ValidateUnbondAmount(ctx, proxyAcc, val.GetOperator(), unbondAmt)
 		if err != nil {
 			k.Logger(ctx).Error(
 				"failed to validate unbond amount",
@@ -821,7 +822,7 @@ func (k Keeper) LiquidUnstake(
 				types.ValidatorKeyVal,
 				val.GetOperator().String(),
 				types.AmountKeyVal,
-				unbondingAmounts[i].TruncateInt().String(),
+				unbondAmt.String(),
 			)
 
 			return time.Time{}, math.ZeroInt(), []stakingtypes.UnbondingDelegation{}, math.ZeroInt(), err
@@ -832,7 +833,7 @@ func (k Keeper) LiquidUnstake(
 		}
 
 		// unbond with weightedShare
-		ubdTime, returnAmount, ubd, err = k.LiquidUnbond(ctx, proxyAcc, liquidStaker, val.GetOperator(), weightedShare, true, sdk.NewCoin(bondDenom, unbondingAmounts[i].TruncateInt()))
+		ubdTime, returnAmount, ubd, err = k.LiquidUnbond(ctx, proxyAcc, liquidStaker, val.GetOperator(), weightedShare, true, sdk.NewCoin(bondDenom, unbondAmt))
 		if err != nil {
 			return time.Time{}, math.ZeroInt(), []stakingtypes.UnbondingDelegation{}, math.ZeroInt(), err
 		}

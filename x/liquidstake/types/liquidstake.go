@@ -185,11 +185,7 @@ func DeductFeeRate(input, feeRate math.LegacyDec) (feeDeductedOutput math.Legacy
 }
 
 func (nas NetAmountState) CalcNetAmount() math.LegacyDec {
-	return math.LegacyNewDecFromInt(
-		nas.TotalLiquidTokens.
-			Add(nas.TotalUnbondingBalance).
-			Add(nas.ProxyAccBalance),
-	).Add(nas.TotalRemainingRewards)
+	return math.LegacyNewDecFromInt(nas.TotalLiquidTokens.Add(nas.TotalUnbondingBalance))
 }
 
 func (nas NetAmountState) CalcMintRate() math.LegacyDec {
