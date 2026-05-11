@@ -292,6 +292,71 @@ func (s *PrecompileTestSuite) TestSetModulePausedEvent() {
 	}
 }
 
+func (s *PrecompileTestSuite) TestStakeToLPEvent() {
+	var (
+		stDB *statedb.StateDB
+		ctx  sdk.Context
+	)
+	testCases := []struct {
+		name        string
+		malleate    func(delegator common.Address) *liquidstaketypes.MsgStakeToLP
+		expErr      bool
+		errContains string
+		postCheck   func(delegator common.Address)
+	}{
+		{
+			"success - StakeToLP event emitted correctly",
+			func(delegator common.Address) *liquidstaketypes.MsgStakeToLP {
+				return &liquidstaketypes.MsgStakeToLP{
+					DelegatorAddress: sdk.AccAddress(delegator.Bytes()).String(),
+					ValidatorAddress: s.liquidValidator.OperatorAddress,
+					StakedAmount:     sdk.NewCoin(s.bondDenom, sdkmath.NewInt(500000000000000000)),
+					LiquidAmount:     sdk.NewCoin(s.bondDenom, sdkmath.NewInt(500000000000000000)),
+				}
+			},
+			false,
+			"",
+			func(delegator common.Address) {
+				log := stDB.Logs()[0]
+				s.Require().Equal(log.Address, s.precompile.Address())
+
+				event := s.precompile.ABI.Events[liquidstake.EventTypeStakeToLP]
+				s.Require().Equal(crypto.Keccak256Hash([]byte(event.Sig)), common.HexToHash(log.Topics[0].Hex()))
+				s.Require().Equal(log.BlockNumber, uint64(ctx.BlockHeight())) //nolint:gosec
+
+				var stakeToLPEvent liquidstake.EventStakeToLP
+				err := cmn.UnpackLog(s.precompile.ABI, &stakeToLPEvent, liquidstake.EventTypeStakeToLP, *log)
+				s.Require().NoError(err)
+				s.Require().Equal(delegator, stakeToLPEvent.DelegatorAddress)
+				s.Require().Equal(s.liquidValidatorAddr, stakeToLPEvent.ValidatorAddress)
+				s.Require().Equal(big.NewInt(500000000000000000), stakeToLPEvent.StakedAmount)
+				s.Require().Equal(big.NewInt(500000000000000000), stakeToLPEvent.LiquidAmount)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			s.SetupTest()
+			ctx = s.nw.GetContext()
+			stDB = s.nw.GetStateDB()
+
+			delegator := s.keyring.GetKey(0)
+			msg := tc.malleate(delegator.Addr)
+
+			err := s.precompile.EmitStakeToLPEvent(ctx, stDB, msg, delegator.Addr)
+
+			if tc.expErr {
+				s.Require().Error(err)
+				s.Require().Contains(err.Error(), tc.errContains)
+			} else {
+				s.Require().NoError(err)
+				tc.postCheck(delegator.Addr)
+			}
+		})
+	}
+}
+
 func (s *PrecompileTestSuite) TestLiquidUnstakeEvent() {
 	var (
 		stDB *statedb.StateDB

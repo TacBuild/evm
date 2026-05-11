@@ -99,6 +99,10 @@ func (p Precompile) LiquidStake(
 		return nil, err
 	}
 
+	if err := p.EmitLiquidStakeEvent(ctx, stateDB, msg, *delegatorAddr); err != nil {
+		return nil, err
+	}
+
 	return method.Outputs.Pack(true)
 }
 
@@ -144,6 +148,10 @@ func (p Precompile) StakeToLP(
 		return nil, err
 	}
 
+	if err := p.EmitStakeToLPEvent(ctx, stateDB, msg, *delegatorAddr); err != nil {
+		return nil, err
+	}
+
 	return method.Outputs.Pack(true)
 }
 
@@ -184,6 +192,10 @@ func (p Precompile) LiquidUnstake(
 		return nil, err
 	}
 
+	if err := p.EmitLiquidUnstakeEvent(ctx, stateDB, msg, *delegatorAddr); err != nil {
+		return nil, err
+	}
+
 	return method.Outputs.Pack(resp.CompletionTime.Unix())
 }
 
@@ -204,6 +216,10 @@ func (p Precompile) UpdateParams(
 	msgSrv := keeper.NewMsgServerImpl(p.liquidStakeKeeper)
 
 	if _, err = msgSrv.UpdateParams(ctx, msg); err != nil {
+		return nil, err
+	}
+
+	if err := p.EmitUpdateParamsEvent(ctx, stateDB, msg); err != nil {
 		return nil, err
 	}
 
@@ -230,6 +246,10 @@ func (p Precompile) UpdateWhitelistedValidators(
 		return nil, err
 	}
 
+	if err := p.EmitUpdateWhitelistedValidatorEvent(ctx, stateDB, msg); err != nil {
+		return nil, err
+	}
+
 	return method.Outputs.Pack(true)
 }
 
@@ -250,6 +270,10 @@ func (p Precompile) SetModulePaused(
 	msgSrv := keeper.NewMsgServerImpl(p.liquidStakeKeeper)
 
 	if _, err = msgSrv.SetModulePaused(ctx, msg); err != nil {
+		return nil, err
+	}
+
+	if err := p.EmitSetModulePausedEvent(ctx, stateDB, msg); err != nil {
 		return nil, err
 	}
 
