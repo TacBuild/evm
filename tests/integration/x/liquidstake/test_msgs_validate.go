@@ -68,62 +68,6 @@ func (s *KeeperTestSuite) TestValidateBasic_LiquidUnstake_BadAddress() {
 }
 
 // ---------------------------------------------------------------------------
-// MsgStakeToLP
-// ---------------------------------------------------------------------------
-
-func (s *KeeperTestSuite) TestValidateBasic_StakeToLP_Valid() {
-	valAddr := sdk.ValAddress(s.addrs[0])
-	msg := types.NewMsgStakeToLP(
-		s.addrs[1],
-		valAddr,
-		sdk.NewCoin("aatom", sdkmath.NewInt(200_000)),
-		sdk.Coin{}, // no liquid amount
-	)
-	s.Require().NoError(msg.ValidateBasic())
-}
-
-func (s *KeeperTestSuite) TestValidateBasic_StakeToLP_ZeroStakedAmount() {
-	valAddr := sdk.ValAddress(s.addrs[0])
-	msg := types.NewMsgStakeToLP(
-		s.addrs[1],
-		valAddr,
-		sdk.NewCoin("aatom", sdkmath.ZeroInt()),
-		sdk.Coin{},
-	)
-	s.Require().Error(msg.ValidateBasic(), "zero staked amount must be rejected")
-}
-
-func (s *KeeperTestSuite) TestValidateBasic_StakeToLP_BadDelegatorAddress() {
-	valAddr := sdk.ValAddress(s.addrs[0])
-	msg := &types.MsgStakeToLP{
-		DelegatorAddress: "bad-addr",
-		ValidatorAddress: valAddr.String(),
-		StakedAmount:     sdk.NewCoin("aatom", sdkmath.NewInt(100_000)),
-	}
-	s.Require().Error(msg.ValidateBasic())
-}
-
-func (s *KeeperTestSuite) TestValidateBasic_StakeToLP_BadValidatorAddress() {
-	msg := &types.MsgStakeToLP{
-		DelegatorAddress: s.addrs[1].String(),
-		ValidatorAddress: "not-a-val-addr",
-		StakedAmount:     sdk.NewCoin("aatom", sdkmath.NewInt(100_000)),
-	}
-	s.Require().Error(msg.ValidateBasic())
-}
-
-func (s *KeeperTestSuite) TestValidateBasic_StakeToLP_WithLiquidAmount() {
-	valAddr := sdk.ValAddress(s.addrs[0])
-	msg := types.NewMsgStakeToLP(
-		s.addrs[1],
-		valAddr,
-		sdk.NewCoin("aatom", sdkmath.NewInt(200_000)),
-		sdk.NewCoin("aatom", sdkmath.NewInt(100_000)),
-	)
-	s.Require().NoError(msg.ValidateBasic(), "valid liquid amount must be accepted")
-}
-
-// ---------------------------------------------------------------------------
 // MsgUpdateParams
 // ---------------------------------------------------------------------------
 

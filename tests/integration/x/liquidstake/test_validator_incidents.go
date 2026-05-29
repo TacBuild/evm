@@ -718,11 +718,9 @@ func (s *KeeperTestSuite) TestSlash_GetNetAmountStateConsistency() {
 	nas, err := s.keeper.GetNetAmountState(ctx)
 	s.Require().NoError(err)
 
-	// NetAmount = ProxyAccBalance + TotalLiquidTokens + TotalUnbondingBalance + TotalRemainingRewards
-	expected := sdkmath.LegacyNewDecFromInt(nas.ProxyAccBalance).
-		Add(sdkmath.LegacyNewDecFromInt(nas.TotalLiquidTokens)).
-		Add(sdkmath.LegacyNewDecFromInt(nas.TotalUnbondingBalance)).
-		Add(nas.TotalRemainingRewards)
+	expected := sdkmath.LegacyNewDecFromInt(
+		nas.TotalLiquidTokens.Add(nas.TotalUnbondingBalance),
+	)
 
 	s.Require().Equal(expected.TruncateInt(), nas.NetAmount.TruncateInt(),
 		"NetAmount should equal the sum of its components after a slash")

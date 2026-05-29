@@ -4,7 +4,6 @@ package types
 const (
 	EventTypeMsgLiquidStake                 = MsgTypeLiquidStake
 	EventTypeMsgLiquidUnstake               = MsgTypeLiquidUnstake
-	EventTypeMsgStakeToLP                   = MsgTypeStakeToLP
 	EventTypeMsgUpdateParams                = MsgTypeUpdateParams
 	EventTypeMsgUpdateWhitelistedValidators = MsgTypeUpdateWhitelistedValidators
 	EventTypeMsgSetModulePaused             = MsgTypeSetModulePaused
@@ -25,7 +24,6 @@ const (
 	AttributeKeyRedelegationCount     = "redelegation_count"
 	AttributeKeyRedelegationFailCount = "redelegation_fail_count"
 	AttributeKeyLiquidAmount          = "liquid_amount"
-	AttributeKeyStakedAmount          = "staked_amount"
 	AttributeKeyUnstakeAmount         = "unstake_amount"
 	AttributeKeyAutocompoundFee       = "autocompound_fee"
 	AttributeKeyModulePaused          = "module_paused"

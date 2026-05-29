@@ -103,8 +103,6 @@ func (p Precompile) Execute(ctx sdk.Context, stateDB vm.StateDB, contract *vm.Co
 	// Transactions
 	case LiquidStakeMethod:
 		bz, err = p.LiquidStake(ctx, contract, stateDB, method, args)
-	case StakeToLPMethod:
-		bz, err = p.StakeToLP(ctx, contract, stateDB, method, args)
 	case LiquidUnstakeMethod:
 		bz, err = p.LiquidUnstake(ctx, contract, stateDB, method, args)
 	case UpdateParamsMethod:
@@ -131,7 +129,6 @@ func (p Precompile) Execute(ctx sdk.Context, stateDB vm.StateDB, contract *vm.Co
 func (Precompile) IsTransaction(method *abi.Method) bool {
 	switch method.Name {
 	case LiquidStakeMethod,
-		StakeToLPMethod,
 		LiquidUnstakeMethod,
 		UpdateParamsMethod,
 		UpdateWhitelistedValidatorsMethod,

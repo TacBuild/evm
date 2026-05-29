@@ -6,7 +6,6 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -94,47 +93,6 @@ func (s *PrecompileTestSuite) TestLiquidStakeEmitsERC20TransferEvent() {
 	s.Require().Equal(delegator.Addr, common.BytesToAddress(log.Topics[2].Bytes()), "expected Transfer to delegator")
 
 	// value must be positive
-	value := new(big.Int).SetBytes(log.Data)
-	s.Require().True(value.Sign() > 0, "expected minted amount > 0")
-}
-
-// TestStakeToLPEmitsERC20TransferEvent verifies that StakeToLP emits
-// a Transfer(address(0) -> delegator, mintedAmount) event on the liquidBondDenom ERC-20.
-func (s *PrecompileTestSuite) TestStakeToLPEmitsERC20TransferEvent() {
-	s.SetupTest()
-	ctx := s.nw.GetContext().WithBlockTime(time.Now())
-	delegator := s.keyring.GetKey(0)
-
-	delAmount := sdkmath.NewInt(1_000_000_000_000_000_000)
-	_, err := s.nw.App.GetStakingKeeper().Delegate(
-		ctx,
-		sdk.AccAddress(delegator.Addr.Bytes()),
-		delAmount,
-		stakingtypes.Unbonded,
-		s.liquidValidator,
-		true,
-	)
-	s.Require().NoError(err)
-
-	tokenizeAmount := big.NewInt(1_000_000_000_000_000_000)
-	input, err := s.precompile.Pack(
-		liquidstake.StakeToLPMethod,
-		delegator.Addr,
-		s.liquidValidatorAddr,
-		tokenizeAmount,
-		tokenizeAmount,
-	)
-	s.Require().NoError(err)
-
-	stDB, err := s.runPrecompileTx(ctx, delegator, input, 1_000_000_000_000_000_000)
-	s.Require().NoError(err)
-
-	log := s.findERC20TransferLog(stDB, s.liquidBondERC20Addr)
-	s.Require().NotNil(log, "expected ERC-20 Transfer log for liquidBondDenom")
-
-	s.Require().Equal(common.Hash{}, log.Topics[1], "expected Transfer from zero address (mint)")
-	s.Require().Equal(delegator.Addr, common.BytesToAddress(log.Topics[2].Bytes()), "expected Transfer to delegator")
-
 	value := new(big.Int).SetBytes(log.Data)
 	s.Require().True(value.Sign() > 0, "expected minted amount > 0")
 }

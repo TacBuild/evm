@@ -22,10 +22,6 @@ service Msg {
   // staking from a delegate.
   rpc LiquidUnstake(MsgLiquidUnstake) returns (MsgLiquidUnstakeResponse);
 
-  // StakeToLP defines a method for LSM-transfer of staked TAC
-  // into gTAC with locking into an LP.
-  rpc StakeToLP(MsgStakeToLP) returns (MsgStakeToLPResponse);
-
   // UpdateParams defines a method to update the module params.
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 
@@ -55,32 +51,6 @@ message MsgLiquidStake {
 
 // MsgLiquidStakeResponse defines the MsgLiquidStake response type.
 message MsgLiquidStakeResponse {
-  string minted_amount = 1 [
-    (gogoproto.nullable) = false,
-    (gogoproto.customtype) = "cosmossdk.io/math.Int"
-  ];
-}
-
-// MsgStakeToLP defines a SDK message for performing an LSM-transfer of staked
-// TAC into gTAC with locking into an LP.
-message MsgStakeToLP {
-  option (gogoproto.equal) = false;
-  option (gogoproto.goproto_getters) = false;
-  option (amino.name) = "liquidstake/MsgStakeToLP";
-  option (cosmos.msg.v1.signer) = "delegator_address";
-
-  string delegator_address = 1
-      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
-
-  string validator_address = 2
-      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
-
-  cosmos.base.v1beta1.Coin staked_amount = 3 [ (gogoproto.nullable) = false ];
-  cosmos.base.v1beta1.Coin liquid_amount = 4 [ (gogoproto.nullable) = false ];
-}
-
-// MsgStakeToLPResponse defines the MsgStakeToLP response type.
-message MsgStakeToLPResponse {
   string minted_amount = 1 [
     (gogoproto.nullable) = false,
     (gogoproto.customtype) = "cosmossdk.io/math.Int"

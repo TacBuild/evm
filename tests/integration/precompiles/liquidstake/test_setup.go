@@ -80,7 +80,6 @@ func (s *PrecompileTestSuite) SetupTest() {
 
 	params := lsKeeper.GetParams(ctx)
 	params.ModulePaused = false
-	params.LsmDisabled = false
 	params.LiquidBondDenom = "agatom"
 
 	valAddr, err := sdk.ValAddressFromBech32(validators[0].OperatorAddress)

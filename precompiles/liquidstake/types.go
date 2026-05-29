@@ -29,7 +29,6 @@ type LiquidStakeParams = struct {
 	LiquidBondDenom       string                 `json:"liquidBondDenom"`
 	WhitelistedValidators []WhitelistedValidator `json:"whitelistedValidators"`
 	UnstakeFeeRate        *big.Int               `json:"unstakeFeeRate"`
-	LsmDisabled           bool                   `json:"lsmDisabled"`
 	MinLiquidStakeAmount  *big.Int               `json:"minLiquidStakeAmount"`
 	CwLockedPoolAddress   common.Address         `json:"cwLockedPoolAddress"`
 	FeeAccountAddress     common.Address         `json:"feeAccountAddress"`
@@ -40,7 +39,6 @@ type LiquidStakeParams = struct {
 
 type LiquidStakeUpdatableParams = struct {
 	UnstakeFeeRate        *big.Int       `json:"unstakeFeeRate"`
-	LsmDisabled           bool           `json:"lsmDisabled"`
 	MinLiquidStakeAmount  *big.Int       `json:"minLiquidStakeAmount"`
 	CwLockedPoolAddress   common.Address `json:"cwLockedPoolAddress"`
 	FeeAccountAddress     common.Address `json:"feeAccountAddress"`
@@ -71,14 +69,6 @@ type NetAmount struct {
 type EventLiquidStake struct {
 	DelegatorAddress common.Address `json:"delegatorAddress"`
 	Amount           *big.Int       `json:"amount"`
-}
-
-// EventStakeToLP represents the StakeToLP event data
-type EventStakeToLP struct {
-	DelegatorAddress common.Address `json:"delegatorAddress"`
-	ValidatorAddress common.Address `json:"validatorAddress"`
-	StakedAmount     *big.Int       `json:"stakedAmount"`
-	LiquidAmount     *big.Int       `json:"liquidAmount"`
 }
 
 // EventLiquidUnstake represents the LiquidUnstake event data
@@ -184,7 +174,6 @@ func NewLiquidStakeParamsOutput(params *types.Params) LiquidStakeParams {
 		LiquidBondDenom:       params.LiquidBondDenom,
 		WhitelistedValidators: whitelistedValidators,
 		UnstakeFeeRate:        params.UnstakeFeeRate.BigInt(),
-		LsmDisabled:           params.LsmDisabled,
 		MinLiquidStakeAmount:  params.MinLiquidStakeAmount.BigInt(),
 		CwLockedPoolAddress:   cwLockedPoolAddr,
 		FeeAccountAddress:     feeAccountAddr,
@@ -218,7 +207,6 @@ func NewLiquidStakeUpdatableParamsOutput(params *types.UpdatableParams) LiquidSt
 
 	return LiquidStakeUpdatableParams{
 		UnstakeFeeRate:        params.UnstakeFeeRate.BigInt(),
-		LsmDisabled:           params.LsmDisabled,
 		MinLiquidStakeAmount:  params.MinLiquidStakeAmount.BigInt(),
 		CwLockedPoolAddress:   cwLockedPoolAddr,
 		FeeAccountAddress:     feeAccountAddr,
@@ -245,41 +233,6 @@ func NewMsgLiquidStake(args []interface{}, denom string) (*common.Address, *type
 	msg := types.MsgLiquidStake{
 		DelegatorAddress: sdk.AccAddress(delegatorAddress.Bytes()).String(),
 		Amount:           sdk.NewCoin(denom, math.NewIntFromBigInt(amount)),
-	}
-
-	return &delegatorAddress, &msg, nil
-}
-
-func NewMsgStakeToLP(args []interface{}, denom string) (*common.Address, *types.MsgStakeToLP, error) {
-	if len(args) != 4 {
-		return nil, nil, fmt.Errorf(cmn.ErrInvalidNumberOfArgs, 4, len(args))
-	}
-
-	delegatorAddress, ok := args[0].(common.Address)
-	if !ok {
-		return nil, nil, fmt.Errorf(cmn.ErrInvalidDelegator, args[0])
-	}
-
-	validatorAddress, ok := args[1].(common.Address)
-	if !ok {
-		return nil, nil, fmt.Errorf(cmn.ErrInvalidValidator, args[1])
-	}
-
-	stakedAmount, ok := args[2].(*big.Int)
-	if !ok {
-		return nil, nil, fmt.Errorf(cmn.ErrInvalidAmount, args[2])
-	}
-
-	liquidAmount, ok := args[3].(*big.Int)
-	if !ok {
-		return nil, nil, fmt.Errorf(cmn.ErrInvalidAmount, args[3])
-	}
-
-	msg := types.MsgStakeToLP{
-		DelegatorAddress: sdk.AccAddress(delegatorAddress.Bytes()).String(),
-		ValidatorAddress: sdk.ValAddress(validatorAddress.Bytes()).String(),
-		StakedAmount:     sdk.NewCoin(denom, math.NewIntFromBigInt(stakedAmount)),
-		LiquidAmount:     sdk.NewCoin(denom, math.NewIntFromBigInt(liquidAmount)),
 	}
 
 	return &delegatorAddress, &msg, nil
@@ -321,7 +274,6 @@ func NewMsgUpdateParams(args []interface{}, denom string, authorityAddress commo
 	Params := types.UpdatableParams{
 		WhitelistAdminAddress: sdk.AccAddress(params.WhitelistAdminAddress.Bytes()).String(),
 		UnstakeFeeRate:        math.LegacyNewDecFromBigIntWithPrec(params.UnstakeFeeRate, math.LegacyPrecision),
-		LsmDisabled:           params.LsmDisabled,
 		MinLiquidStakeAmount:  math.NewIntFromBigInt(params.MinLiquidStakeAmount),
 		CwLockedPoolAddress:   sdk.AccAddress(params.CwLockedPoolAddress.Bytes()).String(),
 		FeeAccountAddress:     sdk.AccAddress(params.FeeAccountAddress.Bytes()).String(),

@@ -28,7 +28,6 @@ func (s *KeeperTestSuite) TestQuerier_Params_Default() {
 	s.Require().Equal(expected.LiquidBondDenom, got.LiquidBondDenom)
 	s.Require().Equal(expected.UnstakeFeeRate, got.UnstakeFeeRate)
 	s.Require().Equal(expected.MinLiquidStakeAmount, got.MinLiquidStakeAmount)
-	s.Require().Equal(expected.LsmDisabled, got.LsmDisabled)
 }
 
 // TestQuerier_Params_AfterUpdate verifies that Params reflects a params update immediately.

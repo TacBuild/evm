@@ -15,8 +15,6 @@ import (
 const (
 	// EventTypeLiquidStake defines the event type for the LiquidStake transaction.
 	EventTypeLiquidStake = "LiquidStake"
-	// EventTypeStakeToLP defines the event type for the StakeToLP transaction.
-	EventTypeStakeToLP = "StakeToLP"
 	// EventTypeLiquidUnstake defines the event type for the LiquidUnstake transaction.
 	EventTypeLiquidUnstake = "LiquidUnstake"
 	// EventTypeUpdateParams defines the event type for the UpdateParams transaction.
@@ -46,49 +44,6 @@ func (p Precompile) EmitLiquidStakeEvent(ctx sdk.Context, stateDB vm.StateDB, ms
 	// Only amount is not indexed, so only pack the amount
 	arguments := abi.Arguments{event.Inputs[1]} // event.Inputs[1] is the amount field
 	packed, err := arguments.Pack(msg.Amount.Amount.BigInt())
-	if err != nil {
-		return err
-	}
-
-	stateDB.AddLog(&ethtypes.Log{
-		Address:     p.Address(),
-		Topics:      topics,
-		Data:        packed,
-		BlockNumber: uint64(ctx.BlockHeight()), //nolint:gosec // G115 // won't exceed uint64
-	})
-
-	return nil
-}
-
-// EmitStakeToLPEvent creates a new stake to LP event emitted on a StakeToLP transaction.
-func (p Precompile) EmitStakeToLPEvent(ctx sdk.Context, stateDB vm.StateDB, msg *types.MsgStakeToLP, delegatorAddr common.Address) error {
-	valAddr, err := sdk.ValAddressFromBech32(msg.ValidatorAddress)
-	if err != nil {
-		return err
-	}
-	validatorAddr := common.BytesToAddress(valAddr.Bytes())
-
-	// Prepare the event topics
-	event := p.ABI.Events[EventTypeStakeToLP]
-	topics := make([]common.Hash, 3)
-
-	// The first topic is always the signature of the event.
-	topics[0] = event.ID
-
-	topics[1], err = cmn.MakeTopic(delegatorAddr)
-	if err != nil {
-		return err
-	}
-
-	topics[2], err = cmn.MakeTopic(validatorAddr)
-	if err != nil {
-		return err
-	}
-
-	// Pack the arguments to be used as the Data field
-	// Only stakedAmount and liquidAmount are not indexed, so only pack those
-	arguments := abi.Arguments{event.Inputs[2], event.Inputs[3]} // stakedAmount and liquidAmount fields
-	packed, err := arguments.Pack(msg.StakedAmount.Amount.BigInt(), msg.LiquidAmount.Amount.BigInt())
 	if err != nil {
 		return err
 	}

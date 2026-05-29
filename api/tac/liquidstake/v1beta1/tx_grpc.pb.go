@@ -21,7 +21,6 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	Msg_LiquidStake_FullMethodName                 = "/tac.liquidstake.v1beta1.Msg/LiquidStake"
 	Msg_LiquidUnstake_FullMethodName               = "/tac.liquidstake.v1beta1.Msg/LiquidUnstake"
-	Msg_StakeToLP_FullMethodName                   = "/tac.liquidstake.v1beta1.Msg/StakeToLP"
 	Msg_UpdateParams_FullMethodName                = "/tac.liquidstake.v1beta1.Msg/UpdateParams"
 	Msg_UpdateWhitelistedValidators_FullMethodName = "/tac.liquidstake.v1beta1.Msg/UpdateWhitelistedValidators"
 	Msg_SetModulePaused_FullMethodName             = "/tac.liquidstake.v1beta1.Msg/SetModulePaused"
@@ -37,9 +36,6 @@ type MsgClient interface {
 	// LiquidUnstake defines a method for performing an undelegation of liquid
 	// staking from a delegate.
 	LiquidUnstake(ctx context.Context, in *MsgLiquidUnstake, opts ...grpc.CallOption) (*MsgLiquidUnstakeResponse, error)
-	// StakeToLP defines a method for LSM-transfer of staked TAC
-	// into gTAC with locking into an LP.
-	StakeToLP(ctx context.Context, in *MsgStakeToLP, opts ...grpc.CallOption) (*MsgStakeToLPResponse, error)
 	// UpdateParams defines a method to update the module params.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	// UpdateWhitelistedValidators defines a method to update the whitelisted
@@ -70,15 +66,6 @@ func (c *msgClient) LiquidStake(ctx context.Context, in *MsgLiquidStake, opts ..
 func (c *msgClient) LiquidUnstake(ctx context.Context, in *MsgLiquidUnstake, opts ...grpc.CallOption) (*MsgLiquidUnstakeResponse, error) {
 	out := new(MsgLiquidUnstakeResponse)
 	err := c.cc.Invoke(ctx, Msg_LiquidUnstake_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *msgClient) StakeToLP(ctx context.Context, in *MsgStakeToLP, opts ...grpc.CallOption) (*MsgStakeToLPResponse, error) {
-	out := new(MsgStakeToLPResponse)
-	err := c.cc.Invoke(ctx, Msg_StakeToLP_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -122,9 +109,6 @@ type MsgServer interface {
 	// LiquidUnstake defines a method for performing an undelegation of liquid
 	// staking from a delegate.
 	LiquidUnstake(context.Context, *MsgLiquidUnstake) (*MsgLiquidUnstakeResponse, error)
-	// StakeToLP defines a method for LSM-transfer of staked TAC
-	// into gTAC with locking into an LP.
-	StakeToLP(context.Context, *MsgStakeToLP) (*MsgStakeToLPResponse, error)
 	// UpdateParams defines a method to update the module params.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	// UpdateWhitelistedValidators defines a method to update the whitelisted
@@ -145,9 +129,6 @@ func (UnimplementedMsgServer) LiquidStake(context.Context, *MsgLiquidStake) (*Ms
 }
 func (UnimplementedMsgServer) LiquidUnstake(context.Context, *MsgLiquidUnstake) (*MsgLiquidUnstakeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LiquidUnstake not implemented")
-}
-func (UnimplementedMsgServer) StakeToLP(context.Context, *MsgStakeToLP) (*MsgStakeToLPResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StakeToLP not implemented")
 }
 func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
@@ -203,24 +184,6 @@ func _Msg_LiquidUnstake_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).LiquidUnstake(ctx, req.(*MsgLiquidUnstake))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Msg_StakeToLP_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgStakeToLP)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).StakeToLP(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Msg_StakeToLP_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).StakeToLP(ctx, req.(*MsgStakeToLP))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -293,10 +256,6 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LiquidUnstake",
 			Handler:    _Msg_LiquidUnstake_Handler,
-		},
-		{
-			MethodName: "StakeToLP",
-			Handler:    _Msg_StakeToLP_Handler,
 		},
 		{
 			MethodName: "UpdateParams",

@@ -6,7 +6,6 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -30,11 +29,6 @@ func (s *PrecompileTestSuite) TestIsTransaction() {
 		{
 			liquidstake.LiquidStakeMethod,
 			s.precompile.Methods[liquidstake.LiquidStakeMethod],
-			true,
-		},
-		{
-			liquidstake.StakeToLPMethod,
-			s.precompile.Methods[liquidstake.StakeToLPMethod],
 			true,
 		},
 		{
@@ -94,21 +88,6 @@ func (s *PrecompileTestSuite) TestRequiredGas() {
 				return input
 			},
 			4040,
-		},
-		{
-			"success - stakeToLP transaction with correct gas estimation",
-			func() []byte {
-				input, err := s.precompile.Pack(
-					liquidstake.StakeToLPMethod,
-					s.keyring.GetAddr(0),
-					s.keyring.GetAddr(1),
-					big.NewInt(1000000),
-					big.NewInt(1000000),
-				)
-				s.Require().NoError(err)
-				return input
-			},
-			5960,
 		},
 		{
 			"success - liquidUnstake transaction with correct gas estimation",
@@ -176,34 +155,6 @@ func (s *PrecompileTestSuite) TestRun() {
 				return input
 			},
 			gas:     1000000,
-			expPass: true,
-		},
-		{
-			name: "pass - stakeToLP transaction",
-			malleate: func(delegator testkeyring.Key) []byte {
-				delAmount := sdkmath.NewInt(1000000000000000000)
-				_, err := s.nw.App.GetStakingKeeper().Delegate(ctx, sdk.AccAddress(delegator.Addr.Bytes()), delAmount, stakingtypes.Bonded, s.liquidValidator, false)
-				if err != nil {
-					panic(err)
-				}
-
-				_, err = s.nw.App.GetStakingKeeper().GetDelegation(ctx, delegator.AccAddr, sdk.ValAddress(s.liquidValidatorAddr.Bytes()))
-				if err != nil {
-					panic(err)
-				}
-
-				tokenizeAmount := big.NewInt(1000000000000000000)
-				input, err := s.precompile.Pack(
-					liquidstake.StakeToLPMethod,
-					delegator.Addr,
-					s.liquidValidatorAddr,
-					tokenizeAmount,
-					tokenizeAmount,
-				)
-				s.Require().NoError(err, "failed to pack input")
-				return input
-			},
-			gas:     1000000000000000000,
 			expPass: true,
 		},
 		{
@@ -309,7 +260,6 @@ func (s *PrecompileTestSuite) TestPrecompileMethodSignatures() {
 	methods := s.precompile.Methods
 
 	s.Require().Contains(methods, liquidstake.LiquidStakeMethod)
-	s.Require().Contains(methods, liquidstake.StakeToLPMethod)
 	s.Require().Contains(methods, liquidstake.LiquidUnstakeMethod)
 	s.Require().Contains(methods, liquidstake.UpdateParamsMethod)
 	s.Require().Contains(methods, liquidstake.UpdateWhitelistedValidatorsMethod)
@@ -449,7 +399,6 @@ func (s *PrecompileTestSuite) TestAdminMethods() {
 				params := lsKeeper.GetParams(ctx)
 				updatableParams := types.UpdatableParams{
 					UnstakeFeeRate:        params.UnstakeFeeRate,
-					LsmDisabled:           true,
 					MinLiquidStakeAmount:  params.MinLiquidStakeAmount,
 					CwLockedPoolAddress:   params.CwLockedPoolAddress,
 					FeeAccountAddress:     params.FeeAccountAddress,
@@ -519,7 +468,6 @@ func (s *PrecompileTestSuite) TestAdminMethods() {
 				params := lsKeeper.GetParams(ctx)
 				updatableParams := types.UpdatableParams{
 					UnstakeFeeRate:        params.UnstakeFeeRate,
-					LsmDisabled:           true,
 					MinLiquidStakeAmount:  params.MinLiquidStakeAmount,
 					CwLockedPoolAddress:   params.CwLockedPoolAddress,
 					FeeAccountAddress:     params.FeeAccountAddress,
@@ -605,7 +553,6 @@ func (s *PrecompileTestSuite) TestAdminMethods() {
 				params := lsKeeper.GetParams(ctx)
 				updatableParams := types.UpdatableParams{
 					UnstakeFeeRate:        params.UnstakeFeeRate,
-					LsmDisabled:           true,
 					MinLiquidStakeAmount:  params.MinLiquidStakeAmount,
 					CwLockedPoolAddress:   params.CwLockedPoolAddress,
 					FeeAccountAddress:     params.FeeAccountAddress,

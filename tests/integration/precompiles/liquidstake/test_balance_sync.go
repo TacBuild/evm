@@ -7,7 +7,6 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/ethereum/go-ethereum/core/tracing"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -165,118 +164,6 @@ func (s *PrecompileTestSuite) TestBalanceSync_LiquidStake() {
 		evmBalBefore.String(), evmBalAfter.String(), diff.String(), stakeAmount.String())
 }
 
-// TestBalanceSync_StakeToLP verifies that after a stakeToLP precompile call
-// the BalanceHandler correctly syncs StateDB:
-// - the delegator receives gTAC (CoinReceived event)
-// - the LSM operation (tokenize + bank.SendCoins) is reflected via SubBalance/AddBalance
-func (s *PrecompileTestSuite) TestBalanceSync_StakeToLP() {
-	s.SetupTest()
-	ctx := s.nw.GetContext().WithBlockTime(time.Now())
-
-	delegator := s.keyring.GetKey(1)
-	delegateAmount := sdkmath.NewInt(1_000_000_000_000_000_000) // 1e18
-
-	// Create a plain (non-validator-bond) delegation required for stakeToLP.
-	_, err := s.nw.App.GetStakingKeeper().Delegate(
-		ctx,
-		sdk.AccAddress(delegator.Addr.Bytes()),
-		delegateAmount,
-		stakingtypes.Bonded,
-		s.liquidValidator,
-		false, // ValidatorBond=false — required for TokenizeShares
-	)
-	s.Require().NoError(err)
-
-	tokenizeAmount := big.NewInt(1_000_000_000_000_000_000)
-
-	// Read EVM balance BEFORE the call.
-	stDB0 := statedb.New(ctx, s.nw.App.GetEVMKeeper(), statedb.NewEmptyTxConfig())
-	evmBalBefore := stDB0.GetBalance(delegator.Addr)
-
-	input, err := s.precompile.Pack(
-		liquidstakeprecompile.StakeToLPMethod,
-		delegator.Addr,
-		s.liquidValidatorAddr,
-		tokenizeAmount,
-		tokenizeAmount,
-	)
-	s.Require().NoError(err)
-
-	stDB, bz, err := s.runPrecompile(ctx, input, delegator, 1_000_000_000_000_000_000)
-	s.Require().NoError(err, "stakeToLP precompile must succeed")
-	s.Require().NotNil(bz)
-
-	// Read EVM balance AFTER the call (from the stDB used in Run).
-	evmBalAfter := stDB.GetBalance(delegator.Addr)
-
-	// stakeToLP does not spend bond denom directly (it uses existing shares),
-	// but bank.SendCoins is called for LSM tokens.
-	// Key assertion: EVM balance must not exceed the initial balance (no phantom balance).
-	s.Require().True(evmBalAfter.Cmp(evmBalBefore) <= 0,
-		"Phantom balance detected: EVM balance after stakeToLP (%s) > before (%s). "+
-			"BalanceHandler did not prevent phantom balance!",
-		evmBalAfter.String(), evmBalBefore.String())
-
-	s.T().Logf("StakeToLP no phantom balance: evm %s->%s", evmBalBefore.String(), evmBalAfter.String())
-}
-
-// TestBalanceSync_DirtyStateObject_StakeToLP reproduces the balance desync attack:
-//  1. Before calling stakeToLP the stateObject is marked dirty (Add+Sub = net zero change).
-//  2. Without BalanceHandler: commitWithCtx would restore the phantom balance via SetAccount.
-//  3. With BalanceHandler (v0.6.0): AfterBalanceChange calls SubBalance/AddBalance from bank
-//     events, correctly overwriting the stale in-memory value in the stateObject.
-//
-// This test WILL FAIL if BalanceHandlerFactory is removed from NewPrecompile (pre-v0.6.0 behaviour).
-func (s *PrecompileTestSuite) TestBalanceSync_DirtyStateObject_StakeToLP() {
-	s.SetupTest()
-	ctx := s.nw.GetContext().WithBlockTime(time.Now())
-
-	delegator := s.keyring.GetKey(2)
-	delegateAmount := sdkmath.NewInt(1_000_000_000_000_000_000)
-
-	_, err := s.nw.App.GetStakingKeeper().Delegate(
-		ctx,
-		sdk.AccAddress(delegator.Addr.Bytes()),
-		delegateAmount,
-		stakingtypes.Bonded,
-		s.liquidValidator,
-		false,
-	)
-	s.Require().NoError(err)
-
-	tokenizeAmount := big.NewInt(1_000_000_000_000_000_000)
-
-	// Read EVM balance from a clean stateDB (before any mutation).
-	stDB0 := statedb.New(ctx, s.nw.App.GetEVMKeeper(), statedb.NewEmptyTxConfig())
-	evmBalClean := stDB0.GetBalance(delegator.Addr)
-
-	input, err := s.precompile.Pack(
-		liquidstakeprecompile.StakeToLPMethod,
-		delegator.Addr,
-		s.liquidValidatorAddr,
-		tokenizeAmount,
-		tokenizeAmount,
-	)
-	s.Require().NoError(err)
-
-	// Use runPrecompileWithDirtyState — marks the stateObject dirty before Run.
-	stDB, bz, err := s.runPrecompileWithDirtyState(ctx, input, delegator, 1_000_000_000_000_000_000)
-	s.Require().NoError(err, "stakeToLP with dirty stateObject must succeed")
-	s.Require().NotNil(bz)
-
-	evmBalAfter := stDB.GetBalance(delegator.Addr)
-
-	// KEY ASSERTION: EVM balance must be <= clean balance (phantom not restored).
-	s.Require().True(evmBalAfter.Cmp(evmBalClean) <= 0,
-		"DIRTY STATE ATTACK SUCCEEDED: EVM balance after stakeToLP (%s) > clean balance (%s). "+
-			"BalanceHandler did not prevent phantom balance! "+
-			"(Ensure BalanceHandlerFactory is set in NewPrecompile)",
-		evmBalAfter.String(), evmBalClean.String())
-
-	s.T().Logf("Dirty stateObject attack blocked by BalanceHandler: clean=%s, after=%s",
-		evmBalClean.String(), evmBalAfter.String())
-}
-
 // TestBalanceSync_LiquidUnstake verifies that after a liquidUnstake precompile call
 // the BalanceHandler correctly updates StateDB (SubBalance for the gTAC burn).
 func (s *PrecompileTestSuite) TestBalanceSync_LiquidUnstake() {
@@ -340,7 +227,7 @@ func (s *PrecompileTestSuite) TestBalanceSync_BalanceHandlerPresent() {
 
 	s.Require().NotNil(s.precompile.Precompile.BalanceHandlerFactory,
 		"BalanceHandlerFactory must be set in NewPrecompile. "+
-			"Without it liquidStake/stakeToLP are vulnerable to balance desync (pre-v0.6.0 bug)")
+			"Without it liquidStake is vulnerable to balance desync (pre-v0.6.0 bug)")
 
 	s.T().Log("BalanceHandlerFactory is configured correctly")
 }

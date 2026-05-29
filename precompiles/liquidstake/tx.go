@@ -18,7 +18,6 @@ import (
 
 const (
 	LiquidStakeMethod                 = "liquidStake"
-	StakeToLPMethod                   = "stakeToLP"
 	LiquidUnstakeMethod               = "liquidUnstake"
 	UpdateParamsMethod                = "updateParams"
 	UpdateWhitelistedValidatorsMethod = "updateWhitelistedValidators"
@@ -100,55 +99,6 @@ func (p Precompile) LiquidStake(
 	}
 
 	if err := p.EmitLiquidStakeEvent(ctx, stateDB, msg, *delegatorAddr); err != nil {
-		return nil, err
-	}
-
-	return method.Outputs.Pack(true)
-}
-
-func (p Precompile) StakeToLP(
-	ctx sdk.Context,
-	contract *vm.Contract,
-	stateDB vm.StateDB,
-	method *abi.Method,
-	args []interface{},
-) ([]byte, error) {
-	bondDenom, err := p.liquidStakeKeeper.BondDenom(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	delegatorAddr, msg, err := NewMsgStakeToLP(args, bondDenom)
-	if err != nil {
-		return nil, err
-	}
-
-	msgSender := contract.Caller()
-	if msgSender != *delegatorAddr {
-		return nil, fmt.Errorf(cmn.ErrRequesterIsNotMsgSender, msgSender.String(), delegatorAddr.String())
-	}
-
-	p.Logger(ctx).Debug(
-		"tx called",
-		"method", method.Name,
-		"delegator_address", msg.DelegatorAddress,
-		"validator_address", msg.ValidatorAddress,
-		"staked_amount", msg.StakedAmount.String(),
-		"liquid_amount", msg.LiquidAmount.String(),
-	)
-
-	msgSrv := keeper.NewMsgServerImpl(p.liquidStakeKeeper)
-
-	resp, err := msgSrv.StakeToLP(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := p.emitLiquidBondDenomTransferEvent(ctx, stateDB, common.Address{}, *delegatorAddr, resp.MintedAmount.BigInt()); err != nil {
-		return nil, err
-	}
-
-	if err := p.EmitStakeToLPEvent(ctx, stateDB, msg, *delegatorAddr); err != nil {
 		return nil, err
 	}
 

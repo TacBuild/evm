@@ -31,7 +31,6 @@ func (s *KeeperTestSuite) TestGenesisLiquidStakeParams() {
 	s.Require().Equal("stk/utac", params.LiquidBondDenom, "liquid bond denom should be stk/utac")
 	s.Require().True(params.UnstakeFeeRate.IsZero(), "unstake fee rate should be 0 (set in SetupTest)")
 	s.Require().False(params.ModulePaused, "module should not be paused")
-	s.Require().True(params.LsmDisabled, "LSM should be disabled")
 	s.Require().Empty(params.WhitelistedValidators, "no whitelisted validators at genesis")
 }
 

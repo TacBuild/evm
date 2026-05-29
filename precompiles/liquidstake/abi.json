@@ -58,47 +58,11 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": true,
-          "internalType": "address",
-          "name": "delegatorAddress",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "validatorAddress",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "stakedAmount",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "liquidAmount",
-          "type": "uint256"
-        }
-      ],
-      "name": "StakeToLP",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
           "components": [
             {
               "internalType": "int256",
               "name": "unstakeFeeRate",
               "type": "int256"
-            },
-            {
-              "internalType": "bool",
-              "name": "lsmDisabled",
-              "type": "bool"
             },
             {
               "internalType": "int256",
@@ -282,11 +246,6 @@
               "type": "int256"
             },
             {
-              "internalType": "bool",
-              "name": "lsmDisabled",
-              "type": "bool"
-            },
-            {
               "internalType": "int256",
               "name": "minLiquidStakeAmount",
               "type": "int256"
@@ -334,40 +293,6 @@
         }
       ],
       "name": "setModulePaused",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "success",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "delegatorAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "validatorAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "stakedAmount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "liquidAmount",
-          "type": "uint256"
-        }
-      ],
-      "name": "stakeToLP",
       "outputs": [
         {
           "internalType": "bool",
@@ -441,11 +366,6 @@
               "internalType": "int256",
               "name": "unstakeFeeRate",
               "type": "int256"
-            },
-            {
-              "internalType": "bool",
-              "name": "lsmDisabled",
-              "type": "bool"
             },
             {
               "internalType": "int256",

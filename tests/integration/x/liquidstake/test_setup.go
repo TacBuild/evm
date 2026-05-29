@@ -80,7 +80,6 @@ func (s *KeeperTestSuite) SetupTest() {
 	params.UnstakeFeeRate = sdkmath.LegacyZeroDec()
 	params.AutocompoundFeeRate = types.DefaultAutocompoundFeeRate
 	params.ModulePaused = false
-	params.LsmDisabled = true
 	s.Require().NoError(s.keeper.SetParams(ctx, params))
 	s.keeper.UpdateLiquidValidatorSet(ctx, true)
 
@@ -189,9 +188,9 @@ func (s *KeeperTestSuite) liquidStaking(liquidStaker sdk.AccAddress, stakingAmt 
 // This uses already-bonded validators, which is required for liquid staking to work.
 //
 // NOTE: Genesis validators are created with DelegatorShares=1.0 and Tokens=1e18,
-// giving a sub-unit shares/tokens ratio that breaks LSM TokenizeShares for small amounts.
-// This function normalises the ratio to 1:1 (DelegatorShares = Tokens) so that
-// LiquidUnstake and StakeToLP work correctly in tests.
+// giving a sub-unit shares/tokens ratio that breaks tokenized-share operations
+// for small amounts. This function normalises the ratio to 1:1
+// (DelegatorShares = Tokens) so LiquidUnstake works correctly in tests.
 func (s *KeeperTestSuite) setupWhitelistedValidators(n int, _ int64) ([]sdk.AccAddress, []sdk.ValAddress) {
 	s.T().Helper()
 	ctx := s.nw.GetContext()

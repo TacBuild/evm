@@ -64,83 +64,6 @@ func (k msgServer) LiquidStake(goCtx context.Context, msg *types.MsgLiquidStake)
 	return &types.MsgLiquidStakeResponse{MintedAmount: gTACMintAmount}, nil
 }
 
-func (k msgServer) StakeToLP(goCtx context.Context, msg *types.MsgStakeToLP) (*types.MsgStakeToLPResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	gTACMintAmount, err := k.LSMDelegate(
-		ctx,
-		msg.GetDelegator(),
-		msg.GetValidator(),
-		types.LiquidStakeProxyAcc,
-		msg.StakedAmount,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	liquidBondDenom := k.LiquidBondDenom(ctx)
-	gTACMinted := sdk.Coin{
-		Denom:  liquidBondDenom,
-		Amount: gTACMintAmount,
-	}
-
-	var cValue math.LegacyDec
-	if gTACMintAmount.IsPositive() {
-		cValue = gTACMintAmount.ToLegacyDec().Quo(msg.StakedAmount.Amount.ToLegacyDec())
-	}
-
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-		sdk.NewEvent(
-			types.EventTypeMsgStakeToLP,
-			sdk.NewAttribute(types.AttributeKeyDelegator, msg.DelegatorAddress),
-			sdk.NewAttribute(types.AttributeKeyStakedAmount, msg.StakedAmount.String()),
-			sdk.NewAttribute(types.AttributeKeyGTACMintedAmount, gTACMinted.String()),
-			sdk.NewAttribute(types.AttributeKeyCValue, cValue.String()),
-		),
-	})
-
-	totalMinted := gTACMintAmount
-
-	if (msg.LiquidAmount != sdk.Coin{}) && (msg.LiquidAmount.Amount != math.Int{}) && msg.LiquidAmount.Amount.IsPositive() {
-		gTACMintAmount, err := k.Keeper.LiquidStake(ctx, types.LiquidStakeProxyAcc, msg.GetDelegator(), msg.LiquidAmount)
-		if err != nil {
-			return nil, err
-		}
-
-		totalMinted = totalMinted.Add(gTACMintAmount)
-
-		gTACMinted := sdk.Coin{
-			Denom:  liquidBondDenom,
-			Amount: gTACMintAmount,
-		}
-
-		var cValue math.LegacyDec
-		if gTACMintAmount.IsPositive() {
-			cValue = gTACMintAmount.ToLegacyDec().Quo(msg.LiquidAmount.Amount.ToLegacyDec())
-		}
-
-		ctx.EventManager().EmitEvents(sdk.Events{
-			sdk.NewEvent(
-				sdk.EventTypeMessage,
-				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			),
-			sdk.NewEvent(
-				types.EventTypeMsgStakeToLP,
-				sdk.NewAttribute(types.AttributeKeyDelegator, msg.DelegatorAddress),
-				sdk.NewAttribute(types.AttributeKeyLiquidAmount, msg.LiquidAmount.String()),
-				sdk.NewAttribute(types.AttributeKeyGTACMintedAmount, gTACMinted.String()),
-				sdk.NewAttribute(types.AttributeKeyCValue, cValue.String()),
-			),
-		})
-	}
-
-	return &types.MsgStakeToLPResponse{MintedAmount: totalMinted}, nil
-}
-
 func (k msgServer) LiquidUnstake(goCtx context.Context, msg *types.MsgLiquidUnstake) (*types.MsgLiquidUnstakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -184,7 +107,6 @@ func (k msgServer) UpdateParams(goCtx context.Context, msg *types.MsgUpdateParam
 
 	// List of all updateable param
 	paramsToSet.UnstakeFeeRate = msg.Params.UnstakeFeeRate
-	paramsToSet.LsmDisabled = msg.Params.LsmDisabled
 	paramsToSet.MinLiquidStakeAmount = msg.Params.MinLiquidStakeAmount
 	paramsToSet.CwLockedPoolAddress = msg.Params.CwLockedPoolAddress
 	paramsToSet.FeeAccountAddress = msg.Params.FeeAccountAddress

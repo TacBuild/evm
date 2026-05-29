@@ -17,7 +17,6 @@ var (
 	ErrTooSmallLiquidStakeAmount                    = errors.Register(ModuleName, 1010, "liquid stake amount is too small, the result becomes zero")
 	ErrTooSmallLiquidUnstakingAmount                = errors.Register(ModuleName, 1011, "liquid unstaking amount is too small, the result becomes zero")
 	ErrNoLPContractAddress                          = errors.Register(ModuleName, 1012, "CW address of an LP contract is not set")
-	ErrDisabledLSM                                  = errors.Register(ModuleName, 1013, "LSM delegation is disabled")
 	ErrLSMTokenizeFailed                            = errors.Register(ModuleName, 1014, "LSM tokenization failed")
 	ErrLSMRedeemFailed                              = errors.Register(ModuleName, 1015, "LSM redemption failed")
 	ErrLPContract                                   = errors.Register(ModuleName, 1016, "CW contract execution failed")
