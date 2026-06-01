@@ -337,6 +337,7 @@ func NewExampleApp(
 		evmaddress.NewEvmCodec(sdk.GetConfig().GetBech32ValidatorAddrPrefix()),
 		evmaddress.NewEvmCodec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
 	)
+	app.StakingKeeper.SetTokenizeSharesAllowedDelegators(liquidstaketypes.LiquidStakeProxyAcc)
 
 	app.MintKeeper = mintkeeper.NewKeeper(
 		appCodec,
