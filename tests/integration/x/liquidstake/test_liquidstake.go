@@ -133,6 +133,30 @@ func (s *KeeperTestSuite) TestLiquidUnstakeBasic() {
 	s.Require().NoError(err)
 }
 
+func (s *KeeperTestSuite) TestLiquidUnstakeRejectsZeroTruncatedValidatorAmounts() {
+	s.setupWhitelistedValidators(3, 1_000_000)
+
+	ctx := s.ctx()
+	skParams, err := s.nw.App.GetStakingKeeper().GetParams(ctx)
+	s.Require().NoError(err)
+	params := s.keeper.GetParams(ctx)
+
+	staker := s.delAddrs[0]
+	_, err = s.keeper.LiquidStake(ctx, types.LiquidStakeProxyAcc, staker,
+		sdk.NewCoin(skParams.BondDenom, sdkmath.NewInt(1_000_000)))
+	s.Require().NoError(err)
+
+	before := s.nw.App.GetBankKeeper().GetBalance(ctx, staker, params.LiquidBondDenom).Amount
+	s.Require().True(before.IsPositive())
+
+	_, _, _, _, err = s.keeper.LiquidUnstake(ctx, types.LiquidStakeProxyAcc, staker,
+		sdk.NewCoin(params.LiquidBondDenom, sdkmath.NewInt(1)))
+	s.Require().ErrorIs(err, types.ErrTooSmallLiquidUnstakingAmount)
+
+	after := s.nw.App.GetBankKeeper().GetBalance(ctx, staker, params.LiquidBondDenom).Amount
+	s.Require().Equal(before, after)
+}
+
 func (s *KeeperTestSuite) TestLiquidValidatorsLifecycle() {
 	_, valOpers, _ := s.CreateValidators([]int64{1_000_000, 1_000_000})
 	ctx := s.ctx()
@@ -183,6 +207,10 @@ func (s *KeeperTestSuite) TestUpdateWhitelistedValidators() {
 
 	params := s.keeper.GetParams(ctx)
 	params.WhitelistedValidators = params.WhitelistedValidators[:2]
+	weights := equalTargetWeights(2)
+	for i := range params.WhitelistedValidators {
+		params.WhitelistedValidators[i].TargetWeight = weights[i]
+	}
 	s.Require().NoError(s.keeper.SetParams(ctx, params))
 	s.keeper.UpdateLiquidValidatorSet(ctx, true)
 

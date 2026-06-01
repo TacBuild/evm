@@ -10,6 +10,13 @@ import (
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 )
 
+var ed25519Order = [32]byte{
+	0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58,
+	0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10,
+}
+
 func (s *PrecompileTestSuite) TestAddress() {
 	s.Require().Equal(evmtypes.Ed25519PrecompileAddress, s.precompile.Address().String())
 }
@@ -163,6 +170,46 @@ func (s *PrecompileTestSuite) TestRun() {
 			false,
 		},
 		{
+			"fail - all zero public key",
+			func() []byte {
+				message := []byte("hello world")
+				sig := ed25519.Sign(s.ed25519Priv, message)
+
+				packed, err := s.precompile.Pack(edprecompile.ED25519VerifyMethod, [32]byte{}, sigToBytes32Arr(sig), message)
+				s.Require().NoError(err)
+				return packed
+			},
+			false,
+			false,
+		},
+		{
+			"fail - all zero signature",
+			func() []byte {
+				message := []byte("hello world")
+				zeroSig := make([]byte, ed25519.SignatureSize)
+
+				packed, err := s.precompile.Pack(edprecompile.ED25519VerifyMethod, [32]byte(s.ed25519Pub), sigToBytes32Arr(zeroSig), message)
+				s.Require().NoError(err)
+				return packed
+			},
+			false,
+			false,
+		},
+		{
+			"fail - non canonical signature scalar",
+			func() []byte {
+				message := []byte("hello world")
+				sig := ed25519.Sign(s.ed25519Priv, message)
+				copy(sig[32:], ed25519Order[:])
+
+				packed, err := s.precompile.Pack(edprecompile.ED25519VerifyMethod, [32]byte(s.ed25519Pub), sigToBytes32Arr(sig), message)
+				s.Require().NoError(err)
+				return packed
+			},
+			false,
+			false,
+		},
+		{
 			"error - invalid method",
 			func() []byte {
 				return []byte{0x01, 0x02, 0x03, 0x04}
@@ -192,14 +239,6 @@ func (s *PrecompileTestSuite) TestRun() {
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
 			input := tc.input()
-
-			if len(input) < 4 {
-				defer func() {
-					if r := recover(); r != nil {
-						return
-					}
-				}()
-			}
 
 			bz, err := s.precompile.Run(nil, &vm.Contract{Input: input}, false)
 

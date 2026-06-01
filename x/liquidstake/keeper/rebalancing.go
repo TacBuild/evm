@@ -205,7 +205,9 @@ func (k Keeper) UpdateLiquidValidatorSet(ctx sdk.Context, redelegate bool) (rede
 // AutocompoundStakingRewards withdraws staking rewards and re-stakes when over threshold.
 func (k Keeper) AutocompoundStakingRewards(ctx sdk.Context, whitelistedValsMap types.WhitelistedValsMap) error {
 	// withdraw rewards of LiquidStakeProxyAcc
-	k.WithdrawLiquidRewards(ctx, types.LiquidStakeProxyAcc)
+	if err := k.WithdrawLiquidRewards(ctx, types.LiquidStakeProxyAcc); err != nil {
+		return err
+	}
 
 	// skip when no active liquid validator
 	activeVals := k.GetActiveLiquidValidators(ctx, whitelistedValsMap)
@@ -229,7 +231,7 @@ func (k Keeper) AutocompoundStakingRewards(ctx sdk.Context, whitelistedValsMap t
 	inflation := minter.Inflation
 
 	// calculate the hourly APY
-	bondRatio := math.LegacyDec(bondedTokens).Quo(math.LegacyDec(totalSupply))
+	bondRatio := math.LegacyNewDecFromInt(bondedTokens).Quo(math.LegacyNewDecFromInt(totalSupply))
 	bondRatio = bondRatio.Add(math.LegacySmallestDec())
 
 	hourlyApy := inflation.Quo(bondRatio).

@@ -72,6 +72,7 @@ func BlockedAddresses() map[string]bool {
 	for _, acc := range accs {
 		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = true
 	}
+	blockedAddrs[liquidstaketypes.DummyFeeAccountAcc.String()] = true
 
 	blockedPrecompilesHex := evmtypes.AvailableStaticPrecompiles
 	for _, addr := range corevm.PrecompiledAddressesPrague {

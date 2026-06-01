@@ -176,7 +176,7 @@ func NativeTokenToGTAC(nativeTokenAmount, gTACTotalSupplyAmount math.Int, netAmo
 
 // GTACToNativeToken returns gTACAmount * netAmount / GtacTotalSupply with truncations
 func GTACToNativeToken(gTACAmount, gTACTotalSupplyAmount math.Int, netAmount math.LegacyDec) (nativeTokenAmount math.LegacyDec) {
-	return math.LegacyNewDecFromInt(gTACAmount).MulTruncate(netAmount).Quo(math.LegacyNewDecFromInt(gTACTotalSupplyAmount)).TruncateDec()
+	return math.LegacyNewDecFromInt(gTACAmount).MulTruncate(netAmount).QuoTruncate(math.LegacyNewDecFromInt(gTACTotalSupplyAmount)).TruncateDec()
 }
 
 // DeductFeeRate returns Input * (1-FeeRate) with truncations

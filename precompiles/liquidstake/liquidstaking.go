@@ -16,6 +16,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
 	"github.com/cosmos/evm/x/liquidstake/keeper"
+	evmtypes "github.com/cosmos/evm/x/vm/types"
 )
 
 var _ vm.PrecompiledContract = &Precompile{}
@@ -56,7 +57,7 @@ func NewPrecompile(
 		Precompile: cmn.Precompile{
 			KvGasConfig:           storetypes.KVGasConfig(),
 			TransientKVGasConfig:  storetypes.TransientGasConfig(),
-			ContractAddress:       common.HexToAddress(LiquidStakingPrecompileAddress),
+			ContractAddress:       common.HexToAddress(evmtypes.LiquidStakePrecompileAddress),
 			BalanceHandlerFactory: cmn.NewBalanceHandlerFactory(bankKeeper),
 		},
 		ABI:               ABI,

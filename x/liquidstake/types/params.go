@@ -148,6 +148,7 @@ func validateWhitelistedValidators(i interface{}) error {
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+	totalWeight := math.ZeroInt()
 	valsMap := map[string]struct{}{}
 	for _, wv := range wvs {
 		_, valErr := sdk.ValAddressFromBech32(wv.ValidatorAddress)
@@ -162,11 +163,18 @@ func validateWhitelistedValidators(i interface{}) error {
 		if !wv.TargetWeight.IsPositive() {
 			return fmt.Errorf("liquidstake validator target weight must be positive: %s", wv.TargetWeight)
 		}
+		totalWeight = totalWeight.Add(wv.TargetWeight)
 
 		if _, ok := valsMap[wv.ValidatorAddress]; ok {
 			return fmt.Errorf("liquidstake validator cannot be duplicated: %s", wv.ValidatorAddress)
 		}
 		valsMap[wv.ValidatorAddress] = struct{}{}
+	}
+	if len(wvs) > 0 && !totalWeight.Equal(TotalValidatorWeight) {
+		return fmt.Errorf(
+			"liquidstake validator weights don't add up; expected %s, got %s",
+			TotalValidatorWeight.String(), totalWeight.String(),
+		)
 	}
 	return nil
 }

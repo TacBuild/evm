@@ -15,11 +15,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// !!WARNING!!, from PixelPlex dev Team:
-// Adding new precompiled contract introduces few implicit conflicts with dependency to cosmos/evm module
-// Particulary here: adding new binded address that potentially can conflict with already exzisted
-const LiquidStakingPrecompileAddress = "0x00000000000000000000000000000000000001600"
-
 type WhitelistedValidator = struct {
 	ValidatorAddress common.Address `json:"validatorAddress"`
 	TargetWeight     *big.Int       `json:"targetWeight"`

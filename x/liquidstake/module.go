@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	_ module.AppModule      = AppModule{}
-	_ module.AppModuleBasic = AppModuleBasic{}
+	_ appmodule.AppModule       = AppModule{}
+	_ module.AppModuleBasic     = AppModuleBasic{}
 	_ appmodule.HasBeginBlocker = AppModule{}
 )
 
@@ -102,9 +102,6 @@ func NewAppModule(
 func (AppModule) Name() string {
 	return types.ModuleName
 }
-
-// RegisterInvariants registers the liquidstake module invariants.
-func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 
 // QuerierRoute returns the liquidstake module's querier route name.
 func (AppModule) QuerierRoute() string {

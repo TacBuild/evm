@@ -55,9 +55,13 @@ func (s *KeeperTestSuite) TestUpdateLiquidValidatorSet_AddValidator() {
 	// Add 3rd validator to the whitelist.
 	ctx = s.ctx()
 	params := s.keeper.GetParams(ctx)
+	weights := equalTargetWeights(3)
+	for i := range params.WhitelistedValidators {
+		params.WhitelistedValidators[i].TargetWeight = weights[i]
+	}
 	params.WhitelistedValidators = append(params.WhitelistedValidators, types.WhitelistedValidator{
 		ValidatorAddress: thirdValAddr,
-		TargetWeight:     sdkmath.NewInt(3000),
+		TargetWeight:     weights[2],
 	})
 	s.Require().NoError(s.keeper.SetParams(ctx, params))
 
@@ -88,6 +92,10 @@ func (s *KeeperTestSuite) TestUpdateLiquidValidatorSet_RemoveValidator() {
 
 	// Keep only the first 2 validators.
 	params.WhitelistedValidators = params.WhitelistedValidators[:2]
+	weights := equalTargetWeights(2)
+	for i := range params.WhitelistedValidators {
+		params.WhitelistedValidators[i].TargetWeight = weights[i]
+	}
 	s.Require().NoError(s.keeper.SetParams(ctx, params))
 
 	s.keeper.UpdateLiquidValidatorSet(ctx, true)
@@ -463,9 +471,13 @@ func (s *KeeperTestSuite) TestBeforeEpochStart_RebalanceEpochViaNextBlock() {
 	// Add 3rd validator before advancing.
 	ctx = s.ctx()
 	params := s.keeper.GetParams(ctx)
+	weights := equalTargetWeights(3)
+	for i := range params.WhitelistedValidators {
+		params.WhitelistedValidators[i].TargetWeight = weights[i]
+	}
 	params.WhitelistedValidators = append(params.WhitelistedValidators, types.WhitelistedValidator{
 		ValidatorAddress: thirdValAddr,
-		TargetWeight:     sdkmath.NewInt(3000),
+		TargetWeight:     weights[2],
 	})
 	s.Require().NoError(s.keeper.SetParams(ctx, params))
 
@@ -534,7 +546,7 @@ func (s *KeeperTestSuite) TestWithdrawLiquidRewards_IncreasesProxyBalance() {
 // TestGetWeightMap_EqualWeights verifies that GetWeightMap returns equal weights
 // for equal-weight whitelisted validators.
 func (s *KeeperTestSuite) TestGetWeightMap_EqualWeights() {
-	s.setupWhitelistedValidators(3, 0)
+	s.setupWhitelistedValidators(2, 0)
 	ctx := s.ctx()
 
 	params := s.keeper.GetParams(ctx)

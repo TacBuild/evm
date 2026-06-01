@@ -645,6 +645,8 @@ func NewExampleApp(
 	// NOTE: capability module's beginblocker must come before any modules using capabilities (e.g. IBC)
 	app.ModuleManager.SetOrderBeginBlockers(
 		minttypes.ModuleName,
+		distrtypes.ModuleName,
+		slashingtypes.ModuleName,
 
 		// Tac modules - epochs must run before liquidstake
 		epochstypes.ModuleName,
@@ -658,7 +660,6 @@ func NewExampleApp(
 		evmtypes.ModuleName, // NOTE: EVM BeginBlocker must come after FeeMarket BeginBlocker
 
 		// TODO: remove no-ops? check if all are no-ops before removing
-		distrtypes.ModuleName, slashingtypes.ModuleName,
 		evidencetypes.ModuleName, stakingtypes.ModuleName,
 		authtypes.ModuleName, banktypes.ModuleName, govtypes.ModuleName, genutiltypes.ModuleName,
 		authz.ModuleName, feegrant.ModuleName,

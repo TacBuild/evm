@@ -121,10 +121,11 @@ func (s *KeeperTestSuite) TestWhitelistedValidatorsPersistAfterNextBlock() {
 	s.Require().GreaterOrEqual(len(validators), 3)
 
 	params := s.keeper.GetParams(ctx)
-	for _, v := range validators[:3] {
+	weights := equalTargetWeights(3)
+	for i, v := range validators[:3] {
 		params.WhitelistedValidators = append(params.WhitelistedValidators, types.WhitelistedValidator{
 			ValidatorAddress: v.OperatorAddress,
-			TargetWeight:     types.TotalValidatorWeight.Quo(sdkInt(3)),
+			TargetWeight:     weights[i],
 		})
 	}
 	s.Require().NoError(s.keeper.SetParams(ctx, params))
@@ -299,10 +300,11 @@ func (s *KeeperTestSuite) TestLiquidStakeAfterParamsCommitted() {
 
 	params := s.keeper.GetParams(ctx)
 	params.WhitelistedValidators = nil
-	for _, v := range validators[:3] {
+	weights := equalTargetWeights(3)
+	for i, v := range validators[:3] {
 		params.WhitelistedValidators = append(params.WhitelistedValidators, types.WhitelistedValidator{
 			ValidatorAddress: v.OperatorAddress,
-			TargetWeight:     types.TotalValidatorWeight.Quo(sdkInt(3)),
+			TargetWeight:     weights[i],
 		})
 	}
 	s.Require().NoError(s.keeper.SetParams(ctx, params))

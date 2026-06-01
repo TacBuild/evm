@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"cosmossdk.io/math"
+	"github.com/cometbft/cometbft/crypto"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/evm/x/liquidstake/types"
@@ -48,6 +50,18 @@ func TestGenesisState_Validate(t *testing.T) {
 				genState.Params.UnstakeFeeRate = math.LegacyDec{}
 			},
 			"unstake fee rate must not be nil",
+		},
+		{
+			"invalid whitelist weight sum",
+			func(genState *types.GenesisState) {
+				genState.Params.WhitelistedValidators = []types.WhitelistedValidator{
+					{
+						ValidatorAddress: sdk.ValAddress(crypto.AddressHash([]byte("validator"))).String(),
+						TargetWeight:     math.NewInt(9000),
+					},
+				}
+			},
+			"liquidstake validator weights don't add up; expected 10000, got 9000",
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

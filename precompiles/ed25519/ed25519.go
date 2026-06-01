@@ -67,6 +67,10 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 }
 
 func (p Precompile) Run(_ *vm.EVM, contract *vm.Contract, _ bool) (bz []byte, err error) {
+	if len(contract.Input) < 4 {
+		return nil, vm.ErrExecutionReverted
+	}
+
 	method, err := p.MethodById(contract.Input[:4])
 	if err != nil {
 		return nil, err

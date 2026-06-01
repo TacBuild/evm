@@ -285,8 +285,9 @@ func (s *KeeperTestSuite) TestStateAudit_FullFlow() {
 // ---------------------------------------------------------------------------
 
 // TestStateAudit_CalcNetAmount_DelegatedAndUnbondingBaseline documents the
-// current stable part of the formula without deciding whether proxy account
-// balances or remaining rewards should be included in future accounting.
+// current stable part of the formula. Proxy account balances and remaining
+// rewards are intentionally realized through the autocompound lifecycle rather
+// than LiquidStake/LiquidUnstake pricing.
 func (s *KeeperTestSuite) TestStateAudit_CalcNetAmount_DelegatedAndUnbondingBaseline() {
 	nas := types.NetAmountState{
 		TotalLiquidTokens:     sdkmath.NewInt(1_000_000),

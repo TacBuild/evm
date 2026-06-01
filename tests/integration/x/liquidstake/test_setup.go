@@ -209,7 +209,7 @@ func (s *KeeperTestSuite) setupWhitelistedValidators(n int, _ int64) ([]sdk.AccA
 	params.WhitelistedValidators = nil
 	params.ModulePaused = false
 
-	valWeight := types.TotalValidatorWeight.Quo(sdkmath.NewInt(int64(n)))
+	targetWeights := equalTargetWeights(n)
 
 	addrs := make([]sdk.AccAddress, n)
 	valOpers := make([]sdk.ValAddress, n)
@@ -239,7 +239,7 @@ func (s *KeeperTestSuite) setupWhitelistedValidators(n int, _ int64) ([]sdk.AccA
 		})
 		params.WhitelistedValidators = append(params.WhitelistedValidators, types.WhitelistedValidator{
 			ValidatorAddress: val.OperatorAddress,
-			TargetWeight:     valWeight,
+			TargetWeight:     targetWeights[i],
 		})
 	}
 	s.Require().NoError(s.keeper.SetParams(ctx, params))
@@ -250,6 +250,25 @@ func (s *KeeperTestSuite) setupWhitelistedValidators(n int, _ int64) ([]sdk.AccA
 	s.Require().NoError(s.nw.CommitState())
 
 	return addrs, valOpers
+}
+
+func equalTargetWeights(n int) []sdkmath.Int {
+	weights := make([]sdkmath.Int, n)
+	if n == 0 {
+		return weights
+	}
+
+	divisor := sdkmath.NewInt(int64(n))
+	baseWeight := types.TotalValidatorWeight.Quo(divisor)
+	remainder := types.TotalValidatorWeight.Sub(baseWeight.Mul(divisor))
+
+	for i := range weights {
+		weights[i] = baseWeight
+		if i == 0 {
+			weights[i] = weights[i].Add(remainder)
+		}
+	}
+	return weights
 }
 
 // (used when we need a pre-existing gTAC balance without going through LiquidStake).

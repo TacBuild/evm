@@ -313,7 +313,7 @@ func (s *KeeperTestSuite) TestValidatorUnbond_BecomesInactiveWhenFullyUnbonded()
 	sk := s.nw.App.GetStakingKeeper()
 
 	// Whitelist all three.
-	valWeight := types.TotalValidatorWeight.Quo(sdkmath.NewInt(3))
+	weights := equalTargetWeights(3)
 	params := s.keeper.GetParams(ctx)
 	params.WhitelistedValidators = nil
 	params.ModulePaused = false
@@ -321,7 +321,7 @@ func (s *KeeperTestSuite) TestValidatorUnbond_BecomesInactiveWhenFullyUnbonded()
 		s.keeper.SetLiquidValidator(ctx, types.LiquidValidator{OperatorAddress: vo.String()})
 		params.WhitelistedValidators = append(params.WhitelistedValidators, types.WhitelistedValidator{
 			ValidatorAddress: vo.String(),
-			TargetWeight:     valWeight,
+			TargetWeight:     weights[i],
 		})
 		_ = delegatorAddrs[i] // keep in scope
 	}
