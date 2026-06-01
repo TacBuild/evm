@@ -274,7 +274,7 @@ replace (
 	// use cosmos fork of keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 	// TacBuild LSM fork of cosmos-sdk
-	github.com/cosmos/cosmos-sdk => github.com/TacBuild/cosmos-sdk v0.53.6-tac.1
+	github.com/cosmos/cosmos-sdk => github.com/TacBuild/cosmos-sdk v0.53.6-tac.2
 	// use Cosmos geth fork
 	// branch: release/1.16
 	github.com/ethereum/go-ethereum => github.com/cosmos/go-ethereum v1.16.2-cosmos-1
