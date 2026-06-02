@@ -11,6 +11,7 @@ option go_package = "github.com/cosmos/evm/x/liquidstake/types";
 message Params {
   option (gogoproto.goproto_getters) = false;
   option (gogoproto.goproto_stringer) = false;
+  reserved 4; // removed lsm_disabled
 
   // LiquidBondDenom specifies the denomination of the token receiving after
   // liquid stake, The value is calculated through NetAmount.
@@ -71,6 +72,7 @@ message Params {
 message UpdatableParams {
   option (gogoproto.goproto_getters) = false;
   option (gogoproto.goproto_stringer) = false;
+  reserved 2; // removed lsm_disabled
 
   // UnstakeFeeRate specifies the fee rate when liquid unstake is requested,
   // unbonded by subtracting it from unbondingAmount
