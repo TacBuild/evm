@@ -456,18 +456,16 @@ func TestPrecompileIntegrationTestSuite(t *testing.T, create network.CreateEvmAp
 		})
 
 		Describe("to delegate from a vesting account", func() {
-			// A vesting account can delegate its still-locked tokens on the Cosmos
-			// layer (TrackDelegation moves them into DelegatedVesting). These tests
-			// assert the same works through the EVM staking precompile.
+			// A vesting account delegates its still-locked tokens on the Cosmos
+			// layer (TrackDelegation moves them into DelegatedVesting), which does
+			// NOT reduce the spendable balance. The EVM statedb tracks only
+			// spendable, so bank tags the coin_spent event with locked_amount and
+			// the balance handler subtracts only the spendable portion
+			// (amount - locked). These tests assert the fix end-to-end AND that no
+			// coins are burned or minted: holdings (bank + delegated) stay ≈ total.
 			//
-			// EVM statedb tracks only the SPENDABLE balance, while the bank
-			// CoinSpent event carries the FULL delegated amount. For a delegation
-			// that draws on locked vesting, BalanceHandler subtracts the full amount
-			// from the spendable-only EVM balance -> uint256 underflow -> panic.
-			//
-			//   - within spendable (amount <= spendable): works today.
-			//   - beyond spendable (amount  > spendable): BUG — expected to FAIL
-			//     until the vesting-delegate fix lands.
+			//   - within spendable (amount <= spendable): no spurious burn.
+			//   - beyond spendable (amount  > spendable): no underflow.
 			var (
 				vestAcc      sdk.AccAddress
 				vestPriv     *ethsecp256k1.PrivKey
@@ -519,8 +517,27 @@ func TestPrecompileIntegrationTestSuite(t *testing.T, create network.CreateEvmAp
 				callArgs.MethodName = staking.DelegateMethod
 			})
 
-			It("should delegate an amount within the spendable balance", func() {
-				delAmt := big.NewInt(1e18) // < spendable (2e18)
+			// assertConserved verifies the delegation neither burned nor minted
+			// coins: holdings (bank + delegated to valAddr) must equal total minus
+			// at most a small gas allowance. Detects spurious burn (holdings < total)
+			// and spurious mint (holdings > total).
+			assertConserved := func() {
+				ctx := s.network.GetContext()
+				res, err := s.grpcHandler.GetDelegation(vestAcc.String(), valAddr.String())
+				Expect(err).To(BeNil())
+				Expect(res.DelegationResponse).NotTo(BeNil())
+				bank := s.network.App.GetBankKeeper().GetBalance(ctx, vestAcc, s.bondDenom).Amount
+				holdings := bank.Add(res.DelegationResponse.Balance.Amount)
+				total := lockedAmt.Add(spendableAmt)
+				gasSlack := math.NewInt(1e17)
+				Expect(holdings.LTE(total)).To(BeTrue(),
+					fmt.Sprintf("spurious MINT: holdings %s > total %s", holdings, total))
+				Expect(holdings.GTE(total.Sub(gasSlack))).To(BeTrue(),
+					fmt.Sprintf("spurious BURN: holdings %s < total-gas %s", holdings, total.Sub(gasSlack)))
+			}
+
+			It("should delegate within spendable without burning coins", func() {
+				delAmt := big.NewInt(1e18) // <= spendable; TrackDelegation still draws from locked first
 
 				callArgs.Args = []interface{}{vestEVM, valAddr.String(), delAmt}
 				logCheckArgs := passCheck.WithExpEvents(staking.EventTypeDelegate)
@@ -534,17 +551,16 @@ func TestPrecompileIntegrationTestSuite(t *testing.T, create network.CreateEvmAp
 				Expect(res.DelegationResponse).NotTo(BeNil())
 				Expect(res.DelegationResponse.Balance.Amount.BigInt()).To(Equal(delAmt), "unexpected delegated amount")
 
-				// delegating from a vesting account is tracked as DelegatedVesting,
-				// so the spendable balance must be preserved (no spendable was spent).
+				// delegation is tracked as DelegatedVesting (drawn from locked), so
+				// spendable is preserved and — critically — nothing is burned.
 				ctx := s.network.GetContext()
 				vacc := s.network.App.GetAccountKeeper().GetAccount(ctx, vestAcc).(*vestingtypes.DelayedVestingAccount)
-				Expect(vacc.GetDelegatedVesting().AmountOf(s.bondDenom).String()).To(Equal(delAmt.String()), "expected delegation tracked as DelegatedVesting")
+				Expect(vacc.GetDelegatedVesting().AmountOf(s.bondDenom).BigInt()).To(Equal(delAmt), "delegation should be tracked as DelegatedVesting")
+				assertConserved()
 			})
 
-			It("should delegate an amount that draws on locked vesting (beyond spendable)", func() {
+			It("should delegate beyond spendable (draws on locked) without underflow", func() {
 				// spendable (2e18) + part of locked (1e18) = 3e18 > spendable.
-				// Cosmos-side DelegateCoins supports this; via the precompile it
-				// currently PANICS (underflow). Expected to FAIL until fixed.
 				delAmt := new(big.Int).Add(spendableAmt.BigInt(), big.NewInt(1e18))
 
 				callArgs.Args = []interface{}{vestEVM, valAddr.String(), delAmt}
@@ -559,11 +575,13 @@ func TestPrecompileIntegrationTestSuite(t *testing.T, create network.CreateEvmAp
 				Expect(res.DelegationResponse).NotTo(BeNil())
 				Expect(res.DelegationResponse.Balance.Amount.BigInt()).To(Equal(delAmt), "unexpected delegated amount")
 
-				// the full delegation must be tracked as DelegatedVesting (all of it
-				// came from locked + spendable, with locked being the larger part).
+				// of 3e18 delegated: all locked (2e18) -> DelegatedVesting, the
+				// spendable part (1e18) -> DelegatedFree.
 				ctx := s.network.GetContext()
 				vacc := s.network.App.GetAccountKeeper().GetAccount(ctx, vestAcc).(*vestingtypes.DelayedVestingAccount)
-				Expect(vacc.GetDelegatedVesting().AmountOf(s.bondDenom).IsPositive()).To(BeTrue(), "expected locked tokens tracked as DelegatedVesting")
+				Expect(vacc.GetDelegatedVesting().AmountOf(s.bondDenom)).To(Equal(lockedAmt), "all locked should be tracked as DelegatedVesting")
+				Expect(vacc.GetDelegatedFree().AmountOf(s.bondDenom).BigInt()).To(Equal(big.NewInt(1e18)), "spendable portion should be DelegatedFree")
+				assertConserved()
 			})
 		})
 

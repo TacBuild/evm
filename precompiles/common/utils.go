@@ -50,6 +50,31 @@ func ParseAmount(event sdk.Event) (*uint256.Int, error) {
 	return amount, nil
 }
 
+// ParseLockedAmount parses the optional "locked_amount" attribute of a coin_spent
+// event — the portion of the spent amount drawn from locked (vesting) balance,
+// emitted by bank's DelegateCoins for vesting accounts. It mirrors ParseAmount:
+// it selects the EVM coin denom and scales to 18 decimals, so it composes with
+// the amount parsed from the same event. Returns zero when the attribute is
+// absent (ordinary, non-vesting spends).
+func ParseLockedAmount(event sdk.Event) (*uint256.Int, error) {
+	amountAttr, ok := event.GetAttribute(banktypes.AttributeKeyLockedAmount)
+	if !ok {
+		return new(uint256.Int), nil
+	}
+
+	amountCoins, err := sdk.ParseCoinsNormalized(amountAttr.Value)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse locked coins from %q: %w", amountAttr.Value, err)
+	}
+
+	amountBigInt := amountCoins.AmountOf(evmtypes.GetEVMCoinDenom()).BigInt()
+	amount, err := utils.Uint256FromBigInt(evmtypes.ConvertAmountTo18DecimalsBigInt(amountBigInt))
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert locked amount to Uint256: %w", err)
+	}
+	return amount, nil
+}
+
 func ParseFractionalAmount(event sdk.Event) (*big.Int, error) {
 	deltaAttr, ok := event.GetAttribute(precisebanktypes.AttributeKeyDelta)
 	if !ok {

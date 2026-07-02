@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/tracing"
+	"github.com/holiman/uint256"
 
 	"github.com/cosmos/evm/utils"
 	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
@@ -91,7 +92,31 @@ func (bh *BalanceHandler) AfterBalanceChange(ctx sdk.Context, stateDB *statedb.S
 				return fmt.Errorf("failed to parse amount from event %q: %w", banktypes.EventTypeCoinSpent, err)
 			}
 
-			stateDB.SubBalance(common.BytesToAddress(spenderAddr.Bytes()), amount, tracing.BalanceChangeUnspecified)
+			// A delegation from a vesting account spends locked tokens (tracked as
+			// DelegatedVesting), which does NOT reduce the spendable balance. Since
+			// the EVM statedb tracks only spendable, subtract just the spendable
+			// portion (amount - locked). Without this, a within-spendable vesting
+			// delegation would spuriously burn coins at commit, and a beyond-
+			// spendable one would underflow. locked is zero for ordinary spends.
+			locked, err := ParseLockedAmount(event)
+			if err != nil {
+				return fmt.Errorf("failed to parse locked amount from event %q: %w", banktypes.EventTypeCoinSpent, err)
+			}
+			// The locked (vesting) portion reported by bank can never exceed the
+			// total spent amount (locked = min(LockedCoins, amount) by construction).
+			// If it does, the event is inconsistent — fail loudly instead of
+			// silently masking a bug in the emission.
+			if locked.Gt(amount) {
+				return fmt.Errorf(
+					"inconsistent %s event: locked amount %s exceeds spent amount %s",
+					banktypes.EventTypeCoinSpent, locked, amount,
+				)
+			}
+			// Subtract only the spendable portion (amount - locked). For ordinary
+			// (non-vesting) spends locked is zero, so this equals amount.
+			sub := new(uint256.Int).Sub(amount, locked)
+
+			stateDB.SubBalance(common.BytesToAddress(spenderAddr.Bytes()), sub, tracing.BalanceChangeUnspecified)
 
 		case banktypes.EventTypeCoinReceived:
 			receiverAddr, err := ParseAddress(event, banktypes.AttributeKeyReceiver)
