@@ -3,6 +3,7 @@ package keeper
 import (
 	"fmt"
 
+	"github.com/cosmos/evm/utils"
 	"github.com/cosmos/evm/x/erc20/types"
 	transferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
 
@@ -27,6 +28,23 @@ type Keeper struct {
 	evmKeeper      types.EVMKeeper
 	stakingKeeper  types.StakingKeeper
 	transferKeeper *transferkeeper.Keeper
+
+	// legacyPrecompiles, when set, enables reading the pre-migration precompile
+	// address lists for historical heights below the migration height (see
+	// IsNativePrecompileAvailable / IsDynamicPrecompileAvailable). It is nil by
+	// default so chains that never migrated the precompile key format are
+	// unaffected.
+	legacyPrecompiles *utils.LazyUpgradeHeight
+}
+
+// SetLegacyPrecompilesHeightResolver enables historical lookups of ERC20
+// precompile availability for state written before the precompile key-format
+// migration. resolve must return the height at which this chain migrated the
+// precompile store layout (0 before it is applied); below that height the legacy
+// concatenated-blob keys are consulted. Passing nil disables the behavior.
+func (k *Keeper) SetLegacyPrecompilesHeightResolver(resolve func(ctx sdk.Context) int64) *Keeper {
+	k.legacyPrecompiles = utils.NewLazyUpgradeHeight(resolve)
+	return k
 }
 
 // NewKeeper creates new instances of the erc20 Keeper

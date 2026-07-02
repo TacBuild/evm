@@ -115,6 +115,9 @@ func (k Keeper) GetNativePrecompiles(ctx sdk.Context) []string {
 }
 
 func (k Keeper) IsNativePrecompileAvailable(ctx sdk.Context, precompile common.Address) bool {
+	if k.legacyPrecompiles.Below(ctx) {
+		return k.legacyPrecompileRegistered(ctx, legacyNativePrecompilesKey, precompile)
+	}
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixNativePrecompiles)
 	return store.Has([]byte(precompile.Hex()))
 }
@@ -155,8 +158,48 @@ func (k Keeper) GetDynamicPrecompiles(ctx sdk.Context) []string {
 }
 
 func (k Keeper) IsDynamicPrecompileAvailable(ctx sdk.Context, precompile common.Address) bool {
+	if k.legacyPrecompiles.Below(ctx) {
+		return k.legacyPrecompileRegistered(ctx, legacyDynamicPrecompilesKey, precompile)
+	}
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixDynamicPrecompiles)
 	return store.Has([]byte(precompile.Hex()))
+}
+
+// legacyNativePrecompilesKey and legacyDynamicPrecompilesKey are the
+// pre-migration store keys that held the precompile lists as a single
+// concatenated blob of 42-character ASCII hex addresses. They were replaced by
+// per-address keys ({0x06}/{0x07}) and deleted during the store migration, so
+// they only remain in historical state below the migration height.
+var (
+	legacyNativePrecompilesKey  = []byte("NativePrecompiles")
+	legacyDynamicPrecompilesKey = []byte("DynamicPrecompiles")
+)
+
+const legacyPrecompileAddrLen = 42 // len("0x" + 40 hex chars)
+
+// legacyPrecompileRegistered reports whether precompile appears in the legacy
+// concatenated-blob list stored under legacyKey. Addresses are compared by value
+// (case-insensitive) to be robust to checksum-casing differences between how the
+// old node wrote the list and the queried address.
+func (k Keeper) legacyPrecompileRegistered(ctx sdk.Context, legacyKey []byte, precompile common.Address) bool {
+	return legacyBlobContains(ctx.KVStore(k.storeKey).Get(legacyKey), precompile)
+}
+
+// legacyBlobContains reports whether precompile appears in a legacy
+// concatenated-blob precompile list (42-character ASCII hex addresses back to
+// back). A blob whose length is not a multiple of the address width is treated
+// as absent rather than parsed partially.
+func legacyBlobContains(blob []byte, precompile common.Address) bool {
+	if len(blob) == 0 || len(blob)%legacyPrecompileAddrLen != 0 {
+		return false
+	}
+	for i := 0; i+legacyPrecompileAddrLen <= len(blob); i += legacyPrecompileAddrLen {
+		hexAddr := string(blob[i : i+legacyPrecompileAddrLen])
+		if common.IsHexAddress(hexAddr) && common.HexToAddress(hexAddr) == precompile {
+			return true
+		}
+	}
+	return false
 }
 
 func (k Keeper) SetDynamicPrecompile(ctx sdk.Context, precompile common.Address) {

@@ -20,6 +20,19 @@ func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
 	if bz == nil {
 		return params
 	}
+
+	// Historical state written before the Params store migration uses the old
+	// proto field numbers; decoding it with the current schema panics (e.g.
+	// "wrong wireType for field HistoryServeWindow") or silently corrupts shifted
+	// fields, breaking read-only historical queries such as eth_call.
+	if k.legacyParams.Below(ctx) {
+		params, err := types.DecodeLegacyParams(bz)
+		if err != nil {
+			panic(err)
+		}
+		return params
+	}
+
 	k.cdc.MustUnmarshal(bz, &params)
 	return
 }

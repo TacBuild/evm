@@ -85,6 +85,11 @@ type Keeper struct {
 	// defaultEvmCoinInfo is the default EVM coin info used when evmCoinInfo is not initialized in the state,
 	// mainly for historical queries.
 	defaultEvmCoinInfo types.EvmCoinInfo
+
+	// legacyParams, when set, enables decoding of pre-migration x/vm Params for
+	// historical reads below the migration height (see GetParams). It is nil by
+	// default so chains that never changed the Params layout are unaffected.
+	legacyParams *utils.LazyUpgradeHeight
 }
 
 // NewKeeper generates new evm module keeper
@@ -218,6 +223,15 @@ func (k *Keeper) SetHooks(eh types.EvmHooks) *Keeper {
 	}
 
 	k.hooks = eh
+	return k
+}
+
+// SetLegacyParamsHeightResolver enables historical decoding of pre-migration
+// x/vm Params. resolve must return the height at which this chain migrated the
+// Params store layout (0 before it is applied); GetParams decodes state below
+// that height with the legacy layout. Passing nil disables the behavior.
+func (k *Keeper) SetLegacyParamsHeightResolver(resolve func(ctx sdk.Context) int64) *Keeper {
+	k.legacyParams = utils.NewLazyUpgradeHeight(resolve)
 	return k
 }
 
