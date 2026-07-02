@@ -53,6 +53,11 @@ func (_m *Erc20Keeper) GetERC20PrecompileInstance(ctx types.Context, address com
 	return r0, r1, r2
 }
 
+// PrimeLegacyPrecompilesHeight provides a mock function with given fields: ctx
+func (_m *Erc20Keeper) PrimeLegacyPrecompilesHeight(ctx types.Context) {
+	_m.Called(ctx)
+}
+
 // NewErc20Keeper creates a new instance of Erc20Keeper. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewErc20Keeper(t interface {

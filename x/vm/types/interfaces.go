@@ -71,6 +71,10 @@ type FeeMarketKeeper interface {
 // Erc20Keeper defines the expected interface needed to instantiate ERC20 precompiles.
 type Erc20Keeper interface {
 	GetERC20PrecompileInstance(ctx sdk.Context, address common.Address) (contract vm.PrecompiledContract, found bool, err error)
+	// PrimeLegacyPrecompilesHeight warms the historical precompile-availability
+	// height cache from the current context. Called from x/vm BeginBlock so the
+	// cache is ready for historical eth_call below the migration height.
+	PrimeLegacyPrecompilesHeight(ctx sdk.Context)
 }
 
 // EvmHooks event hooks for evm tx processing
