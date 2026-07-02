@@ -47,6 +47,15 @@ func (k *Keeper) SetLegacyPrecompilesHeightResolver(resolve func(ctx sdk.Context
 	return k
 }
 
+// PrimeLegacyPrecompilesHeight resolves and caches the migration height from the
+// given (current-height) context. Call it from a per-block hook so the cache is
+// warmed from live state where the applied upgrade height is visible; unlike
+// GetParams, precompile-availability checks are not hit every block, so the
+// cache would otherwise stay cold until a historical query resolves it as 0.
+func (k Keeper) PrimeLegacyPrecompilesHeight(ctx sdk.Context) {
+	k.legacyPrecompiles.Height(ctx)
+}
+
 // NewKeeper creates new instances of the erc20 Keeper
 func NewKeeper(
 	storeKey storetypes.StoreKey,

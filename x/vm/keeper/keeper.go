@@ -235,6 +235,15 @@ func (k *Keeper) SetLegacyParamsHeightResolver(resolve func(ctx sdk.Context) int
 	return k
 }
 
+// PrimeLegacyParamsHeight resolves and caches the migration height from the
+// given (current-height) context. Call it from a per-block hook so the cache is
+// warmed from live state where the applied upgrade height is visible; otherwise
+// the first read could be a historical query whose context predates the upgrade
+// and would resolve the height as 0.
+func (k Keeper) PrimeLegacyParamsHeight(ctx sdk.Context) {
+	k.legacyParams.Height(ctx)
+}
+
 // PostTxProcessing delegates the call to the hooks.
 // If no hook has been registered, this function returns with a `nil` error
 func (k *Keeper) PostTxProcessing(
