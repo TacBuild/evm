@@ -14,6 +14,15 @@ import (
 func (k *Keeper) BeginBlock(ctx sdk.Context) error {
 	logger := ctx.Logger().With("begin_block", "evm")
 
+	// Warm the historical legacy-decode height caches from live state, where the
+	// applied migration height is visible. Without this the first read could be a
+	// historical query whose context predates the upgrade and resolves the height
+	// as 0, skipping the legacy-decode paths.
+	k.PrimeLegacyParamsHeight(ctx)
+	if k.erc20Keeper != nil {
+		k.erc20Keeper.PrimeLegacyPrecompilesHeight(ctx)
+	}
+
 	// Base fee is already set on FeeMarket BeginBlock
 	// that runs before this one
 	// We emit this event on the EVM and FeeMarket modules
