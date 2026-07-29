@@ -142,6 +142,72 @@ func TestParseAmount(t *testing.T) {
 	}
 }
 
+func TestParseLockedAmount(t *testing.T) {
+	testCases := []struct {
+		name     string
+		maleate  func() sdk.Event
+		expAmt   *uint256.Int
+		expError bool
+	}{
+		{
+			name: "absent attribute returns zero",
+			maleate: func() sdk.Event {
+				return sdk.NewEvent(banktypes.EventTypeCoinSpent)
+			},
+			expAmt: uint256.NewInt(0),
+		},
+		{
+			name: "evm denom only",
+			maleate: func() sdk.Event {
+				coinStr := sdk.NewCoins(sdk.NewInt64Coin(evmtypes.GetEVMCoinDenom(), 5)).String()
+				return sdk.NewEvent(banktypes.EventTypeCoinSpent, sdk.NewAttribute(banktypes.AttributeKeyLockedAmount, coinStr))
+			},
+			expAmt: uint256.NewInt(5),
+		},
+		{
+			name: "mixed denoms: only evm denom counts",
+			maleate: func() sdk.Event {
+				coinStr := sdk.NewCoins(
+					sdk.NewInt64Coin(evmtypes.GetEVMCoinDenom(), 5),
+					sdk.NewInt64Coin("foocoin", 99),
+				).String()
+				return sdk.NewEvent(banktypes.EventTypeCoinSpent, sdk.NewAttribute(banktypes.AttributeKeyLockedAmount, coinStr))
+			},
+			expAmt: uint256.NewInt(5),
+		},
+		{
+			name: "no evm denom returns zero",
+			maleate: func() sdk.Event {
+				coinStr := sdk.NewCoins(sdk.NewInt64Coin("foocoin", 99)).String()
+				return sdk.NewEvent(banktypes.EventTypeCoinSpent, sdk.NewAttribute(banktypes.AttributeKeyLockedAmount, coinStr))
+			},
+			expAmt: uint256.NewInt(0),
+		},
+		{
+			name: "invalid coins",
+			maleate: func() sdk.Event {
+				return sdk.NewEvent(banktypes.EventTypeCoinSpent, sdk.NewAttribute(banktypes.AttributeKeyLockedAmount, "invalid"))
+			},
+			expError: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			setupBalanceHandlerTest(t)
+
+			amt, err := cmn.ParseLockedAmount(tc.maleate())
+			if tc.expError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			require.True(t, amt.Eq(tc.expAmt), "expected %s, got %s", tc.expAmt, amt)
+		})
+	}
+}
+
 func TestAfterBalanceChange(t *testing.T) {
 	setupBalanceHandlerTest(t)
 
@@ -226,6 +292,22 @@ func TestAfterBalanceChangeErrors(t *testing.T) {
 		sdk.NewAttribute(banktypes.AttributeKeySpender, addr.String()),
 		sdk.NewAttribute(sdk.AttributeKeyAmount, "invalid"))
 	ctx.EventManager().EmitEvent(ev)
+	err = bh.AfterBalanceChange(ctx, stateDB)
+	require.Error(t, err)
+
+	// reset events
+	ctx = ctx.WithEventManager(sdk.NewEventManager())
+	bh.BeforeBalanceChange(ctx)
+
+	// inconsistent locked_amount: locked (6) exceeds the spent amount (5) — must
+	// fail loudly rather than silently clamp.
+	spent := sdk.NewCoins(sdk.NewInt64Coin(evmtypes.GetEVMCoinDenom(), 5)).String()
+	tooMuchLocked := sdk.NewCoins(sdk.NewInt64Coin(evmtypes.GetEVMCoinDenom(), 6)).String()
+	evLocked := sdk.NewEvent(banktypes.EventTypeCoinSpent,
+		sdk.NewAttribute(banktypes.AttributeKeySpender, addr.String()),
+		sdk.NewAttribute(sdk.AttributeKeyAmount, spent),
+		sdk.NewAttribute(banktypes.AttributeKeyLockedAmount, tooMuchLocked))
+	ctx.EventManager().EmitEvent(evLocked)
 	err = bh.AfterBalanceChange(ctx, stateDB)
 	require.Error(t, err)
 }
