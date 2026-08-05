@@ -224,24 +224,36 @@ func (k Keeper) Params(c context.Context, _ *types.QueryParamsRequest) (*types.Q
 	}, nil
 }
 
+// parseStateOverrides decodes the json encoded state overrides carried by a
+// query request. It returns a nil override when the request doesn't set any.
+func parseStateOverrides(bz []byte) (*rpctypes.StateOverride, error) {
+	if len(bz) == 0 {
+		return nil, nil
+	}
+
+	overrides := new(rpctypes.StateOverride)
+	if err := json.Unmarshal(bz, overrides); err != nil {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid state overrides format: %s", err.Error()))
+	}
+
+	return overrides, nil
+}
+
 // EthCall implements eth_call rpc api.
 func (k Keeper) EthCall(c context.Context, req *types.EthCallRequest) (*types.MsgEthereumTxResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 
-	var overrides *rpctypes.StateOverride
-	if len(req.Overrides) > 0 {
-		overrides = new(rpctypes.StateOverride)
-		if err := json.Unmarshal(req.Overrides, overrides); err != nil {
-			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid state overrides format: %s", err.Error()))
-		}
+	overrides, err := parseStateOverrides(req.Overrides)
+	if err != nil {
+		return nil, err
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
 
 	var args types.TransactionArgs
-	err := json.Unmarshal(req.Args, &args)
+	err = json.Unmarshal(req.Args, &args)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -272,6 +284,47 @@ func (k Keeper) EthCall(c context.Context, req *types.EthCallRequest) (*types.Ms
 	return res, nil
 }
 
+// TacSimulate implements the custom tac_simulate rpc api. It runs the same
+// simulated, non committing execution as eth_call, but additionally reports the
+// emitted logs and the gas estimation computed on the very same overridden
+// state. A reverting execution is not an error here: the revert reason is
+// reported through VmError and the revert data through Ret.
+func (k Keeper) TacSimulate(c context.Context, req *types.TacSimulateRequest) (*types.TacSimulateResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+
+	// TacSimulateRequest mirrors EthCallRequest, so the very same request drives
+	// both the call and the gas estimation below.
+	ethCallReq := &types.EthCallRequest{
+		Args:            req.Args,
+		GasCap:          req.GasCap,
+		ProposerAddress: req.ProposerAddress,
+		ChainId:         req.ChainId,
+		Overrides:       req.Overrides,
+	}
+
+	res, err := k.EthCall(c, ethCallReq)
+	if err != nil {
+		return nil, err
+	}
+
+	// A failing estimation (a reverting call, for instance) must not hide the
+	// call result, so GasEstimated is left at 0 in that case.
+	var gasEstimated uint64
+	if estimate, estimateErr := k.EstimateGasInternal(c, ethCallReq, types.RPC); estimateErr == nil {
+		gasEstimated = estimate.Gas
+	}
+
+	return &types.TacSimulateResponse{
+		Logs:         res.Logs,
+		Ret:          res.Ret,
+		VmError:      res.VmError,
+		GasUsed:      res.GasUsed,
+		GasEstimated: gasEstimated,
+	}, nil
+}
+
 // EstimateGas implements eth_estimateGas rpc api.
 func (k Keeper) EstimateGas(c context.Context, req *types.EthCallRequest) (*types.EstimateGasResponse, error) {
 	return k.EstimateGasInternal(c, req, types.RPC)
@@ -282,6 +335,10 @@ func (k Keeper) EstimateGas(c context.Context, req *types.EthCallRequest) (*type
 // When called from the RPC client, we need to reset the gas meter before
 // simulating the transaction to have
 // an accurate gas estimation for EVM extensions transactions.
+//
+// When req.Overrides is set, the binary search runs on top of the overridden
+// state, so the estimate matches the call it is paired with. eth_estimateGas
+// never sets it; tac_simulate does.
 func (k Keeper) EstimateGasInternal(c context.Context, req *types.EthCallRequest, fromType types.CallType) (*types.EstimateGasResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
@@ -293,8 +350,13 @@ func (k Keeper) EstimateGasInternal(c context.Context, req *types.EthCallRequest
 		return nil, status.Errorf(codes.InvalidArgument, "gas cap cannot be lower than %d", ethparams.TxGas)
 	}
 
+	overrides, err := parseStateOverrides(req.Overrides)
+	if err != nil {
+		return nil, err
+	}
+
 	var args types.TransactionArgs
-	err := json.Unmarshal(req.Args, &args)
+	err = json.Unmarshal(req.Args, &args)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -405,7 +467,7 @@ func (k Keeper) EstimateGasInternal(c context.Context, req *types.EthCallRequest
 		}
 		// pass false to not commit StateDB
 		stateDB := statedb.New(tmpCtx, &k, txConfig)
-		rsp, err = k.ApplyMessageWithConfig(tmpCtx, stateDB, *msg, nil, false, false, cfg, txConfig, false, nil)
+		rsp, err = k.ApplyMessageWithConfig(tmpCtx, stateDB, *msg, nil, false, false, cfg, txConfig, false, overrides)
 		if err != nil {
 			if errors.Is(err, core.ErrIntrinsicGas) || errors.Is(err, core.ErrFloorDataGas) {
 				return true, nil, nil // Special case, raise gas limit

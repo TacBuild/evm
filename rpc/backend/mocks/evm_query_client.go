@@ -417,6 +417,43 @@ func (_m *EVMQueryClient) Storage(ctx context.Context, in *types.QueryStorageReq
 	return r0, r1
 }
 
+// TacSimulate provides a mock function with given fields: ctx, in, opts
+func (_m *EVMQueryClient) TacSimulate(ctx context.Context, in *types.TacSimulateRequest, opts ...grpc.CallOption) (*types.TacSimulateResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TacSimulate")
+	}
+
+	var r0 *types.TacSimulateResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *types.TacSimulateRequest, ...grpc.CallOption) (*types.TacSimulateResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *types.TacSimulateRequest, ...grpc.CallOption) *types.TacSimulateResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*types.TacSimulateResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *types.TacSimulateRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // TraceBlock provides a mock function with given fields: ctx, in, opts
 func (_m *EVMQueryClient) TraceBlock(ctx context.Context, in *types.QueryTraceBlockRequest, opts ...grpc.CallOption) (*types.QueryTraceBlockResponse, error) {
 	_va := make([]interface{}, len(opts))
