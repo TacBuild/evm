@@ -416,6 +416,67 @@ func (b *Backend) DoCall(
 	return res, nil
 }
 
+// DoTacSimulate performs a simulated call operation through the evmtypes. On top
+// of DoCall it returns the emitted logs and the gas estimation of the call.
+//
+// Unlike DoCall it deliberately skips handleRevertError: a revert is part of the
+// simulation result (reported through VmError and Ret), not a JSON-RPC error.
+func (b *Backend) DoTacSimulate(
+	args evmtypes.TransactionArgs,
+	blockNr rpctypes.BlockNumber,
+	overrides *json.RawMessage,
+) (*evmtypes.TacSimulateResponse, error) {
+	bz, err := json.Marshal(&args)
+	if err != nil {
+		return nil, err
+	}
+	header, err := b.CometHeaderByNumber(blockNr)
+	if err != nil {
+		// the error message imitates geth behavior
+		return nil, errors.New("header not found")
+	}
+
+	var bzOverrides []byte
+	if overrides != nil {
+		bzOverrides = *overrides
+	}
+
+	req := evmtypes.TacSimulateRequest{
+		Args:            bz,
+		GasCap:          b.RPCGasCap(),
+		ProposerAddress: sdk.ConsAddress(header.Header.ProposerAddress),
+		ChainId:         b.EvmChainID.Int64(),
+		Overrides:       bzOverrides,
+	}
+
+	// From ContextWithHeight: if the provided height is 0,
+	// it will return an empty context and the gRPC query will use
+	// the latest block height for querying.
+	ctx := rpctypes.ContextWithHeight(blockNr.Int64())
+	timeout := b.RPCEVMTimeout()
+
+	// Setup context so it may be canceled the call has completed
+	// or, in case of unmetered gas, setup a context with a timeout.
+	var cancel context.CancelFunc
+	if timeout > 0 {
+		ctx, cancel = context.WithTimeout(ctx, timeout)
+	} else {
+		ctx, cancel = context.WithCancel(ctx)
+	}
+
+	// Make sure the context is canceled when the call has completed
+	// this makes sure resources are cleaned up.
+	defer cancel()
+
+	res, err := b.QueryClient.TacSimulate(ctx, &req)
+	if err != nil {
+		return nil, err
+	}
+
+	// return result as is, reverts included
+	return res, nil
+}
+
 // GasPrice returns the current gas price based on Cosmos EVM' gas price oracle.
 func (b *Backend) GasPrice() (*hexutil.Big, error) {
 	var (

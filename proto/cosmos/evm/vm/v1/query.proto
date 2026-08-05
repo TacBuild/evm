@@ -59,6 +59,12 @@ service Query {
     option (google.api.http).get = "/cosmos/evm/vm/v1/eth_call";
   }
 
+  // TacSimulate implements the custom `tac_simulate` rpc api which supports
+  // state override
+  rpc TacSimulate(TacSimulateRequest) returns (TacSimulateResponse) {
+    option (google.api.http).get = "/cosmos/evm/vm/v1/tac_simulate";
+  }
+
   // EstimateGas implements the `eth_estimateGas` rpc api
   rpc EstimateGas(EthCallRequest) returns (EstimateGasResponse) {
     option (google.api.http).get = "/cosmos/evm/vm/v1/estimate_gas";
@@ -265,6 +271,41 @@ message EthCallRequest {
   int64 chain_id = 4;
   // state overrides encoded as json
   bytes overrides = 5;
+}
+
+// TacSimulateRequest defines TacSimulate request.
+// The field layout mirrors EthCallRequest so both queries stay interchangeable,
+// while keeping room for tac_simulate specific fields.
+message TacSimulateRequest {
+  // args uses the same json format as the json rpc api.
+  bytes args = 1;
+  // gas_cap defines the default gas cap to be used
+  uint64 gas_cap = 2;
+  // proposer_address of the requested block in hex format
+  bytes proposer_address = 3
+      [ (gogoproto.casttype) =
+            "github.com/cosmos/cosmos-sdk/types.ConsAddress" ];
+  // chain_id is the eip155 chain id parsed from the requested block header
+  int64 chain_id = 4;
+  // state overrides encoded as json
+  bytes overrides = 5;
+}
+
+// TacSimulateResponse defines TacSimulate response
+message TacSimulateResponse {
+  // ret is the returned data from evm function (result or data supplied with
+  // revert opcode)
+  bytes ret = 1;
+  // vm_error is the error returned by vm execution
+  string vm_error = 2;
+  // gas_used specifies how much gas was consumed by the EVM execution
+  uint64 gas_used = 3;
+  // gas_estimated is the estimated minimum gas limit needed to execute
+  // the transaction successfully (result of binary search, like
+  // eth_estimateGas)
+  uint64 gas_estimated = 4;
+  // logs contains the proto-compatible ethereum logs
+  repeated Log logs = 5;
 }
 
 // EstimateGasResponse defines EstimateGas response

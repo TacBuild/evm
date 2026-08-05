@@ -190,6 +190,19 @@ func RegisterEthCallError(queryClient *mocks.EVMQueryClient, request *evmtypes.E
 		Return(nil, errortypes.ErrInvalidRequest)
 }
 
+// TAC Simulate
+func RegisterTacSimulate(queryClient *mocks.EVMQueryClient, request *evmtypes.TacSimulateRequest, response *evmtypes.TacSimulateResponse) {
+	ctx, _ := context.WithCancel(rpc.ContextWithHeight(1)) //nolint
+	queryClient.On("TacSimulate", ctx, request).
+		Return(response, nil)
+}
+
+func RegisterTacSimulateError(queryClient *mocks.EVMQueryClient, request *evmtypes.TacSimulateRequest) {
+	ctx, _ := context.WithCancel(rpc.ContextWithHeight(1)) //nolint
+	queryClient.On("TacSimulate", ctx, request).
+		Return(nil, errortypes.ErrInvalidRequest)
+}
+
 // Estimate Gas
 func RegisterEstimateGas(queryClient *mocks.EVMQueryClient, args evmtypes.TransactionArgs) {
 	bz, _ := json.Marshal(args)

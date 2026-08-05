@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/rlp"
 	"google.golang.org/grpc/metadata"
 
@@ -558,6 +559,130 @@ func (s *TestSuite) TestDoCall() {
 			if tc.expPass {
 				s.Require().NoError(err)
 				s.Require().Equal(tc.expEthTx, msgEthTx)
+			} else {
+				s.Require().Error(err)
+			}
+		})
+	}
+}
+
+func (s *TestSuite) TestDoTacSimulate() {
+	_, bz := s.buildEthereumTx()
+	gasPrice := (*hexutil.Big)(big.NewInt(1))
+	toAddr := utiltx.GenerateAddress()
+	evmChainID := (*hexutil.Big)(s.backend.EvmChainID)
+	callArgs := evmtypes.TransactionArgs{
+		To:                   &toAddr,
+		MaxFeePerGas:         gasPrice,
+		MaxPriorityFeePerGas: gasPrice,
+		Value:                gasPrice,
+		ChainID:              evmChainID,
+	}
+	argsBz, err := json.Marshal(callArgs)
+	s.Require().NoError(err)
+
+	overrides := json.RawMessage(`{
+        "` + toAddr.Hex() + `": {
+            "balance": "0x1000000000000000000"
+        }
+    }`)
+
+	revertResponse := &evmtypes.TacSimulateResponse{
+		Ret:     []byte{0x01, 0x02},
+		VmError: vm.ErrExecutionReverted.Error(),
+	}
+
+	testCases := []struct {
+		name         string
+		registerMock func()
+		overrides    *json.RawMessage
+		expResponse  *evmtypes.TacSimulateResponse
+		expPass      bool
+	}{
+		{
+			"fail - invalid request",
+			func() {
+				client := s.backend.ClientCtx.Client.(*mocks.Client)
+				QueryClient := s.backend.QueryClient.QueryClient.(*mocks.EVMQueryClient)
+				height := int64(1)
+				RegisterHeader(client, &height, bz)
+				RegisterTacSimulateError(QueryClient, &evmtypes.TacSimulateRequest{Args: argsBz, ChainId: s.backend.EvmChainID.Int64()})
+			},
+			nil,
+			nil,
+			false,
+		},
+		{
+			"pass - returned simulation response",
+			func() {
+				client := s.backend.ClientCtx.Client.(*mocks.Client)
+				QueryClient := s.backend.QueryClient.QueryClient.(*mocks.EVMQueryClient)
+				height := int64(1)
+				RegisterHeader(client, &height, bz)
+				RegisterTacSimulate(
+					QueryClient,
+					&evmtypes.TacSimulateRequest{Args: argsBz, ChainId: s.backend.EvmChainID.Int64()},
+					&evmtypes.TacSimulateResponse{GasEstimated: 21000},
+				)
+			},
+			nil,
+			&evmtypes.TacSimulateResponse{GasEstimated: 21000},
+			true,
+		},
+		{
+			// the request the query client receives is matched by deep equality,
+			// so this also pins down that nothing but the state overrides is
+			// forwarded - blockOverrides in particular is not part of the request
+			"pass - state overrides are forwarded to the query",
+			func() {
+				client := s.backend.ClientCtx.Client.(*mocks.Client)
+				QueryClient := s.backend.QueryClient.QueryClient.(*mocks.EVMQueryClient)
+				height := int64(1)
+				RegisterHeader(client, &height, bz)
+				RegisterTacSimulate(
+					QueryClient,
+					&evmtypes.TacSimulateRequest{
+						Args:      argsBz,
+						ChainId:   s.backend.EvmChainID.Int64(),
+						Overrides: overrides,
+					},
+					&evmtypes.TacSimulateResponse{},
+				)
+			},
+			&overrides,
+			&evmtypes.TacSimulateResponse{},
+			true,
+		},
+		{
+			// unlike DoCall, a revert must not be turned into a JSON-RPC error
+			"pass - revert is returned as a result",
+			func() {
+				client := s.backend.ClientCtx.Client.(*mocks.Client)
+				QueryClient := s.backend.QueryClient.QueryClient.(*mocks.EVMQueryClient)
+				height := int64(1)
+				RegisterHeader(client, &height, bz)
+				RegisterTacSimulate(
+					QueryClient,
+					&evmtypes.TacSimulateRequest{Args: argsBz, ChainId: s.backend.EvmChainID.Int64()},
+					revertResponse,
+				)
+			},
+			nil,
+			revertResponse,
+			true,
+		},
+	}
+
+	for _, tc := range testCases {
+		s.Run(fmt.Sprintf("case %s", tc.name), func() {
+			s.SetupTest() // reset test and queries
+			tc.registerMock()
+
+			res, err := s.backend.DoTacSimulate(callArgs, rpctypes.BlockNumber(1), tc.overrides)
+
+			if tc.expPass {
+				s.Require().NoError(err)
+				s.Require().Equal(tc.expResponse, res)
 			} else {
 				s.Require().Error(err)
 			}

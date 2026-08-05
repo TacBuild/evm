@@ -16,6 +16,7 @@ import (
 	"github.com/holiman/uint256"
 	"github.com/stretchr/testify/require"
 
+	rpctypes "github.com/cosmos/evm/rpc/types"
 	"github.com/cosmos/evm/server/config"
 	testconstants "github.com/cosmos/evm/testutil/constants"
 	"github.com/cosmos/evm/testutil/integration/evm/factory"
@@ -2030,6 +2031,284 @@ func (s *KeeperTestSuite) TestEthCall() {
 			s.Require().NoError(err)
 		})
 	}
+}
+
+func (s *KeeperTestSuite) TestTacSimulate() {
+	s.SetupTest()
+
+	erc20Contract, err := testdata.LoadERC20Contract()
+	s.Require().NoError(err)
+
+	senderKey := s.Keyring.GetKey(0)
+	sender := senderKey.Addr
+
+	contractAddr, err := deployErc20Contract(senderKey, s.Factory)
+	s.Require().NoError(err)
+	s.Require().NoError(s.Network.NextBlock())
+
+	recipient := common.HexToAddress("0xC6Fe5D33615a1C52c08018c47E8Bc53646A0E101")
+	transferData, err := erc20Contract.ABI.Pack("transfer", recipient, big.NewInt(1000))
+	s.Require().NoError(err)
+
+	proposerAddress := s.Network.GetContext().BlockHeader().ProposerAddress
+
+	// Address the reverting and balance reading contracts below are injected at
+	// through a state override.
+	overriddenAddr := common.HexToAddress("0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+
+	testCases := []struct {
+		name     string
+		getReq   func() *types.TacSimulateRequest
+		expErr   bool
+		validate func(res *types.TacSimulateResponse)
+	}{
+		{
+			name: "fail - nil request",
+			getReq: func() *types.TacSimulateRequest {
+				return nil
+			},
+			expErr: true,
+		},
+		{
+			name: "fail - invalid args",
+			getReq: func() *types.TacSimulateRequest {
+				return &types.TacSimulateRequest{
+					Args:   []byte("invalid args"),
+					GasCap: config.DefaultGasCap,
+				}
+			},
+			expErr: true,
+		},
+		{
+			name: "fail - invalid state override json",
+			getReq: func() *types.TacSimulateRequest {
+				args, err := json.Marshal(&types.TransactionArgs{
+					From: &sender,
+					To:   &contractAddr,
+					Data: (*hexutil.Bytes)(&transferData),
+				})
+				s.Require().NoError(err)
+
+				return &types.TacSimulateRequest{
+					Args:            args,
+					Overrides:       []byte("invalid json"),
+					GasCap:          config.DefaultGasCap,
+					ProposerAddress: proposerAddress,
+				}
+			},
+			expErr: true,
+		},
+		{
+			name: "pass - successful transfer reports output, logs and gas estimate",
+			getReq: func() *types.TacSimulateRequest {
+				args, err := json.Marshal(&types.TransactionArgs{
+					From: &sender,
+					To:   &contractAddr,
+					Data: (*hexutil.Bytes)(&transferData),
+				})
+				s.Require().NoError(err)
+
+				return &types.TacSimulateRequest{
+					Args:            args,
+					GasCap:          config.DefaultGasCap,
+					ProposerAddress: proposerAddress,
+				}
+			},
+			validate: func(res *types.TacSimulateResponse) {
+				s.Require().Empty(res.VmError)
+				s.Require().NotEmpty(res.Ret)
+				s.Require().NotZero(res.GasEstimated)
+
+				// the ERC20 transfer emits a single Transfer event
+				s.Require().Len(res.Logs, 1)
+				s.Require().Equal(contractAddr, common.HexToAddress(res.Logs[0].Address))
+			},
+		},
+		{
+			name: "pass - revert is reported in the result, not as an error",
+			getReq: func() *types.TacSimulateRequest {
+				args, err := json.Marshal(&types.TransactionArgs{
+					From: &sender,
+					To:   &overriddenAddr,
+				})
+				s.Require().NoError(err)
+
+				override := rpctypes.StateOverride{
+					overriddenAddr: codeOverride(revertingContractCode()),
+				}
+				overrideBz, err := json.Marshal(override)
+				s.Require().NoError(err)
+
+				return &types.TacSimulateRequest{
+					Args:            args,
+					Overrides:       overrideBz,
+					GasCap:          config.DefaultGasCap,
+					ProposerAddress: proposerAddress,
+				}
+			},
+			validate: func(res *types.TacSimulateResponse) {
+				s.Require().Equal(vm.ErrExecutionReverted.Error(), res.VmError)
+				s.Require().Equal(revertPayload.Bytes(), res.Ret)
+				// the binary search cannot find a working gas limit for a call
+				// that always reverts, so the estimation is reported as unknown
+				s.Require().Zero(res.GasEstimated)
+			},
+		},
+		{
+			name: "pass - state override is visible to the simulated execution",
+			getReq: func() *types.TacSimulateRequest {
+				args, err := json.Marshal(&types.TransactionArgs{
+					From: &sender,
+					To:   &overriddenAddr,
+				})
+				s.Require().NoError(err)
+
+				overriddenBalance := (*hexutil.Big)(big.NewInt(123456789))
+				override := rpctypes.StateOverride{
+					overriddenAddr: codeOverride(balanceReaderContractCode(recipient)),
+					recipient:      {Balance: &overriddenBalance},
+				}
+				overrideBz, err := json.Marshal(override)
+				s.Require().NoError(err)
+
+				return &types.TacSimulateRequest{
+					Args:            args,
+					Overrides:       overrideBz,
+					GasCap:          config.DefaultGasCap,
+					ProposerAddress: proposerAddress,
+				}
+			},
+			validate: func(res *types.TacSimulateResponse) {
+				s.Require().Empty(res.VmError)
+				s.Require().Equal("123456789", new(big.Int).SetBytes(res.Ret).String())
+
+				// the simulation must not have committed the overridden balance
+				committed := s.Network.App.GetEVMKeeper().GetBalance(s.Network.GetContext(), recipient)
+				s.Require().True(committed.IsZero(), "state override leaked into the committed state")
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			res, err := s.Network.App.GetEVMKeeper().TacSimulate(s.Network.GetContext(), tc.getReq())
+
+			if tc.expErr {
+				s.Require().Error(err)
+				return
+			}
+
+			s.Require().NoError(err)
+			s.Require().NotNil(res)
+			tc.validate(res)
+		})
+	}
+}
+
+// TestTacSimulateGasEstimation covers the part of tac_simulate that eth_call has
+// no equivalent for: the gas estimate has to be computed on the same overridden
+// state the call itself ran on.
+func (s *KeeperTestSuite) TestTacSimulateGasEstimation() {
+	s.SetupTest()
+
+	proposerAddress := s.Network.GetContext().BlockHeader().ProposerAddress
+	sender := s.Keyring.GetAddr(0)
+	// neither of these holds funds or code on chain
+	unfunded := common.HexToAddress("0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+	target := common.HexToAddress("0x1234567890123456789012345678901234567890")
+
+	newReq := func(args types.TransactionArgs, override rpctypes.StateOverride) *types.TacSimulateRequest {
+		argsBz, err := json.Marshal(&args)
+		s.Require().NoError(err)
+
+		var overrideBz []byte
+		if override != nil {
+			overrideBz, err = json.Marshal(override)
+			s.Require().NoError(err)
+		}
+
+		return &types.TacSimulateRequest{
+			Args:            argsBz,
+			Overrides:       overrideBz,
+			GasCap:          config.DefaultGasCap,
+			ProposerAddress: proposerAddress,
+		}
+	}
+
+	simulate := func(args types.TransactionArgs, override rpctypes.StateOverride) *types.TacSimulateResponse {
+		res, err := s.Network.App.GetEVMKeeper().TacSimulate(s.Network.GetContext(), newReq(args, override))
+		s.Require().NoError(err)
+		return res
+	}
+
+	s.Run("estimate runs on the overridden state", func() {
+		args := types.TransactionArgs{From: &sender, To: &target}
+
+		// calling an account without code is a plain transfer
+		res := simulate(args, nil)
+		s.Require().Equal(ethparams.TxGas, res.GasEstimated)
+
+		// injecting code makes the very same call cost more, which the estimate
+		// can only notice by running under the override
+		res = simulate(args, rpctypes.StateOverride{
+			target: codeOverride(balanceReaderContractCode(target)),
+		})
+		s.Require().Empty(res.VmError)
+		s.Require().Greater(res.GasEstimated, ethparams.TxGas)
+	})
+
+	s.Run("estimate honours a balance override on the sender", func() {
+		// a gas price is what brings the balance recap into play at all
+		gasPrice := (*hexutil.Big)(big.NewInt(1e10))
+		args := types.TransactionArgs{From: &unfunded, To: &target, GasPrice: gasPrice}
+
+		// the sender cannot fund any gas, so there is no estimate to report,
+		// while the call itself still goes through
+		res := simulate(args, nil)
+		s.Require().Empty(res.VmError)
+		s.Require().Zero(res.GasEstimated)
+
+		// overriding its balance has to give the estimation something to work with
+		balance := (*hexutil.Big)(big.NewInt(1e18))
+		res = simulate(args, rpctypes.StateOverride{unfunded: {Balance: &balance}})
+		s.Require().Empty(res.VmError)
+		s.Require().Equal(ethparams.TxGas, res.GasEstimated)
+	})
+}
+
+// revertPayload is the data the contract returned by revertingContractCode
+// reverts with.
+var revertPayload = common.BigToHash(big.NewInt(0xdeadbeef))
+
+// revertingContractCode returns the bytecode of a contract that always reverts
+// with revertPayload.
+func revertingContractCode() []byte {
+	code := append([]byte{0x7f}, revertPayload.Bytes()...) // PUSH32 <revertPayload>
+	return append(code, []byte{
+		0x60, 0x00, // PUSH1 0x00
+		0x52,       // MSTORE
+		0x60, 0x20, // PUSH1 0x20
+		0x60, 0x00, // PUSH1 0x00
+		0xfd, // REVERT
+	}...)
+}
+
+// balanceReaderContractCode returns the bytecode of a contract that returns the
+// balance of addr as seen by the EVM.
+func balanceReaderContractCode(addr common.Address) []byte {
+	code := append([]byte{0x73}, addr.Bytes()...) // PUSH20 <addr>
+	return append(code, []byte{
+		0x31,       // BALANCE
+		0x60, 0x00, // PUSH1 0x00
+		0x52,       // MSTORE
+		0x60, 0x20, // PUSH1 0x20
+		0x60, 0x00, // PUSH1 0x00
+		0xf3, // RETURN
+	}...)
+}
+
+func codeOverride(code []byte) rpctypes.OverrideAccount {
+	return rpctypes.OverrideAccount{Code: (*hexutil.Bytes)(&code)}
 }
 
 func (s *KeeperTestSuite) TestBalance() {
