@@ -414,6 +414,15 @@ func (k Keeper) EstimateGasInternal(c context.Context, req *types.EthCallRequest
 
 		balance := k.bankWrapper.SpendableCoin(ctx, sdk.AccAddress(args.From.Bytes()), baseDenom)
 		available := balance.Amount
+		// A balance override has to be visible here as well. Otherwise the search
+		// is capped by funds the simulated sender is not meant to have, and a
+		// caller pricing a call for a not yet funded account gets no estimate at
+		// all. go-ethereum reads this off the overridden state for that reason.
+		if overrides != nil {
+			if account, ok := (*overrides)[args.GetFrom()]; ok && account.Balance != nil && *account.Balance != nil {
+				available = sdkmath.NewIntFromBigInt((*big.Int)(*account.Balance))
+			}
+		}
 		transfer := "0"
 		if args.Value != nil {
 			if args.Value.ToInt().Cmp(available.BigInt()) >= 0 {

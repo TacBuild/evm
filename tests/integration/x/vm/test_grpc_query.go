@@ -2205,6 +2205,77 @@ func (s *KeeperTestSuite) TestTacSimulate() {
 	}
 }
 
+// TestTacSimulateGasEstimation covers the part of tac_simulate that eth_call has
+// no equivalent for: the gas estimate has to be computed on the same overridden
+// state the call itself ran on.
+func (s *KeeperTestSuite) TestTacSimulateGasEstimation() {
+	s.SetupTest()
+
+	proposerAddress := s.Network.GetContext().BlockHeader().ProposerAddress
+	sender := s.Keyring.GetAddr(0)
+	// neither of these holds funds or code on chain
+	unfunded := common.HexToAddress("0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+	target := common.HexToAddress("0x1234567890123456789012345678901234567890")
+
+	newReq := func(args types.TransactionArgs, override rpctypes.StateOverride) *types.TacSimulateRequest {
+		argsBz, err := json.Marshal(&args)
+		s.Require().NoError(err)
+
+		var overrideBz []byte
+		if override != nil {
+			overrideBz, err = json.Marshal(override)
+			s.Require().NoError(err)
+		}
+
+		return &types.TacSimulateRequest{
+			Args:            argsBz,
+			Overrides:       overrideBz,
+			GasCap:          config.DefaultGasCap,
+			ProposerAddress: proposerAddress,
+		}
+	}
+
+	simulate := func(args types.TransactionArgs, override rpctypes.StateOverride) *types.TacSimulateResponse {
+		res, err := s.Network.App.GetEVMKeeper().TacSimulate(s.Network.GetContext(), newReq(args, override))
+		s.Require().NoError(err)
+		return res
+	}
+
+	s.Run("estimate runs on the overridden state", func() {
+		args := types.TransactionArgs{From: &sender, To: &target}
+
+		// calling an account without code is a plain transfer
+		res := simulate(args, nil)
+		s.Require().Equal(ethparams.TxGas, res.GasEstimated)
+
+		// injecting code makes the very same call cost more, which the estimate
+		// can only notice by running under the override
+		res = simulate(args, rpctypes.StateOverride{
+			target: codeOverride(balanceReaderContractCode(target)),
+		})
+		s.Require().Empty(res.VmError)
+		s.Require().Greater(res.GasEstimated, ethparams.TxGas)
+	})
+
+	s.Run("estimate honours a balance override on the sender", func() {
+		// a gas price is what brings the balance recap into play at all
+		gasPrice := (*hexutil.Big)(big.NewInt(1e10))
+		args := types.TransactionArgs{From: &unfunded, To: &target, GasPrice: gasPrice}
+
+		// the sender cannot fund any gas, so there is no estimate to report,
+		// while the call itself still goes through
+		res := simulate(args, nil)
+		s.Require().Empty(res.VmError)
+		s.Require().Zero(res.GasEstimated)
+
+		// overriding its balance has to give the estimation something to work with
+		balance := (*hexutil.Big)(big.NewInt(1e18))
+		res = simulate(args, rpctypes.StateOverride{unfunded: {Balance: &balance}})
+		s.Require().Empty(res.VmError)
+		s.Require().Equal(ethparams.TxGas, res.GasEstimated)
+	})
+}
+
 // revertPayload is the data the contract returned by revertingContractCode
 // reverts with.
 var revertPayload = common.BigToHash(big.NewInt(0xdeadbeef))
