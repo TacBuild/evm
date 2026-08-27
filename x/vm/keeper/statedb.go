@@ -10,10 +10,12 @@ import (
 	"github.com/cosmos/evm/x/vm/statedb"
 	"github.com/cosmos/evm/x/vm/types"
 
+	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	errortypes "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
@@ -114,6 +116,17 @@ func (k *Keeper) SetBalance(ctx sdk.Context, addr common.Address, amount *uint25
 		return nil
 	}
 	cosmosAddr := sdk.AccAddress(addr.Bytes())
+
+	// Never mint/burn against a module account through the EVM balance path.
+	// SetBalance reconciles an account's bank balance to a target by minting or
+	// burning the delta; module accounts have their balances managed by their own
+	// module logic and must not be written through the EVM statedb commit path.
+	if acct := k.accountKeeper.GetAccount(ctx, cosmosAddr); acct != nil {
+		if _, isModule := acct.(sdk.ModuleAccountI); isModule {
+			return errorsmod.Wrapf(errortypes.ErrUnauthorized, "%s is not allowed to receive funds", cosmosAddr)
+		}
+	}
+
 	coin := k.bankWrapper.SpendableCoin(ctx, cosmosAddr, types.GetEVMCoinDenom())
 
 	balance := coin.Amount.BigInt()

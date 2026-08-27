@@ -12,6 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	ethparams "github.com/ethereum/go-ethereum/params"
 	"github.com/holiman/uint256"
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/cosmos/evm/x/vm/statedb"
@@ -744,4 +745,23 @@ func CollectContractStorage(db vm.StateDB) statedb.Storage {
 
 func TestStateDBTestSuite(t *testing.T) {
 	suite.Run(t, &StateDBTestSuite{})
+}
+
+func TestAddBalanceOverflow(t *testing.T) {
+	newDB := func() *statedb.StateDB {
+		return statedb.New(sdk.Context{}.WithEventManager(sdk.NewEventManager()), mocks.NewEVMKeeper(), emptyTxConfig)
+	}
+
+	// Overflowing uint256 must panic, not silently wrap around to near zero.
+	db := newDB()
+	db.AddBalance(address, new(uint256.Int).SetAllOne(), tracing.BalanceChangeUnspecified)
+	require.Panics(t, func() {
+		db.AddBalance(address, uint256.NewInt(1), tracing.BalanceChangeUnspecified)
+	})
+
+	// A non-overflowing add still updates the balance normally.
+	db = newDB()
+	db.AddBalance(address, uint256.NewInt(100), tracing.BalanceChangeUnspecified)
+	db.AddBalance(address, uint256.NewInt(23), tracing.BalanceChangeUnspecified)
+	require.Equal(t, uint256.NewInt(123), db.GetBalance(address))
 }
