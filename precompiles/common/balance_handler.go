@@ -82,6 +82,10 @@ func (bh *BalanceHandler) AfterBalanceChange(ctx sdk.Context, stateDB *statedb.S
 			if err != nil {
 				return fmt.Errorf("failed to parse spender address from event %q: %w", banktypes.EventTypeCoinSpent, err)
 			}
+			// EVM state only tracks 20-byte accounts.
+			if len(spenderAddr.Bytes()) != common.AddressLength {
+				continue
+			}
 			if bh.bankKeeper.BlockedAddr(spenderAddr) {
 				// Bypass blocked addresses
 				continue
@@ -123,6 +127,10 @@ func (bh *BalanceHandler) AfterBalanceChange(ctx sdk.Context, stateDB *statedb.S
 			if err != nil {
 				return fmt.Errorf("failed to parse receiver address from event %q: %w", banktypes.EventTypeCoinReceived, err)
 			}
+			// EVM state only tracks 20-byte accounts.
+			if len(receiverAddr.Bytes()) != common.AddressLength {
+				continue
+			}
 			if bh.bankKeeper.BlockedAddr(receiverAddr) {
 				// Bypass blocked addresses
 				continue
@@ -139,6 +147,10 @@ func (bh *BalanceHandler) AfterBalanceChange(ctx sdk.Context, stateDB *statedb.S
 			addr, err := ParseAddress(event, precisebanktypes.AttributeKeyAddress)
 			if err != nil {
 				return fmt.Errorf("failed to parse address from event %q: %w", precisebanktypes.EventTypeFractionalBalanceChange, err)
+			}
+			// EVM state only tracks 20-byte accounts.
+			if len(addr.Bytes()) != common.AddressLength {
+				continue
 			}
 			if bh.bankKeeper.BlockedAddr(addr) {
 				// Bypass blocked addresses
