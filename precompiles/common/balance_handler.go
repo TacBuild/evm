@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/holiman/uint256"
 
@@ -82,12 +81,15 @@ func (bh *BalanceHandler) AfterBalanceChange(ctx sdk.Context, stateDB *statedb.S
 			if err != nil {
 				return fmt.Errorf("failed to parse spender address from event %q: %w", banktypes.EventTypeCoinSpent, err)
 			}
-			// EVM state only tracks 20-byte accounts.
-			if len(spenderAddr.Bytes()) != common.AddressLength {
+
+			// Skip non-EVM addresses
+			spenderEVM, ok := addressToEVM(spenderAddr)
+			if !ok {
 				continue
 			}
+
+			// Bypass blocked addresses
 			if bh.bankKeeper.BlockedAddr(spenderAddr) {
-				// Bypass blocked addresses
 				continue
 			}
 
@@ -120,17 +122,20 @@ func (bh *BalanceHandler) AfterBalanceChange(ctx sdk.Context, stateDB *statedb.S
 			// (non-vesting) spends locked is zero, so this equals amount.
 			sub := new(uint256.Int).Sub(amount, locked)
 
-			stateDB.SubBalance(common.BytesToAddress(spenderAddr.Bytes()), sub, tracing.BalanceChangeUnspecified)
+			stateDB.SubBalance(spenderEVM, sub, tracing.BalanceChangeUnspecified)
 
 		case banktypes.EventTypeCoinReceived:
 			receiverAddr, err := ParseAddress(event, banktypes.AttributeKeyReceiver)
 			if err != nil {
 				return fmt.Errorf("failed to parse receiver address from event %q: %w", banktypes.EventTypeCoinReceived, err)
 			}
-			// EVM state only tracks 20-byte accounts.
-			if len(receiverAddr.Bytes()) != common.AddressLength {
+
+			// Skip non-EVM addresses
+			receiverEVM, ok := addressToEVM(receiverAddr)
+			if !ok {
 				continue
 			}
+
 			if bh.bankKeeper.BlockedAddr(receiverAddr) {
 				// Bypass blocked addresses
 				continue
@@ -141,19 +146,22 @@ func (bh *BalanceHandler) AfterBalanceChange(ctx sdk.Context, stateDB *statedb.S
 				return fmt.Errorf("failed to parse amount from event %q: %w", banktypes.EventTypeCoinReceived, err)
 			}
 
-			stateDB.AddBalance(common.BytesToAddress(receiverAddr.Bytes()), amount, tracing.BalanceChangeUnspecified)
+			stateDB.AddBalance(receiverEVM, amount, tracing.BalanceChangeUnspecified)
 
 		case precisebanktypes.EventTypeFractionalBalanceChange:
 			addr, err := ParseAddress(event, precisebanktypes.AttributeKeyAddress)
 			if err != nil {
 				return fmt.Errorf("failed to parse address from event %q: %w", precisebanktypes.EventTypeFractionalBalanceChange, err)
 			}
-			// EVM state only tracks 20-byte accounts.
-			if len(addr.Bytes()) != common.AddressLength {
+
+			// Skip non-EVM addresses
+			addrEVM, ok := addressToEVM(addr)
+			if !ok {
 				continue
 			}
+
+			// Bypass blocked addresses
 			if bh.bankKeeper.BlockedAddr(addr) {
-				// Bypass blocked addresses
 				continue
 			}
 
@@ -168,9 +176,9 @@ func (bh *BalanceHandler) AfterBalanceChange(ctx sdk.Context, stateDB *statedb.S
 			}
 
 			if delta.Sign() == 1 {
-				stateDB.AddBalance(common.BytesToAddress(addr.Bytes()), deltaAbs, tracing.BalanceChangeUnspecified)
+				stateDB.AddBalance(addrEVM, deltaAbs, tracing.BalanceChangeUnspecified)
 			} else if delta.Sign() == -1 {
-				stateDB.SubBalance(common.BytesToAddress(addr.Bytes()), deltaAbs, tracing.BalanceChangeUnspecified)
+				stateDB.SubBalance(addrEVM, deltaAbs, tracing.BalanceChangeUnspecified)
 			}
 
 		default:
