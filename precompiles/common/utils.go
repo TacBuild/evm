@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/holiman/uint256"
 
 	"github.com/cosmos/evm/utils"
@@ -29,6 +30,16 @@ func ParseAddress(event sdk.Event, key string) (sdk.AccAddress, error) {
 	}
 
 	return accAddr, nil
+}
+
+// addressToEVM converts Cosmos address to EVM or returns false.
+// bech32 allows 20+ bytes, while evm is 20 bytes fixed.
+func addressToEVM(addr sdk.AccAddress) (common.Address, bool) {
+	if len(addr.Bytes()) != common.AddressLength {
+		return common.Address{}, false
+	}
+
+	return common.BytesToAddress(addr.Bytes()), true
 }
 
 func ParseAmount(event sdk.Event) (*uint256.Int, error) {
